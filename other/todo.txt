@@ -1,0 +1,12 @@
+-Signin
+  - Rememebr me functionality
+-Signup
+  - Email verification // turn it off so that i can use fake emails
+
+
+
+-app
+  - Add too many auth requests functionality as a context component surrounding the app
+    - If the error.code === 'auth/too-many-requests' then setTimeout for exponentially increasing timestamp
+    - Could change it tho
+  - See if I can combine EmailNotVerified and EmailVerification components since the two resendEmail functions are the exact same and so are like the buttons

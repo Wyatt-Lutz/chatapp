@@ -1,0 +1,17 @@
+We will have authContext similar to vid
+Also have chatcontext or someting in in which
+  Firebase has a users section and and a chats section
+    users
+      email
+      password
+      pfp
+      uids that have chatted with
+    chats
+      chatID
+      messages
+        message
+        timestamp
+        user or something
+  So the app loads the chats the user has chatted with but not any of the messages, just the dm from the home page
+  Then when user clicks on the chat, it then loads the messages by having the chatID be the two uids added together
+  Im not sure if ill use chatcontext but I will probably use useReducer
