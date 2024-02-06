@@ -18,6 +18,7 @@ const Signup = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
 
+
       await setDoc(doc(db, "users", uid), {
         email: email,
         username: username,

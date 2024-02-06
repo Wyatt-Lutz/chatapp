@@ -15,3 +15,23 @@ Also have chatcontext or someting in in which
   So the app loads the chats the user has chatted with but not any of the messages, just the dm from the home page
   Then when user clicks on the chat, it then loads the messages by having the chatID be the two uids added together
   Im not sure if ill use chatcontext but I will probably use useReducer
+
+
+
+
+
+
+Layout:
+  Sidebar of Dm's
+  Main Chat area
+    - timestamp
+    - Search functionality
+
+
+  Controls area (Settings, friends, profile )
+  Settings
+    change password
+    cahnge email
+    Block list
+    Logout
+
