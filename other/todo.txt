@@ -2,6 +2,7 @@
   - Rememebr me functionality
 -Signup
   - Email verification // turn it off so that i can use fake emails
+  - Think aboiut whetehr there can be duplicate usernames and then have #**** or just every username has to be unique
 
 
 
