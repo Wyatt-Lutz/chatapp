@@ -1,5 +1,4 @@
-We will have authContext similar to vid
-Also have chatcontext or someting in in which
+
   Firebase has a users section and and a chats section
     users
       email
@@ -17,6 +16,13 @@ Also have chatcontext or someting in in which
   Im not sure if ill use chatcontext but I will probably use useReducer
 
 
+
+So well have groupdm
+in whcih it is created by one user who can add multiple users to it on creation in the addUser function
+so the chatID should be the addition of all the user ids from largest to smallest, but since the uids are hexademical, I may need to use numbers
+
+Also each user has a userChats document of all the chats they are in with chatID and recipeitns, not messages
+Keep chats collection because people can be added to chats
 
 
 
