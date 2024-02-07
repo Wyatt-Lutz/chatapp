@@ -1,6 +1,6 @@
 const UserBar = () => {
   return (
-    <div>UserBar</div>
+    <div className="ring p-2">Settings</div>
   )
 }
 export default UserBar;

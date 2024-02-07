@@ -46,9 +46,9 @@ const Signup = () => {
         <EmailVerification email={email} />
       ) :
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-          <input type="text" placeholder="Username" {...register('username', { required: true })}></input>
-          <input type="email" placeholder="Email" {...register('email', { required: true })}></input>
-          <input type="password" placeholder="******" {...register('password', { required: true })}></input>
+          <input type="text" placeholder="Username" {...register('username', { required: true, maxLength: 15 })}></input>
+          <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 50 })}></input>
+          <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 100 })}></input>
           <div className="italic text-sm">*Must be at least 6 characters</div>
           <button type="submit" className="border rounded-md bg-zinc-500">Signup</button>
         </form>

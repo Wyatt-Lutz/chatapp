@@ -4,10 +4,14 @@ import UserBar from './UserBar'
 
 const Main = () => {
   return (
-    <section>
+    <section className='flex justify-center items-center h-screen'>
+      <div className='flex ring flex-col'>
+        <SideBar />
+        <UserBar />
+      </div>
       <ChatScreen />
-      <SideBar />
-      <UserBar />
+
+
     </section>
 
   )

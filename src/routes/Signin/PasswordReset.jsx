@@ -28,7 +28,7 @@ const PasswordReset = ({passChange}) => {
   return (
     <section>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-        <input type="email" placeholder="Email" {...register('email', { required: true })}></input>
+        <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 50 })}></input>
         <button type="submit" className="border rounded-md bg-zinc-500">Signup</button>
       </form>
       <button onClick={() => passChange(false)} className="border rounded-md bg-zinc-500 m-2 p-1">Return to Signin</button>

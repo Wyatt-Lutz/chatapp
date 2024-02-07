@@ -119,8 +119,8 @@ const Signin = () => {
       ) : (
         <div>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-            <input type="email" placeholder="Email" {...register('email', { required: true })}></input>
-            <input type="password" placeholder="******" {...register('password', { required: true })}></input>
+            <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 50 })}></input>
+            <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 100 })}></input>
             <button type="submit" className="border rounded-md bg-zinc-500">Signin</button>
           </form>
           <button onClick={() => setPassReset(true)}>Forgot Password?</button>

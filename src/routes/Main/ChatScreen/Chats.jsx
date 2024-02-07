@@ -1,6 +1,6 @@
 const Chats = () => {
   return(
-    <div>Chats</div>
+    <div className="m-10 ring">Chats</div>
   )
 }
 
