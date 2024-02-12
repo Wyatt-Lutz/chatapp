@@ -22,10 +22,9 @@ in whcih it is created by one user who can add multiple users to it on creation 
 so the chatID should be the addition of all the user ids from largest to smallest, but since the uids are hexademical, I may need to use numbers
 
 Also each user has a userChats document of all the chats they are in with chatID and recipeitns, not messages
-Keep chats collection because people can be added to chats
 
 
-
+so if we click on an empty chat then we need to have error handling so that if there is no messages array then just have div, "its empty in here" or something
 
 Layout:
   Sidebar of Dm's

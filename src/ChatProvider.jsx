@@ -1,9 +1,8 @@
-import { createContext, useReducer, useContext } from "react";
-import { AuthContext } from "./AuthProvider";
+import { createContext, useReducer } from "react";
+
 
 export const ChatContext = createContext();
 export const ChatContextProvider = ({ children }) => {
-  const { currentUser } = useContext(AuthContext);
   const initialState = {
     chatID: null,
     user: {},
@@ -13,8 +12,7 @@ export const ChatContextProvider = ({ children }) => {
     switch (action.type) {
       case "CHANGE_CHAT":
         return {
-          user: action.payload,
-          chatID: currentUser.uid + action.payload.uid,
+          chatID: action.payload,
         };
 
         default:

@@ -2,9 +2,12 @@
   - Rememebr me functionality
 -Signup
   - Email verification // turn it off so that i can use fake emails
-  - Think aboiut whetehr there can be duplicate usernames and then have #**** or just every username has to be unique
+  - Think I need to prevent duplicate usernames becauser of adding people to chats
 
-
+-Sidebar
+  - when the chat is created, automatically go to the chat, dont know how to do that rn
+  - With each chatName / recipeints for chat name, have ... for the limit of the name like 'Literally Lob...'
+  - Sort the chatbar for most recent chatted in on top, need to add a timestamp or something
 
 -app
   - Add too many auth requests functionality as a context component surrounding the app
@@ -14,4 +17,5 @@
 
 
 
--in readme credit lama dev for chat context (if I use it)
+-in readme credit lama dev for chat context
+   - link youtube video on the words lama dev if possilbe
