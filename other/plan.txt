@@ -26,6 +26,18 @@ Also each user has a userChats document of all the chats they are in with chatID
 
 so if we click on an empty chat then we need to have error handling so that if there is no messages array then just have div, "its empty in here" or something
 
+
+
+add implementation for undread messages
+
+add implementation to prevent spamming
+
+
+
+BIG:
+  I need to prevent having to pay for this so try and minizmze write and read requests
+  documnet max size is 1 MiB so find some way around this like deleting chats after number reached in database
+
 Layout:
   Sidebar of Dm's
   Main Chat area

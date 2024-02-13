@@ -10,12 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.20.2",
+    "@tanstack/react-query-devtools": "^5.20.2",
     "crypto-js": "^4.2.0",
     "firebase": "^10.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.1",
-    "react-router-dom": "^6.22.0"
+    "react-router-dom": "^6.22.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",

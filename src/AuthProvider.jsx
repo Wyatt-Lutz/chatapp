@@ -10,9 +10,11 @@ export const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     const authState = onAuthStateChanged(auth, (user) => {
       setCurrUser(user);
+      console.info('authstate listener subscribe');
     });
     return () => {
       authState();
+      console.info('auth state listener unsubscribe');
     };
   }, []);
 

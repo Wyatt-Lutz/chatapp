@@ -3,7 +3,7 @@ import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 
-import {collection, getDocs, getDoc, setDoc, updateDoc, doc, query} from 'firebase/firestore';
+import {collection, getDocs, getDoc, setDoc, updateDoc, doc, query, onSnapshot} from 'firebase/firestore';
 import { db } from "../../../../firebase";
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
@@ -17,40 +17,42 @@ const ChatBar = () => {
   const [chats, setChats] = useState([]);
 
 
-
   const docRef = collection(db, 'users');
 
-  useEffect(() => {
 
-    const getChats = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "users", currUser.uid, "userChats"));
-        const fetchedChats  = querySnapshot.docs.map((doc) => {
-          return{
-            chatID: doc.data().chatID,
-            chatName: doc.data().chatName,
-            recipients: doc.data().recipients,
-          }
-        })
-        setChats(fetchedChats);
+  const getChats = async () => {
 
-
-
-
-
-
-
-      } catch (error) {
-        console.error(error);
-      }
+    console.info('chatBar getChats run');
+    const querySnapshot = query(collection(db, "users", currUser.uid, "userChats"));
+    const listener = onSnapshot(querySnapshot, (snap) => {
+      const fetchedChats = snap.docs.map((doc) => {
+        return{
+          chatID: doc.data().chatID,
+          chatName: doc.data().chatName,
+          recipients: doc.data().recipients,
+        };
+      });
+      console.info('fetched chatBar chats');
+      setChats(fetchedChats);
+    });
+    return () => {
+      console.info("unsubscribing from chatBar listner")
+      listener();
     }
-    getChats();
-  }, [chats]);
+  }
+
+  useEffect(() => {
+    if (currUser.uid) {
+      getChats();
+    }
+
+  }, []);
+
+
 
 
   const addUser = async ({recipient}) => {
     try {
-      console.log(addUserUsers);
 
       const snap = await getDocs(docRef);
       const recipientUser = snap.docs.find((doc) => doc.data().username === recipient);
@@ -63,6 +65,7 @@ const ChatBar = () => {
         console.info('user already added') //toast
         return;
       }
+      console.info('added user to chatbar')
       setAddUserUsers(prev => [...prev, recipientUser])
 
     } catch (error) {
@@ -72,7 +75,7 @@ const ChatBar = () => {
 
   const createChat = async ({chatName}) => {
     try {
-
+      console.info('created chat')
       const uids = [currUser.uid];
       addUserUsers.forEach((user) => uids.push(user.data().uid));
       const recipients = [];
@@ -84,18 +87,14 @@ const ChatBar = () => {
         return numA - numB;
       }
       uids.sort(sortUids);
-      console.log(uids);
+
       const chatID = uids.join("");
-      console.log(chatID);
+
 
 
       await setDoc(doc(db, "chats", chatID), {
         name: chatName ?? "",
         chatID: chatID,
-        messages: {
-          text: "",
-
-        },
       });
 
 

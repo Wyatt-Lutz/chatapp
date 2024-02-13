@@ -14,6 +14,7 @@
     - If the error.code === 'auth/too-many-requests' then setTimeout for exponentially increasing timestamp
     - Could change it tho
   - See if I can combine EmailNotVerified and EmailVerification components since the two resendEmail functions are the exact same and so are like the buttons
+  - THe Authprotected routes thing is broken, I can go to localhost without having to sign in
 
 
 
