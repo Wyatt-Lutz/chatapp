@@ -33,6 +33,7 @@ const ChatBar = () => {
         };
       });
       console.info('fetched chatBar chats');
+
       setChats(fetchedChats);
     });
     return () => {

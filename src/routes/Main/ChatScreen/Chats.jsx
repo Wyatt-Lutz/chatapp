@@ -1,10 +1,11 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { ChatContext } from "../../../ChatProvider";
 import { AuthContext } from "../../../AuthProvider";
-import { onSnapshot, doc, getDoc, getDocs, collection, Timestamp, arrayUnion, updateDoc, query, startAfter } from "firebase/firestore";
+import { onSnapshot, doc, getDoc, orderBy, limit, setDoc, getDocs, collection, Timestamp, arrayUnion, updateDoc, query, startAfter, serverTimestamp } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from 'uuid';
+import { initializeApp } from "firebase/app";
 //import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 
 
@@ -17,105 +18,161 @@ import { v4 as uuidv4 } from 'uuid';
 */
 
 const Chats = () => {
-  const [chats, setChats] = useState([]);
+  const [messageData, setMessageData] = useState([]);
   const [lastChat, setLastChat] = useState(null);
   const { register, handleSubmit, resetField } = useForm();
   const {data} = useContext(ChatContext);
   const {currUser} = useContext(AuthContext);
   //const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
-  const endOfChatsRef = useRef(null);
+  const endOfChatsRef = useRef(true);
+  const initialMount = useRef(true);
+  const currMessage = useRef();
 
 
 
 
-  const fetchChats = async (startAfterChat = null) => {
-    console.log('fetch More Chats run');
+  const fetchChats = async (startAfterChat) => {
+    console.info('fetch Chats run');
     setLoading(true);
     try{
-      const chatQuery = query(collection(db, "chats", data.chatID).orderBy("date").limit(50), startAfterChat ? startAfter(lastChat) : undefined);
+      const messageData = [];
+      const chatRef = collection(db, "chats", data.chatID, "messages");
+
+      const chatQuery = startAfterChat
+        ? query(chatRef, orderBy("date", "desc"), startAfter(startAfterChat), limit(25))
+        : query(chatRef, orderBy("date", "desc"), limit(25));
       const querySnapshot = await getDocs(chatQuery);
-      const messages = querySnapshot.data().messages;
-      const lastChated = messages[messages.length - 1]; // otherwise the 49th index
+      if (querySnapshot.empty) {
+        console.info('querySnap at fetch chats empty');
+        return;
+      }
+      querySnapshot.forEach((chat) => {
+        messageData.push(chat.data());
+      })
+      setMessageData((prev) => [...messageData.reverse(), ...prev]);
+
+      const lastChated = querySnapshot.docs[querySnapshot.docs.length - 1]; // in other words the 49th index
       setLastChat(lastChated);
-      startAfterChat ? setChats((prev) => [...prev, messages]) : setChats(messages); //test if I can just have ...prev even if setChats is empty array
+
 
     } catch (error) {
       console.error(error)
     } finally {
       setLoading(false);
+
     }
 
 
   }
+
   const fetchMoreChats = () => {
-    if (!data.chatID || !lastChat) {
-      console.error('No last chat or chatID, fetch more chats shouldnt run')
-      return; //toast error or somthing
+    if (!data.chatID) {
+      console.error('No chatID, fetch more chats should not run');
+      return;
     }
-    fetchChats(lastChat);
 
+    if (lastChat) {
+      fetchChats(lastChat);
+    } else {
+      console.error('No last chat, fetch more chats should not run');
+    }
   }
+
 
   useEffect(() => {
-
     if (!data.chatID) {
       console.info("chatID undefined");
       return; //make it so that It doesnt try to load chats
     }
-    if (data.chatID) {
-      fetchChats();
-    }
+    setMessageData([]);
+    initialMount.current = true;
+    fetchChats(null);
+    console.info('reset message data');
 
-    const chatListener = onSnapshot(doc(db, "chats", data.chatID), (snap) => {
-      console.log("chat listener ran");
-      const messages = snap.data()?.messages || [];
-      setChats(messages);
-      const lastChated = messages.length > 0 ? messages[messages.length-1] : null;
-      setLastChat(lastChated);
+
+    const chatRef = collection(db, "chats", data.chatID, "messages");
+    const chatQuery = query(chatRef, orderBy("date", "desc"));
+
+
+    const chatListener = onSnapshot(chatQuery, (snap) => {
+      if(initialMount.current) {
+        initialMount.current = false;
+        return;
+      }
+      console.info("chat listener ran");
+      const newMessageData = snap.docs[0].data();
+      setMessageData((prev) => [...prev, newMessageData]);
+
+      setLastChat(newMessageData);
+      currMessage.current?.scrollIntoView({behavior:"smooth"})
+
     });
 
+
     return () => chatListener();
-  }, [])
+
+  }, [data.chatID]);
 
 
   const addMessage = async({text}) => {
     resetField('text');
     console.info('added message to database')
-
-
-    await updateDoc(doc(db, "chats", data.chatID), {
-      messages: arrayUnion({
+    const chatID = uuidv4();
+    await setDoc(doc(db, "chats", data.chatID, "messages", chatID), {
         text: text,
-        date: Timestamp.now(),
-        id: uuidv4(),
+        id: chatID,
+        date: Date.now(),
         senderID: currUser.uid,
-      })
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
   };
 
   const handleScroll = () => {
     console.info('handle scroll run')
-    if (endOfChatsRef.current && endOfListRef.current.getBoundingClientRect().top <= window.innerHeight && !loading) {{
-      fetchMoreChats();
-    }}
+    const scrollY = window.scrollY;
+    if (scrollY <= 100) {
+      fetchMoreChats(lastChat);
+    }
   };
+/*
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return() => {
+      window.removeEventListener('scroll', handleScroll);
+    }
+  }, [data.chatID, lastChat]);
+*/
 
 
   return(
-    <section onScroll={handleScroll}>
+    <div>
 
-      {!data.chatID && (
+      {!data.chatID ? (
         <div>Friends online:</div> //firends online
+      ) : (
+        <div>
+          {messageData.map((chat) => (
+
+            <div className="text-xl font-bold py-2" key={chat.id}>{chat.text}</div>
+
+          ))}
+
+
+
+          <form onSubmit={handleSubmit(addMessage)}>
+            <input placeholder="Type here..." {...register('text', { required: true, maxLength: 200})}></input>
+          </form>
+
+          <button onClick={() => fetchChats(lastChat)}>Load more</button>
+          <div ref={currMessage}></div>
+
+        </div>
+
       )}
-      {chats.map((chat) => (
-        <div key={chat.id}>{chat.text}</div>
-      ))}
-      <div ref={endOfChatsRef}></div>
-      <form onSubmit={handleSubmit(addMessage)}>
-        <input placeholder="Type here..." {...register('text', { required: true, maxLength: 200})}></input>
-      </form>
-    </section>
+
+    </div>
   )
 }
 
