@@ -1,9 +1,13 @@
 -Signin
-  - Rememebr me functionality
+  - Add signup button
+
 -Signup
   - Email verification // turn it off so that i can use fake emails
   - Think I need to prevent duplicate usernames becauser of adding people to chats
 
+-chats
+  -Make sure chats doesnt run when you initially sign in
+  - Make it so the listnere subscribes only after fetchChats finishes everything
 -Sidebar
   - when the chat is created, automatically go to the chat, dont know how to do that rn
   - With each chatName / recipeints for chat name, have ... for the limit of the name like 'Literally Lob...'
@@ -13,6 +17,7 @@
   - Add too many auth requests functionality as a context component surrounding the app
     - If the error.code === 'auth/too-many-requests' then setTimeout for exponentially increasing timestamp
     - Could change it tho
+  - SOmething is wrong with user persistence i think
   - See if I can combine EmailNotVerified and EmailVerification components since the two resendEmail functions are the exact same and so are like the buttons
   - THe Authprotected routes thing is broken, I can go to localhost without having to sign in
 

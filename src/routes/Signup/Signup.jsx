@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db, auth } from "../../../firebase";
-import { createUserWithEmailAndPassword, sendEmailVerification} from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile} from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import EmailVerification from "./EmailVerification";
 
@@ -16,6 +16,7 @@ const Signup = () => {
     try {
       setEmail(email);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+     // await updateProfile(userCredential.user, {displayName: username});
       const uid = userCredential.user.uid;
 
 

@@ -1,9 +1,9 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 
-import {collection, getDocs, getDoc, setDoc, updateDoc, doc, query, onSnapshot} from 'firebase/firestore';
+import {collection, getDocs, getDoc, setDoc, updateDoc, where, doc, query, onSnapshot} from 'firebase/firestore';
 import { db } from "../../../../firebase";
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
@@ -15,40 +15,62 @@ const ChatBar = () => {
   const { currUser } = useContext(AuthContext);
   const [addUserUsers, setAddUserUsers] = useState([]); //excluded uid of currUser
   const [chats, setChats] = useState([]);
+  const initialMount = useRef(true);
 
 
   const docRef = collection(db, 'users');
 
+  const fetchChats = async () => {
+    try {
+      console.info("chatBar fetched initial chats");
+      const chatsQuery = query(collection(db, "chats"), where(`recipients.${currUser.displayName}`, "==", true));
+      const querySnapshot = await getDocs(chatsQuery);
+      if (querySnapshot.empty) {
+        console.info('chatBar querySnapshot empty')
+        return;
+      }
 
-  const getChats = async () => {
+      const chatsIn = querySnapshot.docs.map((chat) => ({
+        name: chat.data().name,
+        recipients: chat.data().recipients,
+        chatID: chat.data().chatID,
+      }));
 
-    console.info('chatBar getChats run');
-    const querySnapshot = query(collection(db, "users", currUser.uid, "userChats"));
-    const listener = onSnapshot(querySnapshot, (snap) => {
-      const fetchedChats = snap.docs.map((doc) => {
-        return{
-          chatID: doc.data().chatID,
-          chatName: doc.data().chatName,
-          recipients: doc.data().recipients,
-        };
-      });
-      console.info('fetched chatBar chats');
+      setChats(chatsIn);
 
-      setChats(fetchedChats);
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
+
+
+
+
+
+  useEffect(() => {
+    if (!currUser) {
+      console.info('no current user');
+      return;
+    }
+    fetchChats();
+    const chatsQuery = query(collection(db, "chats"),  where(`recipients.${currUser.displayName}`, "==", true));
+    const listener = onSnapshot(chatsQuery, (snap) => {
+      if(initialMount.current) {
+        console.info('subscribed to chatBar listener');
+        initialMount.current = false;
+        return;
+      }
+      console.info('Chatbar listener fetch chats');
+      const chatsIn = snap.docs.map((doc) => doc.data());
+      setChats(chatsIn);
+
     });
     return () => {
       console.info("unsubscribing from chatBar listner")
       listener();
     }
-  }
-
-  useEffect(() => {
-    if (currUser.uid) {
-      getChats();
-    }
-
-  }, []);
-
+  }, [currUser]);
 
 
 
@@ -76,49 +98,39 @@ const ChatBar = () => {
 
   const createChat = async ({chatName}) => {
     try {
-      console.info('created chat')
-      const uids = [currUser.uid];
-      addUserUsers.forEach((user) => uids.push(user.data().uid));
-      const recipients = [];
 
-      addUserUsers.forEach((user) => recipients.push(user.data().username));
-      function sortUids(a, b) {
+      const uids = [currUser.uid];
+      const recipients = {};
+      recipients[currUser.displayName] = true;
+
+      addUserUsers.forEach((user) => {
+        uids.push(user.data().uid);
+        recipients[user.data().username] = true;
+      });
+
+      uids.sort((a, b) => {
         const numA = parseInt(a.match(/\d+/)[0]);
         const numB = parseInt(b.match(/\d+/)[0]);
         return numA - numB;
-      }
-      uids.sort(sortUids);
-
+      });
       const chatID = uids.join("");
-
-
-
       await setDoc(doc(db, "chats", chatID), {
         name: chatName ?? "",
+        recipients: recipients,
         chatID: chatID,
       });
-
-
-      for(let i=0; i < uids.length; i++) {
-        await setDoc(doc(db, "users", uids[i], "userChats", chatID), {
-          chatID: chatID,
-          chatName: chatName ?? "",
-          recipients: recipients,
-          //add chat picture
-        });
-
-      }
+      await setDoc(doc(db, "chats", chatID, "messages", "0"), {
+        messages: {},
+      });
+      console.info('created chat');
 
       setAddUser(false);
       // see if I can automaitcally go to the chat just created
 
+
     } catch (error) {
       console.error(error);
     }
-
-
-
-
   }
 
   const handleChangeChat = (chatID) => {
@@ -152,13 +164,13 @@ const ChatBar = () => {
         </div>
 
       )}
-      <div>hello</div>
+
       {chats && chats.map((chat) => (
         <button className="ring m-2" onClick={() => handleChangeChat(chat.chatID)} key={chat.chatID}>
-          {chat.chatName !== "" ? (
-            <div>{chat.chatName}</div>
+          {chat.name !== "" ? (
+            <div>{chat.name}</div>
           ) : (
-            <div>{chat.recipients.join(", ")}</div> // add ... at limit of last name
+            <div>{Object.keys(chat.recipients).filter((username) => chat.recipients[username] && username !== currUser.displayName).join(', ')}</div> // add ... at limit of last name
           )}
 
         </button>
