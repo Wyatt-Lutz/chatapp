@@ -11,12 +11,6 @@ import { initializeApp } from "firebase/app";
 
 
 
-/*
-  51K reads
-  171 writes
-
-
-*/
 
 const Chats = () => {
   const [messageData, setMessageData] = useState([]);
@@ -143,7 +137,7 @@ const Chats = () => {
     const chatID = uuidv4();
     const date = dayjs();
     const chatDate = date.format('MM/DD/YYYY h:m A');
-
+//Remember to add back rweact query (well think about it first, think trhough it)
     await updateDoc(doc(db, "chats", data.chatID, "messages", "0"), {
       messages: arrayUnion({
         text: text,
