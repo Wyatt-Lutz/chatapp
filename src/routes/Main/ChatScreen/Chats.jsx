@@ -138,6 +138,7 @@ const Chats = () => {
     const date = dayjs();
     const chatDate = date.format('MM/DD/YYYY h:m A');
 //Remember to add back rweact query (well think about it first, think trhough it)
+//and also remember bug with adding same person to chat
     await updateDoc(doc(db, "chats", data.chatID, "messages", "0"), {
       messages: arrayUnion({
         text: text,
