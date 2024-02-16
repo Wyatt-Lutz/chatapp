@@ -16,10 +16,8 @@ const Signup = () => {
     try {
       setEmail(email);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-     // await updateProfile(userCredential.user, {displayName: username});
+      await updateProfile(userCredential.user, {displayName: username});
       const uid = userCredential.user.uid;
-
-
       await setDoc(doc(db, "users", uid), {
         email: email,
         username: username,
@@ -30,8 +28,6 @@ const Signup = () => {
       setIsVerify(true);
       await sendEmailVerification(auth.currentUser);
       console.info('Email verfication sent')
-
-
 
       //send to home
 
