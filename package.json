@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.20.5",
-    "@tanstack/react-query-devtools": "^5.20.5",
+    "@tanstack/react-query-devtools": "^5.21.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.10",
     "firebase": "^10.8.0",

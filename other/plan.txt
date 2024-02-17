@@ -34,9 +34,6 @@ add implementation to prevent spamming
 
 
 
-BIG:
-  I need to prevent having to pay for this so try and minizmze write and read requests
-  documnet max size is 1 MiB so find some way around this like deleting chats after number reached in database
 
 Layout:
   Sidebar of Dm's
@@ -50,5 +47,24 @@ Layout:
     change password
     cahnge email
     Block list
+    change pfp
     Logout
+
+THings to do
+  - USer mini area
+    - Online and offline functionality
+  - User pfps and chat pictures
+  - Change chat names and pfps (chat owners?)
+  - Editing and deleting messages
+  - Yesterday and today for the times
+    - Also merge messages if they are at the same minute
+  - Blocking users
+  - Search messages
+  - Settings
+    - Change password, email
+    - Block list -> editable
+    - Change pfp
+    - Logout
+
+  - Styling
 

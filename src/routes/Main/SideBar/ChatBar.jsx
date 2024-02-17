@@ -11,7 +11,7 @@ const ChatBar = () => {
 
   const { dispatch } = useContext(ChatContext);
   const [isAddUser, setAddUser] = useState(false);
-  const {register, handleSubmit} = useForm();
+  const {register, handleSubmit, resetField} = useForm();
   const { currUser } = useContext(AuthContext);
   const [addUserUsers, setAddUserUsers] = useState([]); //excluded uid of currUser
   const [chats, setChats] = useState([]);
@@ -76,7 +76,7 @@ const ChatBar = () => {
 
   const addUser = async ({recipient}) => {
     try {
-
+      resetField('recipient');
       const snap = await getDocs(docRef);
       const recipientUser = snap.docs.find((doc) => doc.data().username === recipient);
 
@@ -84,7 +84,7 @@ const ChatBar = () => {
         console.info('user does not exist') //toast
         return;
       }
-      if (addUserUsers.some(user => user === recipientUser)) {
+      if (addUserUsers.some(user => user.data().username === recipient)) {
         console.info('user already added') //toast
         return;
       }
@@ -98,7 +98,7 @@ const ChatBar = () => {
 
   const createChat = async ({chatName}) => {
     try {
-
+      resetField('chatName');
       const uids = [currUser.uid];
       const recipients = {};
       recipients[currUser.displayName] = true;
@@ -114,6 +114,10 @@ const ChatBar = () => {
         return numA - numB;
       });
       const chatID = uids.join("");
+      if (chats.some(chat => chat.chatID === chatID)) {
+        console.log('already chat with those users') //toast
+        return;
+      }
       await setDoc(doc(db, "chats", chatID), {
         name: chatName ?? "",
         recipients: recipients,
@@ -124,12 +128,15 @@ const ChatBar = () => {
       });
       console.info('created chat');
 
-      setAddUser(false);
+
       // see if I can automaitcally go to the chat just created
 
 
     } catch (error) {
       console.error(error);
+    } finally {
+      setAddUser(false);
+      setAddUserUsers([]);
     }
   }
 
@@ -146,8 +153,13 @@ const ChatBar = () => {
       {isAddUser && (
         <div className=" inset-0 fixed ">
 
-            <form onSubmit={handleSubmit(addUser)}>
-              <input {...register('recipient', { required: true })}></input>
+            <form className="flex" onSubmit={handleSubmit(addUser)}>
+              <input {...register('recipient', { required: false })} />
+              <div className="flex">
+                {addUserUsers.map((user) => (
+                  <div className="px-2" key={user.data().uid}>{user.data().username}</div>
+                ))}
+              </div>
               <button className="ring "type="submit">Find User</button>
             </form>
 
@@ -164,7 +176,7 @@ const ChatBar = () => {
         </div>
 
       )}
-
+      <div className="flex flex-col">
       {chats && chats.map((chat) => (
         <button className="ring m-2" onClick={() => handleChangeChat(chat.chatID)} key={chat.chatID}>
           {chat.name !== "" ? (
@@ -176,6 +188,9 @@ const ChatBar = () => {
         </button>
 
       ))}
+
+      </div>
+
 
 
     </section>
