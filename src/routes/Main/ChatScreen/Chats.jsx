@@ -30,12 +30,13 @@ const Chats = () => {
   const [points, setPoints] = useState({x: 0, y: 0});
   const [editState, setEditState] = useState({});
   const [contextMenuData, setContextMenuData] = useState(null);
-  const numChatsInDocZero = useRef(0);
+  const numChatsAddedInDocZero = useRef(0);
 
 
 
   const fetchMoreChats = async() => {
     try {
+      console.log('fetch more chats run');
       if (!data.chatID) {
         console.log('No chatID, fetch more chats should not run');
         return;
@@ -54,7 +55,11 @@ const Chats = () => {
         queryClient.setQueryData([data.chatID], [...currMessages, ...queryClient.getQueryData([data.chatID])]);
       } else if (numChats.current === 0) {
         console.log('numChats is 0')
-        currMessages = storedChats[0]?.messages;
+        currMessages = storedChats[0].messages;
+        console.log(currMessages);
+        if (Object.keys(currMessages).length < 1) {
+          return [];
+        }
         currMessages = currMessages.slice(Math.max(currMessages.length - numChatsPerDoc, 0), currMessages.length);
         //queryClient.setQueryData([data.chatID], currMessages);
         return currMessages;
@@ -65,10 +70,6 @@ const Chats = () => {
         return;
       }
 
-      if (currMessages && Object.keys(currMessages).length < 1) {
-        console.info('no chats in chat');
-        return;
-      }
 
     } catch (error) {
       console.error(error);
@@ -78,6 +79,7 @@ const Chats = () => {
   }
 
   const chatData = useQuery({
+    refetchOnWindowFocus: false,
     queryKey: [data.chatID],
     queryFn: () => fetchMoreChats(),
   });
@@ -90,48 +92,45 @@ const Chats = () => {
       console.error(chatData.error);
     }
   }, [chatData]);
-  /*
 
 
-  */
-
-  const addMessageMutation = useMutation({
-    mutationFn: ({text}) => {
-      addMessage(text);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [data.chatID]})
-    },
-  });
-
-  const editMessageMutation = useMutation({
-    mutationFn: ({id, text}) => {
-      editMessage(id, text);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [data.chatID]});
-    }
-  })
-
-  const deleteMessageMutation = useMutation({
-    mutationFn: (id) => {
-      deleteMessage(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [data.chatID]});
-    }
-  })
 
   const editMessage = async(id, text) => {
     //error was that it was loading the same chats twice when load more chats was clicked twice
     setEditState({id: false});
 
     const queryIndex = chatData.data.findIndex((chat) => chat.id === id);
-    const docNumber = Math.trunc(queryIndex/(numChatsInDocZero.current + numChatsPerDoc));
-
-
-    console.log(docNumber);
+    console.log('queryIndex: ' + queryIndex);
+    const totalDocs = Math.max(1, (Math.ceil((chatData.data.length - numChatsAddedInDocZero.current)/numChatsPerDoc)));
+    console.log('totalDocs: ' + totalDocs);
+    const docNumber = totalDocs === 1 ? 0 : totalDocs - (Math.trunc(queryIndex/(numChatsAddedInDocZero.current + numChatsPerDoc)));
+    console.log('docNumber: ' + docNumber);
+    const startIndexOfDoc = numChatsAddedInDocZero.current + (numChatsPerDoc * docNumber);
+    console.log('startIndexOfDoc: ' + startIndexOfDoc);
+    const endIndexOfDoc = Math.trunc((chatData.data.length - numChatsAddedInDocZero.current) / numChatsPerDoc) === docNumber ? (chatData.data.length - (docNumber * numChatsPerDoc)) : (docNumber * numChatsPerDoc);
+    console.log('endIndexOfDoc: ' + endIndexOfDoc);
+    const currMessagesInDoc = chatData.data.slice(chatData.data.length - startIndexOfDoc, chatData.data.length - startIndexOfDoc + endIndexOfDoc);
+    console.log('currMessagesInDoc: ' + currMessagesInDoc);
+    const updatedMessages = currMessagesInDoc[queryIndex - startIndexOfDoc].text = text.editMessage;
+    /*
+    updatedMessages[startIndexOfDoc - queryIndex] = {
+      ...updatedMessages[startIndexOfDoc - queryIndex],
+      text: text.editMessage,
+    };
+    */
+    console.log('updatedMessages: ' + updatedMessages);
+/*
+    await updateDoc(doc(db, "chats", data.chatID, "messages", docNumber.toString()), {
+      messages: {
+        text: text.editMessage,
+        id: id,
+      },
+    });
+    */
   }
+
+
+
 
   const deleteMessage = async(id) => {
     console.log(id);
@@ -147,37 +146,37 @@ const Chats = () => {
   const reallocateData = async () => {
     try {
       const messagesRef = collection(db, "chats", data.chatID, "messages");
-    const querySnapshot = await getDocs(messagesRef);
-    const storedChats = querySnapshot.docs.map(doc => doc.data());
-    const currMessages = storedChats[0]?.messages;
-    if (Object.keys(currMessages).length < 1) {
-      return;
-    }
-    const numOfExcess = currMessages.length - numChatsPerDoc;
-    if (numOfExcess > 0) {
-      console.info("ran message reallocation process")
-      const nowOldMessagesInCurr = currMessages.slice(0, currMessages.length - numChatsPerDoc);
-      const nextChatBlockLeft = numChatsPerDoc - storedChats[storedChats.length-1]?.messages.length;
-      console.log("nextChatBlockLeft: " + nextChatBlockLeft);
-      if (nextChatBlockLeft !== null && nextChatBlockLeft > 0) {
-        console.log('filled last doc')
-        await updateDoc(doc(messagesRef, (querySnapshot.docs.length - 1).toString()), {
-          messages: arrayUnion(...currMessages.slice(0, Math.min(numOfExcess, nextChatBlockLeft))),
+      const querySnapshot = await getDocs(messagesRef);
+      const storedChats = querySnapshot.docs.map(doc => doc.data());
+      const currMessages = storedChats[0]?.messages;
+      if (Object.keys(currMessages).length < 1) {
+        return;
+      }
+      const numOfExcess = currMessages.length - numChatsPerDoc;
+      if (numOfExcess > 0) {
+        console.info("ran message reallocation process")
+        const nowOldMessagesInCurr = currMessages.slice(0, currMessages.length - numChatsPerDoc);
+        const nextChatBlockLeft = numChatsPerDoc - storedChats[storedChats.length-1]?.messages.length;
+        console.log("nextChatBlockLeft: " + nextChatBlockLeft);
+        if (nextChatBlockLeft !== null && nextChatBlockLeft > 0) {
+          console.log('filled last doc')
+          await updateDoc(doc(messagesRef, (querySnapshot.docs.length - 1).toString()), {
+            messages: arrayUnion(...currMessages.slice(0, Math.min(numOfExcess, nextChatBlockLeft))),
+          });
+        }
+        for (let i = 0; i < Math.ceil((numOfExcess - Math.max(nextChatBlockLeft, 0))/numChatsPerDoc); i++) {
+          console.log('loop run')
+          const nextMessages = currMessages.slice((Math.max(nextChatBlockLeft, 0) + (numChatsPerDoc * i)), (numOfExcess * (i + 1)));
+          console.log(nextMessages);
+          await setDoc(doc(messagesRef, (querySnapshot.docs.length).toString()), {
+            messages: nextMessages,
+          })
+        }
+
+        await updateDoc(doc(messagesRef, "0"), {
+          messages: arrayRemove(...nowOldMessagesInCurr),
         });
       }
-      for (let i = 0; i < Math.ceil((numOfExcess - Math.max(nextChatBlockLeft, 0))/numChatsPerDoc); i++) {
-        console.log('loop run')
-        const nextMessages = currMessages.slice((Math.max(nextChatBlockLeft, 0) + (numChatsPerDoc * i)), (numOfExcess * (i + 1)));
-        console.log(nextMessages);
-        await setDoc(doc(messagesRef, (querySnapshot.docs.length).toString()), {
-          messages: nextMessages,
-        })
-      }
-
-      await updateDoc(doc(messagesRef, "0"), {
-        messages: arrayRemove(...nowOldMessagesInCurr),
-      });
-    }
 
 
     } catch (error) {
@@ -204,22 +203,24 @@ const Chats = () => {
     const chatRef = doc(db, "chats", data.chatID, "messages", "0");
     const chatListener = onSnapshot(chatRef, (snap) => {
       const messages = snap.data().messages;
+      if (initialFetch.current) {
+        console.info('subscribed to chatListener')
+        initialFetch.current = false;
+        lastChatID.current = data.chatID;
+        return;
+      }
       if(Object.keys(messages).length < 1) {
         //no chats in database
         return;
       }
-      if (initialFetch.current) {
-        console.info('subscribed to chatListener')
-        initialFetch.current = false;
-        return;
-      }
-      if (lastChatID.current !== data.chatID) {
+      if (lastChatID.current !== data.chatID) { //to be safe
         lastChatID.current = data.chatID;
         return;
       }
       console.info("chat listener ran");
       console.log(messages);
       queryClient.setQueryData([data.chatID], messages);
+
 
     }, (error) => console.error(error));
 
@@ -231,9 +232,9 @@ const Chats = () => {
   }, [data.chatID]);
 
 
-  const addMessage = async(text) => {
+  const addMessage = async({text}) => {
     resetField('text');
-    numChatsInDocZero.current += 1;
+    numChatsAddedInDocZero.current += 1;
     console.info('added message to database')
     const chatID = uuidv4();
 
@@ -242,7 +243,7 @@ const Chats = () => {
 //and also remember bug with adding same person to chat
     await updateDoc(doc(db, "chats", data.chatID, "messages", "0"), {
       messages: arrayUnion({
-        text: text,
+        text,
         id: chatID,
         date: Date.now(),
         sender: currUser.displayName,
@@ -252,13 +253,13 @@ const Chats = () => {
 
   };
 
-/*
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [chatData]);
-*/
+
 
   const handleContextMenu = (e, chat) => {
     e.preventDefault();
@@ -296,7 +297,7 @@ const Chats = () => {
                   </div>
 
                   {editState[chat.id] ? (
-                    <form onSubmit={handleSubmit((text) => editMessageMutation.mutate({id: chat.id, text}))}>
+                    <form onSubmit={handleSubmit((text) => editMessage(chat.id, text))}>
                       <input placeholder={chat.text} {...register('editMessage', { required: false, maxLength: 200 })} />
 
                     </form>
@@ -310,7 +311,7 @@ const Chats = () => {
 
             ))}
 
-          <form onSubmit={handleSubmit((data) => addMessageMutation.mutate(data))}>
+          <form onSubmit={handleSubmit((text) => addMessage(text))}>
             <input placeholder="Type here..." {...register('text', { required: false, maxLength: 200})} />
 
           </form>
@@ -326,7 +327,7 @@ const Chats = () => {
       {clicked && (
         <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
           <button onClick={() => setEditState((prev) => ({...prev, [contextMenuData.chatID]: true }))}>Edit</button>
-          <button onClick={() => deleteMessageMutation.mutate(contextMenuData.chatID)}>Delete</button>
+          <button onClick={() => deleteMessage(contextMenuData.chatID)}>Delete</button>
         </div>
       )}
 

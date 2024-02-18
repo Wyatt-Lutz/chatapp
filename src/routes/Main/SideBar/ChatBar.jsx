@@ -177,17 +177,17 @@ const ChatBar = () => {
 
       )}
       <div className="flex flex-col">
-      {chats && chats.map((chat) => (
-        <button className="ring m-2" onClick={() => handleChangeChat(chat.chatID)} key={chat.chatID}>
-          {chat.name !== "" ? (
-            <div>{chat.name}</div>
-          ) : (
-            <div>{Object.keys(chat.recipients).filter((username) => chat.recipients[username] && username !== currUser.displayName).join(', ')}</div> // add ... at limit of last name
-          )}
+        {chats && chats.map((chat) => (
+          <button className="ring m-2" onClick={() => handleChangeChat(chat.chatID)} key={chat.chatID}>
+            {chat.name !== "" ? (
+              <div>{chat.name}</div>
+            ) : (
+              <div>{Object.keys(chat.recipients).filter((username) => chat.recipients[username] && username !== currUser.displayName).join(', ')}</div> // add ... at limit of last name
+            )}
 
-        </button>
+          </button>
 
-      ))}
+        ))}
 
       </div>
 
