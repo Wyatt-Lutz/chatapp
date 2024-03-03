@@ -99,8 +99,28 @@ const Chats = () => {
     //error was that it was loading the same chats twice when load more chats was clicked twice
     setEditState({id: false});
 
+
+
     const queryIndex = chatData.data.findIndex((chat) => chat.id === id);
     console.log('queryIndex: ' + queryIndex);
+
+    const docOfMessage = Math.trunc((chatData.data.length - (queryIndex + 1))/numChatsPerDoc);
+    console.log("docOfMessage: " + docOfMessage);
+
+    const numOfDocs = Math.trunc((chatData.data.length - numChatsAddedInDocZero.current)/numChatsPerDoc);
+    console.log("numOfDocs: " + numOfDocs);
+
+    const startIndexInQuery = Math.max(0, chatData.data.length - numChatsAddedInDocZero.current - ((docOfMessage + 1) * numChatsPerDoc));
+    const endIndexInQuery = Math.min(startIndexInQuery + numChatsPerDoc + numChatsAddedInDocZero.current - 1, chatData.data.length);
+
+    console.log("startIndex: " + startIndexInQuery);
+    console.log("endIndex: " + endIndexInQuery);
+
+
+
+
+
+/*
     const totalDocs = Math.max(1, (Math.ceil((chatData.data.length - numChatsAddedInDocZero.current)/numChatsPerDoc)));
     console.log('totalDocs: ' + totalDocs);
     const docNumber = totalDocs === 1 ? 0 : totalDocs - (Math.trunc(queryIndex/(numChatsAddedInDocZero.current + numChatsPerDoc)));
@@ -117,9 +137,9 @@ const Chats = () => {
       ...updatedMessages[startIndexOfDoc - queryIndex],
       text: text.editMessage,
     };
-    */
+
     console.log('updatedMessages: ' + updatedMessages);
-/*
+
     await updateDoc(doc(db, "chats", data.chatID, "messages", docNumber.toString()), {
       messages: {
         text: text.editMessage,
@@ -127,6 +147,7 @@ const Chats = () => {
       },
     });
     */
+
   }
 
 
@@ -166,7 +187,7 @@ const Chats = () => {
         }
         for (let i = 0; i < Math.ceil((numOfExcess - Math.max(nextChatBlockLeft, 0))/numChatsPerDoc); i++) {
           console.log('loop run')
-          const nextMessages = currMessages.slice((Math.max(nextChatBlockLeft, 0) + (numChatsPerDoc * i)), (numOfExcess * (i + 1)));
+          const nextMessages = currMessages.slice((Math.max(nextChatBlockLeft, 0) + (numChatsPerDoc * i)), (numChatsPerDoc * (i + 1)));
           console.log(nextMessages);
           await setDoc(doc(messagesRef, (querySnapshot.docs.length).toString()), {
             messages: nextMessages,
