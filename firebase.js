@@ -2,11 +2,13 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
 
 
 const firebaseConfig = {
   apiKey: "AIzaSyBu-sdXz1njK-QXuDGN9FRjQX0yc8UhjIY",
   authDomain: "chatapp-fb9af.firebaseapp.com",
+  databaseURL: "https://chatapp-fb9af-default-rtdb.firebaseio.com",
   projectId: "chatapp-fb9af",
   storageBucket: "chatapp-fb9af.appspot.com",
   messagingSenderId: "877180065623",
@@ -15,7 +17,8 @@ const firebaseConfig = {
 };
 
 
+
 export const app = initializeApp(firebaseConfig);
+export const db = getDatabase(app);
 export const auth = getAuth();
 export const storage = getStorage();
-export const db = getFirestore()

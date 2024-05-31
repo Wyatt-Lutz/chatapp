@@ -2,9 +2,8 @@ import { useContext, useState, useEffect, useRef } from "react";
 import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
-
-import {collection, getDocs, getDoc, setDoc, updateDoc, where, doc, query, onSnapshot} from 'firebase/firestore';
 import { db } from "../../../../firebase";
+import { ref, query, set, get, off, child, push, orderByChild, equalTo, onValue, onChildAdded } from 'firebase/database'
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
 
@@ -18,57 +17,24 @@ const ChatBar = () => {
   const initialMount = useRef(true);
 
 
-  const docRef = collection(db, 'users');
-
-  const fetchChats = async () => {
-    try {
-      console.info("chatBar fetched initial chats");
-      const chatsQuery = query(collection(db, "chats"), where(`recipients.${currUser.displayName}`, "==", true));
-      const querySnapshot = await getDocs(chatsQuery);
-      if (querySnapshot.empty) {
-        console.info('chatBar querySnapshot empty')
-        return;
-      }
-
-      const chatsIn = querySnapshot.docs.map((chat) => ({
-        name: chat.data().name,
-        recipients: chat.data().recipients,
-        chatID: chat.data().chatID,
-      }));
-
-      setChats(chatsIn);
-
-    } catch (error) {
-      console.error(error);
-    }
-
-  }
-
-
-
-
+  const chatsInRef = ref(db, "users/" + currUser.uid + '/chatsIn');
 
   useEffect(() => {
-    if (!currUser) {
-      console.info('no current user');
-      return;
-    }
-    fetchChats();
-    const chatsQuery = query(collection(db, "chats"),  where(`recipients.${currUser.displayName}`, "==", true));
-    const listener = onSnapshot(chatsQuery, (snap) => {
-      if(initialMount.current) {
-        console.info('subscribed to chatBar listener');
-        initialMount.current = false;
-        return;
-      }
-      console.info('Chatbar listener fetch chats');
-      const chatsIn = snap.docs.map((doc) => doc.data());
-      setChats(chatsIn);
+    //fetchChats();
+    console.info('use effect run')
 
-    });
+    const handleNewChatAdded = async (snap) => {
+      const newChatID = snap.val()
+      const chatRef = ref(db, "chats/" + newChatID);
+      const newChatSnap = await get(chatRef);
+      const newChatData = newChatSnap.val();
+      newChatData.id = newChatID;
+      setChats(prev => [...prev, newChatData]);
+
+    }
+    const unsub = onChildAdded(chatsInRef, handleNewChatAdded);
     return () => {
-      console.info("unsubscribing from chatBar listner")
-      listener();
+      unsub();
     }
   }, [currUser]);
 
@@ -77,19 +43,30 @@ const ChatBar = () => {
   const addUser = async ({recipient}) => {
     try {
       resetField('recipient');
-      const snap = await getDocs(docRef);
-      const recipientUser = snap.docs.find((doc) => doc.data().username === recipient);
+      console.log(recipient);
+      const usersQuery = query(ref(db, "users"), orderByChild('username'), equalTo(recipient));
+      get(usersQuery).then((snap) => {
+        if (!snap.exists()) {
+          console.info('user doesnt exist');
+          return;
+        }
 
-      if (!recipientUser) {
-        console.info('user does not exist') //toast
-        return;
-      }
-      if (addUserUsers.some(user => user.data().username === recipient)) {
-        console.info('user already added') //toast
-        return;
-      }
-      console.info('added user to chatbar')
-      setAddUserUsers(prev => [...prev, recipientUser])
+        if (addUserUsers.some(user => user.username === recipient)) {
+          console.info('user already added') //toast
+          return;
+        }
+        const user = {
+          uid: Object.keys(snap.val())[0],
+          username: Object.values(snap.val())[0].username,
+        }
+        console.log(user);
+
+
+        setAddUserUsers(prev => [...prev, user])
+        console.info('added user to chatbar');
+      })
+
+
 
     } catch (error) {
       console.error(error);
@@ -100,14 +77,13 @@ const ChatBar = () => {
     try {
       resetField('chatName');
       const uids = [currUser.uid];
-      const recipients = {};
-      recipients[currUser.displayName] = true;
-
+      const members = {[currUser.displayName] : false}
       addUserUsers.forEach((user) => {
-        uids.push(user.data().uid);
-        recipients[user.data().username] = true;
+        uids.push(user.uid);
+        members[user.username] = false;
       });
-
+      console.log(addUserUsers);
+      console.log(uids);
       uids.sort((a, b) => {
         const numA = parseInt(a.match(/\d+/)[0]);
         const numB = parseInt(b.match(/\d+/)[0]);
@@ -118,14 +94,21 @@ const ChatBar = () => {
         console.log('already chat with those users') //toast
         return;
       }
-      await setDoc(doc(db, "chats", chatID), {
-        name: chatName ?? "",
-        recipients: recipients,
-        chatID: chatID,
+      set(ref(db, "chats/" + chatID), {
+        title: chatName && chatName.length > 0 ? chatName : Object.keys(members).join(", "),
+        lastMessage: null,
+        timeStamp: null,
       });
-      await setDoc(doc(db, "chats", chatID, "messages", "0"), {
-        messages: {},
-      });
+      set(ref(db, "members/" + chatID), members);
+
+      uids.forEach((uid) => {
+        const chatsRef = ref(db, "users/" + uid + "/chatsIn");
+        push(chatsRef, chatID).then(() => {
+          console.log('added chat to user metadata');
+        })
+      })
+
+
       console.info('created chat');
 
 
@@ -134,10 +117,10 @@ const ChatBar = () => {
 
     } catch (error) {
       console.error(error);
-    } finally {
-      setAddUser(false);
-      setAddUserUsers([]);
     }
+    setAddUser(false);
+    setAddUserUsers([]);
+
   }
 
   const handleChangeChat = (chatID) => {
@@ -157,7 +140,7 @@ const ChatBar = () => {
               <input {...register('recipient', { required: false })} />
               <div className="flex">
                 {addUserUsers.map((user) => (
-                  <div className="px-2" key={user.data().uid}>{user.data().username}</div>
+                  <div className="px-2" key={user.uid}>{user.username}</div>
                 ))}
               </div>
               <button className="ring "type="submit">Find User</button>
@@ -176,16 +159,19 @@ const ChatBar = () => {
         </div>
 
       )}
+
       <div className="flex flex-col">
-        {chats && chats.map((chat) => (
-          <button className="ring m-2" onClick={() => handleChangeChat(chat.chatID)} key={chat.chatID}>
-            {chat.name !== "" ? (
-              <div>{chat.name}</div>
-            ) : (
-              <div>{Object.keys(chat.recipients).filter((username) => chat.recipients[username] && username !== currUser.displayName).join(', ')}</div> // add ... at limit of last name
-            )}
+        {chats.map((chat) => (
+
+          <button className="ring m-2" onClick={() => handleChangeChat(chat.id)} key={chat.id}>
+            {chat.title.split(', ').filter(username => username !== currUser.displayName).join(', ')}
+            {chat.lastMessage && chat.lastMessage}
+            {chat.timeStamp && chat.timeStamp}
 
           </button>
+
+
+
 
         ))}
 

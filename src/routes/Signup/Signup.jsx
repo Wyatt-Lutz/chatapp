@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db, auth } from "../../../firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile} from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { ref, query, set, get, orderByChild, equalTo, onValue } from 'firebase/database'
 import EmailVerification from "./EmailVerification";
+
 
 
 const Signup = () => {
@@ -17,11 +18,13 @@ const Signup = () => {
       setEmail(email);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, {displayName: username});
-      const uid = userCredential.user.uid;
-      await setDoc(doc(db, "users", uid), {
-        email: email,
+      const uid = userCredential.user.uid
+
+      set(ref(db, "users/" + uid), {
         username: username,
-        uid: uid,
+        email: email,
+        blocked: [],
+        chatsIn: [],
       });
 
       console.info('registration successful');

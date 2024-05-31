@@ -65,6 +65,91 @@ THings to do
     - Block list -> editable
     - Change pfp
     - Logout
+  -Deleting an account
+    -Making sure their messages arent deleted, itll just say deleted user
 
   - Styling
 
+
+-users
+  -user1 (uid)
+    -username
+    -email
+    -blocked
+      -u1
+      -u2
+    -cachedChats
+      -c1
+      -c2
+
+
+-chats
+  -c1
+    -title
+    -user + last message - like in one string bc this will be for sideBar
+    -timestamp
+    -
+
+-members
+  -c1 - will be a uid and will just iterate over all the chats - will want to use index query for this
+    -u1 : true
+      -unread
+    -u2 : false
+      -unread
+
+
+-messages
+  -c1
+    -m1
+      -message
+      -timestamp
+      -user
+
+
+onLoad:
+  - fetches first 50 messages or whatever
+
+- Whenever user scrolls up, load more
+
+
+
+
+We also need to index data for queries with like searching. At bottom is tips with the indexing - https://firebase.google.com/docs/database/usage/billing
+
+Can do just like oldest messages at doc 0, newest at index of length - 1
+And wehn creating a message, if the messages already is max of doc of length - 1 create a new doc
+  - Also need to think about like what if people send messages at same time, will it still work
+
+Think about dynmaic loading -> only have one chat displayed at a time and chache the rest in react qeuery or something
+  - Think about if this will work will all implementations before doing anything - like legit plan it out and see if it works
+
+- So whenever a user sends, edits, or deletes a chat, just fetch all the messages in the document and put them where they normally are at their indicies
+  - If deleting a chat, make sure that the index for the first chat in the document in the react query is the same if they delete the first message in the document
+
+
+
+Regarding unread
+  - Have the number for each user in a chat and a true or false for if they are in the chat or not
+  - When user loads into chat, sets thiers to 0
+  - When a user sends a chat, it increments for all users not in the chat actively
+  - Will have a listener in chatbar or whatever that listens for specifically that change
+  - Also need a useEffect to fetch them initially
+
+
+  {
+  "rules": {
+    "members": {
+      ".indexOn": ["userID"],
+      "$chatID" : {
+        ".read": "auth.uid != null && data.child(auth.uid).exists()",
+        ".write": "auth.uid != null"
+      }
+    },
+    "messages": {
+      "$chatID": {
+        ".read": "auth.uid != null && root.child('members/' + $chatID + '/' + auth.uid).exists()",
+        ".write": "auth.uid != null && root.child('members/' + $chatID + '/' + auth.uid).exists()"
+      }
+  	}
+	}
+}

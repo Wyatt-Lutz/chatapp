@@ -6,10 +6,12 @@ import { onAuthStateChanged } from "firebase/auth";
 export const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const [currUser, setCurrUser] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const authState = onAuthStateChanged(auth, (user) => {
       setCurrUser(user);
+      setLoading(false);
       console.info('authstate listener subscribe');
     });
     return () => {
@@ -18,6 +20,9 @@ export const AuthContextProvider = ({ children }) => {
     };
   }, []);
 
+  if (loading) {
+    return <div>...</div>
+  }
 
   return(
     <AuthContext.Provider value={{ currUser }}>

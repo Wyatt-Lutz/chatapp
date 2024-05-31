@@ -1,24 +1,27 @@
 import { useForm } from "react-hook-form";
 import { db, auth } from "../../../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { collection, getDocs } from "firebase/firestore";
+
+import { ref, query, set, get, orderByChild, equalTo, onValue } from 'firebase/database'
 
 
 const PasswordReset = ({passChange}) => {
   const { register, handleSubmit } = useForm();
   const onSubmit = async ({email}) => {
     try {
-      const docRef = collection(db, 'users');
-      const snap = await getDocs(docRef);
-      const isEmail = snap.docs.find((doc) => doc.data().email === email);
-      if (isEmail) {
-        await sendPasswordResetEmail(auth, email);
-        console.info('password-reset email sent');
-        passChange(false);
+      const emailsRef = query(ref(db, "users"), orderByChild('email'), equalTo(email));
+      get(emailsRef).then((snap) => {
+        if (!snap.exists() || snap.val() == null) {
+          console.info('no account with that email') //toast
+          return;
+        }
+      })
 
-      } else {
-        console.info('No account with that Email.');
-      }
+      await sendPasswordResetEmail(auth, email);
+      console.info('password reset email send') //toast
+      passChange(false);
+
+
     } catch (error) {
       console.error(error);
     }
