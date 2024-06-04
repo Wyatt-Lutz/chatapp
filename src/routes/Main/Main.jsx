@@ -1,5 +1,4 @@
 import ChatScreen from './ChatScreen/ChatScreen';
-import Chats from './ChatScreen/Chats';
 
 import SideBar from './SideBar/SideBar';
 
@@ -10,7 +9,7 @@ const Main = () => {
         <SideBar />
 
       </div>
-      <Chats />
+      <ChatScreen />
 
 
     </section>

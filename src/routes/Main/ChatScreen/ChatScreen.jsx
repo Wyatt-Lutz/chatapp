@@ -5,14 +5,16 @@ import { ChatContext } from '../../../ChatProvider';
 
 const ChatScreen = () => {
   const { data } = useContext(ChatContext);
-  if (!data.chatID) {
-    return <div>friends online</div>
-  }
+
 
   return(
     <section>
+      {!data.chatID ? (
+        <div>firends online</div>
+      ) : (
+        <Chats />
+      )}
 
-      <Chats />
 
     </section>
   )

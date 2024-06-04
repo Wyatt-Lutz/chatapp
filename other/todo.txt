@@ -8,6 +8,9 @@
   - Think I need to prevent duplicate usernames becauser of adding people to chats
 
 -chats
+  - See if there is a more effeicient method to get the timestamp of the last message that had a timestamp, right now I have it stored in localstorage
+  - See if I can optimize the thing in which whenever set() runs when you add a message, it immediatly invokes onValue(), but then onValue() also sees that the database changes so theres a double invocation. Right now i have it so if the userSent a chat, it returns in the handleNewMessage
+  - Make sure that text box is not accessible if user hasnt clicked on chat - would be replaced by like friends list or whatever
   - I should take out the naming the chat and instead just have it automatically name the chat as the name of the members. Then have a button next to the name of the chat after they created it to change the name - only if more than 2 people in chat
   - Fix the whole scrolling thing, it maybe be css related who knows
   - See if I can optimize something with the chats listener because whenever you delete a message, it looks weird
