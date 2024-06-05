@@ -3,16 +3,15 @@ import { ref, query, set, get, update, endBefore, limitToLast, push, orderByChil
 
 const NUM_CHATS_PER_PAGE = 10;
 
-export const fetchChats = async(time, chatsRef) => {
+export const fetchChats = async(time, db, chatID) => {
   console.info('fetchChats run');
+  const chatsRef = ref(db, "messages/" + chatID + "/");
   const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(time), limitToLast(NUM_CHATS_PER_PAGE));
   const snap = await get(messageQuery);
 
   if (!snap.exists()) {
-    console.log('no message data');
     return [];
   }
-
   const messageData = []
   snap.forEach((child) => {
     messageData.push(child.val());

@@ -3,7 +3,7 @@ import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 import { db } from "../../../../firebase";
-import { ref, query, set, get, off, child, push, orderByChild, equalTo, onValue, onChildAdded } from 'firebase/database'
+import { ref, query, set, get, push, orderByChild, equalTo, onChildAdded } from 'firebase/database'
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
 
@@ -14,13 +14,12 @@ const ChatBar = () => {
   const { currUser } = useContext(AuthContext);
   const [addUserUsers, setAddUserUsers] = useState([]); //excluded uid of currUser
   const [chats, setChats] = useState([]);
-  const initialMount = useRef(true);
+
 
 
   const chatsInRef = ref(db, "users/" + currUser.uid + '/chatsIn');
 
   useEffect(() => {
-    //fetchChats();
     console.info('use effect run')
 
     const handleNewChatAdded = async (snap) => {
