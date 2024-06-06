@@ -1,9 +1,9 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 import { db } from "../../../../firebase";
-import { ref, query, set, get, push, orderByChild, equalTo, onChildAdded } from 'firebase/database'
+import { ref, query, set, get, push, orderByChild, equalTo, onChildAdded, update, onChildChanged } from 'firebase/database'
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
 
@@ -14,26 +14,29 @@ const ChatBar = () => {
   const { currUser } = useContext(AuthContext);
   const [addUserUsers, setAddUserUsers] = useState([]); //excluded uid of currUser
   const [chats, setChats] = useState([]);
-
-
-
   const chatsInRef = ref(db, "users/" + currUser.uid + '/chatsIn');
+
+  const handleNewChatAdded = useCallback(async(snap) => {
+    const newChatID = snap.key;
+    const chatRef = ref(db, "chats/" + newChatID);
+    console.log(newChatID)
+    const newChatSnap = await get(chatRef);
+    const newChatData = newChatSnap.val();
+    newChatData.id = newChatID;
+    setChats(prev => [...prev, newChatData]);
+
+  }, [currUser]);
+
+
 
   useEffect(() => {
     console.info('use effect run')
 
-    const handleNewChatAdded = async (snap) => {
-      const newChatID = snap.val()
-      const chatRef = ref(db, "chats/" + newChatID);
-      const newChatSnap = await get(chatRef);
-      const newChatData = newChatSnap.val();
-      newChatData.id = newChatID;
-      setChats(prev => [...prev, newChatData]);
 
-    }
-    const unsub = onChildAdded(chatsInRef, handleNewChatAdded);
+    const childAddedListener = onChildAdded(chatsInRef, handleNewChatAdded);
+    //const childChangedListener = onChildChanged()
     return () => {
-      unsub();
+      childAddedListener();
     }
   }, [currUser]);
 
@@ -75,51 +78,57 @@ const ChatBar = () => {
   const createChat = async ({chatName}) => {
     try {
       resetField('chatName');
-      const uids = [currUser.uid];
-      const members = {[currUser.displayName] : false}
-      addUserUsers.forEach((user) => {
-        uids.push(user.uid);
-        members[user.username] = false;
-      });
-      console.log(addUserUsers);
-      console.log(uids);
+
+
+      const uids = [currUser.uid, ...addUserUsers.map(user => user.uid)];
+
+
+      console.log(Object.values(addUserUsers));
+
+/*
       uids.sort((a, b) => {
         const numA = parseInt(a.match(/\d+/)[0]);
         const numB = parseInt(b.match(/\d+/)[0]);
         return numA - numB;
       });
-      const chatID = uids.join("");
+  */
+
+
+      const chatID = uids.sort().join("");
       if (chats.some(chat => chat.chatID === chatID)) {
         console.log('already chat with those users') //toast
         return;
       }
+
+
       set(ref(db, "chats/" + chatID), {
-        title: chatName && chatName.length > 0 ? chatName : Object.keys(members).join(", "),
+        title: chatName && chatName.length > 0 ? chatName : addUserUsers.map(user => user.username).join(", "),
         lastMessage: null,
         timeStamp: null,
       });
-      set(ref(db, "members/" + chatID), members);
+
+
 
       uids.forEach((uid) => {
-        const chatsRef = ref(db, "users/" + uid + "/chatsIn");
-        push(chatsRef, chatID).then(() => {
-          console.log('added chat to user metadata');
-        })
+        const userChatDataRef = ref(db, "users/" + uid + "/chatsIn");
+        const chatData = {[chatID]: 0};
+        //push(userChatDataRef, chatData);
+        update(userChatDataRef, chatData)
+
+        const membersDataRef = ref(db, "chats/" + chatID);
+        const userData = {[uid]: false};
+        //push(membersDataRef, userData);
+        update(membersDataRef, userData);
       })
 
 
       console.info('created chat');
-
-
       // see if I can automaitcally go to the chat just created
-
-
     } catch (error) {
       console.error(error);
     }
     setAddUser(false);
     setAddUserUsers([]);
-
   }
 
   const handleChangeChat = (chatID) => {

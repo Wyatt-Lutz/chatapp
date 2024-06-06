@@ -42,8 +42,42 @@ export const addMessage = async({text}, chatID, displayName, db, chatData, prevT
     renderTimeAndSender,
   }
   await set(newMessageRef, newMessage);
+
+  await updateUnreadCount(db, chatID);
   return {renderState: renderTimeAndSender, time: Date.now()};
+
 };
+
+const updateUnreadCount = async(db, chatID) => {
+  const usersRef = ref(db, "chats/" + chatID);
+  const usersSnap = await get(usersRef);
+  if (!usersSnap.exists()) {
+    return;
+  }
+
+  for(const key in usersSnap.val()) {
+    if (usersSnap.val()[key] === false) {
+      const userDataRef = ref(db, "users/" + key + "/chatsIn");
+      const userDataSnap = await get(userDataRef);
+      if (!userDataSnap.exists()) {
+        return;
+      }
+      const prevUnread = userDataSnap.val()[chatID];
+      await update(userDataRef, {[chatID]: prevUnread + 1});
+    }
+  }
+}
+
+export const updateUserOnlineStatus = async(db, chatID, userUid) => {
+  const dataRef = ref(db, "chats/" + chatID);
+  await update(dataRef, {
+    [userUid]: true,
+  });
+
+  const userDataRef = ref(db, "users/" + userUid + "/chatsIn");
+  await update(userDataRef, {[chatID]: 0});
+}
+
 
 
 

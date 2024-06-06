@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { useElementOnScreen } from "../../../IntersectionObserver";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast } from 'firebase/database'
-import {fetchChats, addMessage, editMessage, deleteMessage} from './useChatData';
+import {fetchChats, addMessage, editMessage, deleteMessage, updateUserOnlineStatus} from './useChatData';
 
 
 const Chats = () => {
@@ -74,7 +74,6 @@ const Chats = () => {
     })
 
 
-
   }, [data.chatID]);
 
   const handleChildChanged = useCallback((snap) => {
@@ -93,18 +92,18 @@ const Chats = () => {
     queryClient.setQueryData([data.chatID], updatedData);
   }, [data.chatID]);
 
+
+
 /*
-I was starting to create the unread messages for those not in the chat itself
-So for the person that creates a message, iterate over each user in the member section and if they are false, increment by 1
-Then when a user loads up the app, use the chatsIn data to iterate over each chat thing and find their count for unread messages for each chat
-  - This will go on the chatbar thing
-But also, I could have a onChildChanged thing for that specific location in the chatBar in case the user is on the app, but not in specific chats
+I was finishing the unread messages implementation. I need to use the listener for the chatbar if someone deleted a chat for the if unread
+count increase because the listener has reference at chatsIn so if it changes , look for both deleted chat and changed unread then update jsx
+accodingly.
 
-To do:
-Change the data structure for each member, need boolean and count
-Add implementation for if person joins chat, change boolean to true
 
-And theres the whole sidebar thing I have to do as well
+todo:
+Add a listener to chatBar for if somebody else deletes a chat
+Redo the updatUnreadCoutn except with runTransaction to rpevent data corrutptin from concurrent modification
+
 
 
 */
@@ -114,6 +113,8 @@ And theres the whole sidebar thing I have to do as well
       console.info("chatID undefined");
       return;
     }
+
+    updateUserOnlineStatus(db, data.chatID, currUser.uid);
 
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));
     const childAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
