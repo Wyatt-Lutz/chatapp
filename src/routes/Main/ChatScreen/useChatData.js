@@ -1,5 +1,5 @@
 
-import { ref, query, set, get, update, endBefore, limitToLast, push, orderByChild, onValue, remove, serverTimestamp } from 'firebase/database';
+import { ref, query, set, get, update, endBefore, runTransaction, limitToLast, push, orderByChild, onValue, remove, serverTimestamp } from 'firebase/database';
 
 const NUM_CHATS_PER_PAGE = 10;
 
@@ -55,27 +55,35 @@ const updateUnreadCount = async(db, chatID) => {
     return;
   }
 
-  for(const key in usersSnap.val()) {
-    if (usersSnap.val()[key] === false) {
-      const userDataRef = ref(db, "users/" + key + "/chatsIn");
-      const userDataSnap = await get(userDataRef);
-      if (!userDataSnap.exists()) {
-        return;
+  for(const userUid in usersSnap.val()) {
+    if (usersSnap.val()[userUid] === false) {
+      const userDataRef = ref(db, "users/" + userUid + `/chatsIn/${chatID}`);
+      const transactionUpdate = (currData) => {
+        if (currData === null) {
+          return 0;
+        } else {
+          return currData + 1;
+        }
       }
-      const prevUnread = userDataSnap.val()[chatID];
-      await update(userDataRef, {[chatID]: prevUnread + 1});
+      runTransaction(userDataRef, transactionUpdate).catch((error) => {
+        console.error('update unreadcount transaction failed:' + error);
+      })
     }
   }
 }
 
-export const updateUserOnlineStatus = async(db, chatID, userUid) => {
+export const updateUserOnlineStatus = async(isOnline, db, chatID, userUid) => {
   const dataRef = ref(db, "chats/" + chatID);
+
   await update(dataRef, {
-    [userUid]: true,
+    [userUid]: isOnline,
   });
 
-  const userDataRef = ref(db, "users/" + userUid + "/chatsIn");
-  await update(userDataRef, {[chatID]: 0});
+  if (isOnline) {
+    const userDataRef = ref(db, "users/" + userUid + "/chatsIn");
+    await update(userDataRef, {[chatID]: 0});
+  }
+
 }
 
 

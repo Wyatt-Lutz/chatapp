@@ -34,6 +34,7 @@ const ChatBar = () => {
 
 
     const childAddedListener = onChildAdded(chatsInRef, handleNewChatAdded);
+    const childChangedListener = onChildChanged(chatsIn)
     //const childChangedListener = onChildChanged()
     return () => {
       childAddedListener();

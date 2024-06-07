@@ -51,6 +51,7 @@ const Chats = () => {
     setContextMenuData(null);
   }, []);
 
+
   const handleScroll = useCallback(() => {
     setScrolled(true);
     if (messagesContainerRef.current.scrollTop !== 0 && atBottom) {
@@ -58,7 +59,11 @@ const Chats = () => {
     } else if (messagesContainerRef.current.scrollTop === 0 && !atBottom) {
       setAtBottom(true);
     }
-  }, [])
+  }, []);
+
+  const handleUpdateUserStatus = useCallback(() => {
+    updateUserOnlineStatus(false, db, data.chatID, currUser.uid);
+  })
 
   const handleChildAdded = useCallback((snap) => {
     const existingData = queryClient.getQueryData([data.chatID]) ?? [];
@@ -102,7 +107,6 @@ accodingly.
 
 todo:
 Add a listener to chatBar for if somebody else deletes a chat
-Redo the updatUnreadCoutn except with runTransaction to rpevent data corrutptin from concurrent modification
 
 
 
@@ -113,26 +117,24 @@ Redo the updatUnreadCoutn except with runTransaction to rpevent data corrutptin 
       console.info("chatID undefined");
       return;
     }
-
-    updateUserOnlineStatus(db, data.chatID, currUser.uid);
-
+    updateUserOnlineStatus(true, db, data.chatID, currUser.uid);
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));
     const childAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
-
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current))
-
     const childChangedListener = onChildChanged(otherListenersQuery, handleChildChanged);
     const childRemovedListener = onChildRemoved(otherListenersQuery, handleChildRemoved);
     const container = messagesContainerRef.current;
     window.addEventListener("click", handleClick);
     container.addEventListener("scroll", handleScroll);
-
+    window.addEventListener("beforeunload", handleUpdateUserStatus);
     return () => {
       childAddedListener();
       childChangedListener();
       childRemovedListener();
       window.removeEventListener("click", handleClick);
       container.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("beforeunload", handleUpdateUserStatus);
+      handleUpdateUserStatus();
     }
   }, [data.chatID]);
 
@@ -171,9 +173,9 @@ Redo the updatUnreadCoutn except with runTransaction to rpevent data corrutptin 
   }, [isVisible]);
 
   const handleAddMessage = async(text) => {
+    resetField('text');
     const prevTimestamp = localStorage.getItem('timestamp');
     const timeData = await addMessage(text, data.chatID, currUser.displayName, db, chatData, prevTimestamp);
-    resetField('text');
     userSentChat.current = true;
     if (timeData.renderState) {
       localStorage.setItem('timestamp', timeData.time);
@@ -218,9 +220,9 @@ Redo the updatUnreadCoutn except with runTransaction to rpevent data corrutptin 
 
                         {editState[chat.id] ? (
                           <form onSubmit={handleSubmit((text) => {
+                            resetField('editMessage');
                             editMessage(chat.id, text.editMessage, data.chatID, db);
                             setEditState({id: false});
-                            resetField('editMessage');
                             })}
                           >
                             <input placeholder={chat.text} {...register('editMessage', { required: false, maxLength: 200 })} />
