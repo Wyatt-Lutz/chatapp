@@ -1,7 +1,7 @@
 import { useContext, useState, useMemo, useCallback, useEffect, useRef, Fragment} from "react";
 import { ChatContext } from "../../../ChatProvider";
 import { AuthContext } from "../../../AuthProvider";
-import { db } from "../../../../firebase";
+import { db } from "../../../../hidden/firebase";
 import { useForm } from "react-hook-form";
 import { debounce } from 'lodash';
 import dayjs from "dayjs";
@@ -90,7 +90,7 @@ const Chats = () => {
     queryClient.setQueryData([data.chatID], updatedData);
 
   }, [data.chatID]);
-
+//HELLOLOOO
   const handleChildRemoved = useCallback((snap) => {
     const existingData = queryClient.getQueryData([data.chatID]);
     const updatedData = existingData.filter((chat) => chat.id !== snap.key);

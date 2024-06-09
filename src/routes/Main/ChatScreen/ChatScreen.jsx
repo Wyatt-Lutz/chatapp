@@ -10,7 +10,7 @@ const ChatScreen = () => {
   return(
     <section>
       {!data.chatID ? (
-        <div>firends online</div>
+        <div>firends online YOOOO WASGOOOD</div>
       ) : (
         <Chats />
       )}
