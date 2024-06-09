@@ -1,7 +1,7 @@
 import { useContext, useState, useMemo, useCallback, useEffect, useRef, Fragment} from "react";
 import { ChatContext } from "../../../ChatProvider";
 import { AuthContext } from "../../../AuthProvider";
-import { db } from "../../../../firebase";
+import { db } from "../../../../hidden/firebase";
 import { useForm } from "react-hook-form";
 import { debounce } from 'lodash';
 import dayjs from "dayjs";
