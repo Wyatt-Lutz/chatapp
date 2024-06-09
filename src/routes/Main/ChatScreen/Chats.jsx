@@ -99,19 +99,6 @@ const Chats = () => {
 
 
 
-/*
-I was finishing the unread messages implementation. I need to use the listener for the chatbar if someone deleted a chat for the if unread
-count increase because the listener has reference at chatsIn so if it changes , look for both deleted chat and changed unread then update jsx
-accodingly.
-
-
-todo:
-Add a listener to chatBar for if somebody else deletes a chat
-
-
-
-*/
-
   useEffect(() => {
     if (!data.chatID) {
       console.info("chatID undefined");

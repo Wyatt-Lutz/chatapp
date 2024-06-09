@@ -32,6 +32,7 @@
   - Sort the chatbar for most recent chatted in on top, need to add a timestamp or something
 
 -app
+  - Find anywhere I can reduce database calls (and learn a conventional method to do so like batching calls). One place is createChat when I loop over uids
   - Check in useEffects with listeners if I realy need the initialmount check
   - Add too many auth requests functionality as a context component surrounding the app
     - If the error.code === 'auth/too-many-requests' then setTimeout for exponentially increasing timestamp

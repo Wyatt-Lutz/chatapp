@@ -1,9 +1,9 @@
-import { useContext, useState, useEffect, useRef, useCallback } from "react";
+import { useContext, useState, useEffect, useRef, Fragment, useCallback } from "react";
 import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 import { db } from "../../../../firebase";
-import { ref, query, set, get, push, orderByChild, equalTo, onChildAdded, update, onChildChanged } from 'firebase/database'
+import { ref, query, set, get, push, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved } from 'firebase/database'
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
 
@@ -12,19 +12,34 @@ const ChatBar = () => {
   const [isAddUser, setAddUser] = useState(false);
   const {register, handleSubmit, resetField} = useForm();
   const { currUser } = useContext(AuthContext);
-  const [addUserUsers, setAddUserUsers] = useState([]); //excluded uid of currUser
+  const [addUserUsers, setAddUserUsers] = useState([{uid: currUser.uid, username: currUser.displayName}]); //excluded uid of currUser
   const [chats, setChats] = useState([]);
+  const [numUnread, setNumUnread] = useState({});
   const chatsInRef = ref(db, "users/" + currUser.uid + '/chatsIn');
 
   const handleNewChatAdded = useCallback(async(snap) => {
     const newChatID = snap.key;
     const chatRef = ref(db, "chats/" + newChatID);
-    console.log(newChatID)
     const newChatSnap = await get(chatRef);
     const newChatData = newChatSnap.val();
     newChatData.id = newChatID;
     setChats(prev => [...prev, newChatData]);
+    setNumUnread(prev => ({
+      ...prev,
+      [newChatID]: snap.val(),
+    }));
 
+  }, [currUser]);
+
+  const handleChangeInChat = useCallback((snap) => {
+    setNumUnread(prev => ({
+      ...prev,
+      [snap.key]: snap.val(),
+    }));
+  }, [currUser]);
+
+  const handleChildRemoved = useCallback((snap) => {
+    chats.filter(chat => chat.id !== snap.key);
   }, [currUser]);
 
 
@@ -34,10 +49,12 @@ const ChatBar = () => {
 
 
     const childAddedListener = onChildAdded(chatsInRef, handleNewChatAdded);
-    const childChangedListener = onChildChanged(chatsIn)
-    //const childChangedListener = onChildChanged()
+    const childChangedListener = onChildChanged(chatsInRef, handleChangeInChat)
+    const childRemovedListener = onChildRemoved(chatsInRef, handleChildRemoved);
     return () => {
       childAddedListener();
+      childChangedListener();
+      childRemovedListener();
     }
   }, [currUser]);
 
@@ -79,12 +96,10 @@ const ChatBar = () => {
   const createChat = async ({chatName}) => {
     try {
       resetField('chatName');
+      const uids = [...addUserUsers.map(user => user.uid)];
+      console.log(addUserUsers);
 
 
-      const uids = [currUser.uid, ...addUserUsers.map(user => user.uid)];
-
-
-      console.log(Object.values(addUserUsers));
 
 /*
       uids.sort((a, b) => {
@@ -113,12 +128,10 @@ const ChatBar = () => {
       uids.forEach((uid) => {
         const userChatDataRef = ref(db, "users/" + uid + "/chatsIn");
         const chatData = {[chatID]: 0};
-        //push(userChatDataRef, chatData);
         update(userChatDataRef, chatData)
 
         const membersDataRef = ref(db, "chats/" + chatID);
         const userData = {[uid]: false};
-        //push(membersDataRef, userData);
         update(membersDataRef, userData);
       })
 
@@ -129,7 +142,7 @@ const ChatBar = () => {
       console.error(error);
     }
     setAddUser(false);
-    setAddUserUsers([]);
+    setAddUserUsers([{uid: currUser.uid, username: currUser.displayName}]);
   }
 
   const handleChangeChat = (chatID) => {
@@ -148,7 +161,7 @@ const ChatBar = () => {
             <form className="flex" onSubmit={handleSubmit(addUser)}>
               <input {...register('recipient', { required: false })} />
               <div className="flex">
-                {addUserUsers.map((user) => (
+                {addUserUsers.filter(user => user.username !== currUser.displayName).map((user) => (
                   <div className="px-2" key={user.uid}>{user.username}</div>
                 ))}
               </div>
@@ -171,13 +184,17 @@ const ChatBar = () => {
 
       <div className="flex flex-col">
         {chats.map((chat) => (
+          <Fragment key={chat.id}>
+            <div  className="flex">
+              <button className="ring m-2" onClick={() => handleChangeChat(chat.id)}>
+                {chat.title.split(', ').filter(username => username !== currUser.displayName).join(', ')}
+              </button>
+              <div>{numUnread[chat.id]}</div>
 
-          <button className="ring m-2" onClick={() => handleChangeChat(chat.id)} key={chat.id}>
-            {chat.title.split(', ').filter(username => username !== currUser.displayName).join(', ')}
-            {chat.lastMessage && chat.lastMessage}
-            {chat.timeStamp && chat.timeStamp}
+            </div>
 
-          </button>
+
+          </Fragment>
 
 
 

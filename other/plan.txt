@@ -55,9 +55,6 @@ THings to do
     - Online and offline functionality
   - User pfps and chat pictures
   - Change chat names and pfps (chat owners?)
-  - Editing and deleting messages
-  - Yesterday and today for the times
-    - Also merge messages if they are at the same minute
   - Blocking users
   - Search messages
   - Settings
