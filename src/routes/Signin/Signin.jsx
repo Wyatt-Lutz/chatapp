@@ -4,7 +4,7 @@ import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword, setPersistence, sendEmailVerification, browserLocalPersistence } from "firebase/auth";
 import CryptoAES from 'crypto-js/aes';
 import CryptoENC from 'crypto-js/enc-utf8';
-import servKey from '../../../servKey';
+import { servKey } from "../../../envVars";
 import { useNavigate } from 'react-router-dom';
 import EmailNotVerified from "./EmailNotVerified";
 import PasswordReset from "./PasswordReset";

@@ -11,8 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-firebase.js
-servKey.js
+envVars.js
 
 
 # Editor directories and files
