@@ -1,7 +1,7 @@
 import { useContext, useState, useMemo, useCallback, useEffect, useRef, Fragment} from "react";
 import { ChatContext } from "../../../ChatProvider";
 import { AuthContext } from "../../../AuthProvider";
-import { db } from "../../../../hidden/firebase";
+import { db } from "../../../../firebase";
 import { useForm } from "react-hook-form";
 import { debounce } from 'lodash';
 import dayjs from "dayjs";
@@ -35,7 +35,7 @@ const Chats = () => {
   const [containerRef, isVisible] = useElementOnScreen({
     root: null,
     rootMargin: "0px",
-    threshold: 0.1,
+    threshold: 1,
   });
 
 
@@ -71,12 +71,10 @@ const Chats = () => {
       endTimestamp.current = existingData[0].timestamp;
     }
     queryClient.setQueryData([data.chatID], [...existingData, snap.val()]);
-    setAtBottom(prevState => {
-      if (!prevState) {
-        setUnread(prev => prev + 1);
-      }
-      return prevState;
-    })
+    if (!atBottom) {
+      setUnread(prev => prev + 1);
+    }
+
 
 
   }, [data.chatID]);
@@ -90,7 +88,7 @@ const Chats = () => {
     queryClient.setQueryData([data.chatID], updatedData);
 
   }, [data.chatID]);
-//HELLOLOOO
+
   const handleChildRemoved = useCallback((snap) => {
     const existingData = queryClient.getQueryData([data.chatID]);
     const updatedData = existingData.filter((chat) => chat.id !== snap.key);
@@ -127,11 +125,14 @@ const Chats = () => {
 
 
   const calcTime = (time) => {
-    const currTime = Date.now()
     const formattedTime = dayjs(time).format('h:mm A');
-    if (currTime - time < 86400000) {
+    const today = new Date();
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const yesterdayMidnight = new Date(todayMidnight);
+    yesterdayMidnight.setDate(todayMidnight.getDate() - 1);
+    if (time - todayMidnight.getTime() > 0) {
       return 'Today at ' + formattedTime;
-    } else if (currTime - time < 172800000 ) {
+    } else if (time - yesterdayMidnight.getTime() > 0) {
       return 'Yesterday at' + formattedTime;
     }
     return dayjs(time).format('MM/DD/YYYY h:m A');
@@ -193,7 +194,7 @@ const Chats = () => {
                 {chatData.data?.map((chat, index) => (
                   <Fragment key={chat.id}>
                     <div onContextMenu={(e) => handleContextMenu(e, chat)} className="hover:bg-gray-600">
-                      {chat.renderTimeAndSender && (
+                      {(chat.renderTimeAndSender || index === 0) && (
                             <div className="flex">
                               <div>{chat.sender}</div>
                               <div>{calcTime(chat.timestamp)}</div>
@@ -242,7 +243,9 @@ const Chats = () => {
           </form>
         </div>
 
-        <div ref={containerRef}></div>
+        <div className="flex border min-h-10" ref={containerRef}></div>
+
+
       </div>
       {clicked && (
         <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>

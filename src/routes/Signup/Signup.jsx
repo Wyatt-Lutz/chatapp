@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db, auth } from "../../../hidden/firebase";
+import { db, auth } from "../../../firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile} from "firebase/auth";
 import { ref, query, set, get, orderByChild, equalTo, onValue } from 'firebase/database'
 import EmailVerification from "./EmailVerification";

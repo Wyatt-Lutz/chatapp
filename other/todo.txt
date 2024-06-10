@@ -8,6 +8,7 @@
   - Think I need to prevent duplicate usernames becauser of adding people to chats
 
 -chats
+  - If you have more than 10 chats and you are loading the first chats, It dosnt display the timestamp for the first message that is loaded
   - Check if user online status is false if they change chats
   - Should add something to indicate the top of a chat
   - See if there is a more efficient method with handleClick in which I jsut reset to close the context menu

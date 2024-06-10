@@ -2,8 +2,8 @@ import { useContext, useState, useEffect, useRef, Fragment, useCallback } from "
 import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
-import { db } from "../../../../hidden/firebase";
-import { ref, query, set, get, push, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved } from 'firebase/database'
+import { db } from "../../../../firebase";
+import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved } from 'firebase/database'
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
 

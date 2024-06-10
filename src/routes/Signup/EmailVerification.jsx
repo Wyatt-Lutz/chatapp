@@ -1,6 +1,6 @@
 
 import { useNavigate } from 'react-router-dom';
-import { auth } from "../../../hidden/firebase";
+import { auth } from "../../../firebase";
 import { sendEmailVerification } from "firebase/auth";
 
 const EmailVerification = ({email}) => {
