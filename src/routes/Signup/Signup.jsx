@@ -4,35 +4,34 @@ import { useNavigate } from 'react-router-dom';
 import { db, auth } from "../../../firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile} from "firebase/auth";
 import { ref, query, set, get, orderByChild, equalTo, onValue } from 'firebase/database'
-import EmailVerification from "./EmailVerification";
 
 
 
 const Signup = () => {
-  const { register, handleSubmit } = useForm();
-  const [isVerify, setIsVerify] = useState(false);
-  const [email, setEmail] = useState(null);
+  const { register, formState: { errors }, handleSubmit } = useForm();
 
+  const navigate = useNavigate();
   const onSubmit = async({email, password, username}) => {
     try {
-      setEmail(email);
+
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, {displayName: username});
-      const uid = userCredential.user.uid
+      const trimmedUsername = username.trim()
+      console.log(username.length);
+      console.log(trimmedUsername.length);
+      await updateProfile(userCredential.user, {displayName: trimmedUsername});
+
+      const uid = userCredential.user.uid;
 
       set(ref(db, "users/" + uid), {
-        username: username,
+        username: trimmedUsername,
         email: email,
         blocked: [],
         chatsIn: [],
       });
 
       console.info('registration successful');
-      setIsVerify(true);
-      await sendEmailVerification(auth.currentUser);
-      console.info('Email verfication sent')
 
-      //send to home
+      navigate("/")
 
     } catch (error) {
       console.error(error);
@@ -42,17 +41,21 @@ const Signup = () => {
 
   return(
     <section>
-      {isVerify ? (
-        <EmailVerification email={email} />
-      ) :
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-          <input type="text" placeholder="Username" {...register('username', { required: true, maxLength: 15 })}></input>
-          <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 50 })}></input>
-          <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 100 })}></input>
-          <div className="italic text-sm">*Must be at least 6 characters</div>
-          <button type="submit" className="border rounded-md bg-zinc-500">Signup</button>
-        </form>
-      }
+
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+        <input type="text" placeholder="Username" {...register('username', { required: {value: true, message: "Usernames are required."}, maxLength: {value: 15, message: "Usernames cannot be longer than 15 characters."} })}></input>
+        <input type="email" placeholder="Email" {...register('email', { required: {value: true, message: "Emails are required."}, maxLength: {value: 254, message: "Email adresses cannot exceed 254 characters."} })}></input>
+        <input type="password" placeholder="******" {...register('password', { required: {value: true, message: "Passwords are required."}, maxLength: {value: 128, message: "Passwords cannot exceed 128 characters."} })}></input>
+        <div className="italic text-sm">*Must be at least 6 characters</div>
+        <button type="submit" className="border rounded-md bg-zinc-500">Signup</button>
+
+        {errors.username?.message}
+        {errors.email?.message}
+        {errors.password?.message}
+      </form>
+
+
+      <button onClick={() => navigate("/signin")}>Signin</button>
 
     </section>
 

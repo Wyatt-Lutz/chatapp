@@ -6,7 +6,7 @@ import CryptoAES from 'crypto-js/aes';
 import CryptoENC from 'crypto-js/enc-utf8';
 import { servKey } from "../../../envVars";
 import { useNavigate } from 'react-router-dom';
-import EmailNotVerified from "./EmailNotVerified";
+import EmailNotVerified from "../../utils/EmailNotVerified";
 import PasswordReset from "./PasswordReset";
 
 const Signin = () => {
@@ -23,16 +23,15 @@ const Signin = () => {
   const handlePassChange = (state) => {
     setPassReset(state);
   }
-  const handleVerifyChange = (state) => {
-    setVerify(state);
-  }
-
 
   useEffect(() => {
     ifCookieSignin();
   }, []);
 
   async function ifCookieSignin() {
+    if (!document.cookie) {
+      return;
+    }
     const cookieData = await decodeCookie();
     if (cookieData) {
       const parsedData = JSON.parse(cookieData);
@@ -44,35 +43,26 @@ const Signin = () => {
 
 
 
-
-
   const onSubmit = async ({email, password}) => {
     try {
       setEmail(email);
 
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.info("signin successful");
+      await signInWithEmailAndPassword(auth, email, password).then(() => {
+        console.info("signin successful");
+      });
 
-      if (!userCredential?.user?.emailVerified) {
-        await sendEmailVerification(auth.currentUser);
-        setVerify(true);
-        console.info("Email Verification sent");
-      }
 
       if (checkboxRef.current.checked) {
         await issueCookie(email, password);
       }
+
+      await setPersistence(auth, browserLocalPersistence).then(() => {
+        console.info('persistance set');
+      });
+
       navigate('/');
 
-
-      await setPersistence(auth, browserLocalPersistence);
-      console.info('persistance set')
-
-
-
-
     } catch (error) {
-
       console.error(error);
     }
   }
@@ -110,12 +100,11 @@ const Signin = () => {
 
 
 
+
   return(
     <section>
       {passReset ? (
         <PasswordReset passChange={handlePassChange}/>
-      ) : isVerify ? (
-        <EmailNotVerified email={email} verifyChange={handleVerifyChange}/>
       ) : (
         <div>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
@@ -126,6 +115,7 @@ const Signin = () => {
           <button onClick={() => setPassReset(true)}>Forgot Password?</button>
           <input type="checkbox" ref={checkboxRef} />
           <span>Remember Me</span>
+          <button onClick={() => navigate("/signup")}> Signup </button>
         </div>
       )}
 
