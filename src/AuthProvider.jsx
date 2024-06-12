@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { auth } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, setPersistence, browserLocalPersistence} from "firebase/auth";
 
 
 export const AuthContext = createContext();
@@ -12,11 +12,9 @@ export const AuthContextProvider = ({ children }) => {
     const authState = onAuthStateChanged(auth, (user) => {
       setCurrUser(user);
       setLoading(false);
-      console.info('authstate listener subscribe');
     });
     return () => {
       authState();
-      console.info('auth state listener unsubscribe');
     };
   }, []);
 

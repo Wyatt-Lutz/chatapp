@@ -1,103 +1,32 @@
 import { useForm } from "react-hook-form";
 import { useState, useRef, useEffect} from "react"
 import { auth } from "../../../firebase";
-import { signInWithEmailAndPassword, setPersistence, sendEmailVerification, browserLocalPersistence } from "firebase/auth";
-import CryptoAES from 'crypto-js/aes';
-import CryptoENC from 'crypto-js/enc-utf8';
-import { servKey } from "../../../envVars";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signInWithCustomToken, browserSessionPersistence } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
-import EmailNotVerified from "../../utils/EmailNotVerified";
 import PasswordReset from "./PasswordReset";
 
 const Signin = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, formState: { errors }, handleSubmit } = useForm();
   const [passReset, setPassReset] = useState(false);
-  const [email, setEmail] = useState(null);
-  const [isVerify, setVerify] = useState(false);
   const checkboxRef = useRef(false);
-
   const navigate = useNavigate();
-
 
 
   const handlePassChange = (state) => {
     setPassReset(state);
   }
 
-  useEffect(() => {
-    ifCookieSignin();
-  }, []);
 
-  async function ifCookieSignin() {
-    if (!document.cookie) {
-      return;
-    }
-    const cookieData = await decodeCookie();
-    if (cookieData) {
-      const parsedData = JSON.parse(cookieData);
-      const data = parsedData.cookieData;
-      const [email, password] = data;
-      await onSubmit({email, password});
-    }
-  }
-
-
-
-  const onSubmit = async ({email, password}) => {
-    try {
-      setEmail(email);
-
-      await signInWithEmailAndPassword(auth, email, password).then(() => {
-        console.info("signin successful");
-      });
-
-
-      if (checkboxRef.current.checked) {
-        await issueCookie(email, password);
+  const signUserIn = async({email, password}, token) => {
+    await setPersistence(auth, checkboxRef.current.checked ? browserLocalPersistence : browserSessionPersistence).then(() => {
+      if(token) {
+        return signInWithCustomToken(auth, token);
       }
-
-      await setPersistence(auth, browserLocalPersistence).then(() => {
-        console.info('persistance set');
-      });
-
-      navigate('/');
-
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-
-  async function issueCookie(email, password) {
-
-    const expireTime = new Date(Date.now()+ 2629746000); // 1 month
-    const expires = expireTime.toUTCString();
-
-    const path = '/';
-    const secure = true;
-    const httpOnly = true;
-    const sameSite = 'lax';
-
-    const cookieData = [email, password];
-
-    var encodedData = CryptoAES.encrypt(JSON.stringify({cookieData}), servKey).toString();
-
-    document.cookie = `rememberMeToken=${encodedData};expires=${expires};path=${path};secure=${secure};sameSite=${sameSite};`;
-  }
-
-  async function decodeCookie() {
-    try{
-      const cookies = document.cookie;
-      const [_, cookieDatas] = cookies.split('=');
-      const decryptedData = CryptoAES.decrypt(cookieDatas, servKey).toString(CryptoENC);
-      return decryptedData;
-
-    } catch (error) {
-      console.error(error)
-    }
+      return signInWithEmailAndPassword(auth, email, password);
+    });
+    navigate("/");
 
   }
-
 
 
 
@@ -107,16 +36,19 @@ const Signin = () => {
         <PasswordReset passChange={handlePassChange}/>
       ) : (
         <div>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-            <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 50 })}></input>
-            <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 100 })}></input>
+          <form noValidate onSubmit={handleSubmit((data) => signUserIn(data, null))} className="flex flex-col">
+            <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 254, pattern: {value: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/, message: "Not valid email."}})}></input>
+            <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 128, minLength: {value: 6, message: "Passwords are at least 6 characters."}, pattern: {value: /^[A-Za-z0-9$!@#%^&*()-_+=\[\]{};:'",.<>/?`~\\|]+$/, message: "Invalid use of characters inside password"} })}></input>
             <button type="submit" className="border rounded-md bg-zinc-500">Signin</button>
           </form>
+          {errors.email?.message}
+          {errors.password?.message}
           <button onClick={() => setPassReset(true)}>Forgot Password?</button>
           <input type="checkbox" ref={checkboxRef} />
           <span>Remember Me</span>
           <button onClick={() => navigate("/signup")}> Signup </button>
         </div>
+
       )}
 
     </section>

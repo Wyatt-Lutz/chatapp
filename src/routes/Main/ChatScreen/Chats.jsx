@@ -217,8 +217,14 @@ const Chats = () => {
                           </form>
 
                         ) : (
+                          <div>
+                            <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
+                            {chat.hasBeenEdited && (
+                              <div>Edited</div>
+                            )}
+                          </div>
 
-                          <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
+
                         )}
 
 

@@ -40,6 +40,7 @@ export const addMessage = async({text}, chatID, displayName, db, chatData, prevT
     id: newMessageRef.key,
     sender: displayName,
     renderTimeAndSender,
+    hasBeenEdited: false,
   }
   await set(newMessageRef, newMessage);
 
@@ -93,7 +94,8 @@ export const updateUserOnlineStatus = async(isOnline, db, chatID, userUid) => {
 export const editMessage = async(id, text, chatID, db) => {
   const chatRef = ref(db, "messages/" + chatID + "/" + id);
   await update(chatRef, {
-    text: text
+    text: text,
+    hasBeenEdited: true
   });
 }
 
