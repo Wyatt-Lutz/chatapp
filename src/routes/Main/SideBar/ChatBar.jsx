@@ -3,12 +3,11 @@ import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 import { db } from "../../../../firebase";
-import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved } from 'firebase/database'
+import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved } from 'firebase/database';
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
 
-
-  const { dispatch } = useContext(ChatContext);
+  const { data, dispatch } = useContext(ChatContext);
   const [isAddUser, setAddUser] = useState(false);
   const {register, handleSubmit, resetField} = useForm();
   const { currUser } = useContext(AuthContext);
@@ -22,6 +21,11 @@ const ChatBar = () => {
     const chatRef = ref(db, "chats/" + newChatID);
     const newChatSnap = await get(chatRef);
     const newChatData = newChatSnap.val();
+    /*
+    if (newChatData.metadata.title === "") {
+      newChatData.metadata.title = addUserUsers.map(user => user.username).filter(username => username !== currUser.displayName).join(', ')
+    }
+      */
     newChatData.id = newChatID;
     setChats(prev => [...prev, newChatData]);
     setNumUnread(prev => ({
@@ -45,12 +49,13 @@ const ChatBar = () => {
 
 
   useEffect(() => {
-    console.info('use effect run')
-
+    console.info('use effect run');
 
     const childAddedListener = onChildAdded(chatsInRef, handleNewChatAdded);
-    const childChangedListener = onChildChanged(chatsInRef, handleChangeInChat)
+    const childChangedListener = onChildChanged(chatsInRef, handleChangeInChat);
     const childRemovedListener = onChildRemoved(chatsInRef, handleChildRemoved);
+
+
     return () => {
       childAddedListener();
       childChangedListener();
@@ -117,10 +122,8 @@ const ChatBar = () => {
       }
 
 
-      set(ref(db, "chats/" + chatID), {
-        title: chatName && chatName.length > 0 ? chatName : addUserUsers.map(user => user.username).join(", "),
-        lastMessage: null,
-        timeStamp: null,
+      set(ref(db, "chats/" + chatID + "/metadata"), {
+        title: chatName && chatName.length > 0 ? chatName : "",
       });
 
 
@@ -145,8 +148,8 @@ const ChatBar = () => {
     setAddUserUsers([{uid: currUser.uid, username: currUser.displayName}]);
   }
 
-  const handleChangeChat = (chatID) => {
-    dispatch({ type: "CHANGE_CHAT", payload: chatID});
+  const handleChangeChat = (chatID, title) => {
+    dispatch({ type: "CHANGE_CHAT", payload: { chatID, title }});
   };
 
 
@@ -186,8 +189,8 @@ const ChatBar = () => {
         {chats.map((chat) => (
           <Fragment key={chat.id}>
             <div  className="flex">
-              <button className="ring m-2" onClick={() => handleChangeChat(chat.id)}>
-                {chat.title.split(', ').filter(username => username !== currUser.displayName).join(', ')}
+              <button className="ring m-2" onClick={() => handleChangeChat(chat.id, chat.metadata.title)}>
+                {(data.chatID === chat.id && data.title) ? data.title : chat.metadata.title}
               </button>
               <div>{numUnread[chat.id]}</div>
 

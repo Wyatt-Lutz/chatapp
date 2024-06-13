@@ -21,16 +21,9 @@ export const fetchChats = async(time, db, chatID) => {
 
 
 
-export const addMessage = async({text}, chatID, displayName, db, chatData, prevTimestamp) => {
-  let renderTimeAndSender = true;
-  if (chatData.data && prevTimestamp) {
-    const previousMessage = chatData.data[chatData.data.length - 1];
-    if (previousMessage.sender === displayName && Date.now() - prevTimestamp < 180000) {
-      renderTimeAndSender = false;
-    }
-  }
-
-
+export const addMessage = async(text, chatID, displayName, db, renderTimeAndSender) => {
+  console.log(text);
+  console.log(displayName);
   const chatRef = ref(db, "messages/" + chatID + "/");
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
@@ -102,4 +95,15 @@ export const editMessage = async(id, text, chatID, db) => {
 export const deleteMessage = async(id, db, chatID) => {
   const chatRef = ref(db, "messages/" + chatID + "/" + id);
   await remove(chatRef);
+}
+
+
+export const editTitle = async(newTitle, chatID, db, displayName) => {
+
+  const titleRef = ref(db, "chats/" + chatID + "/metadata");
+  await update(titleRef, {
+    title: newTitle,
+  });
+  const changedTitleText = displayName + " has changed the chat name to " + newTitle;
+  await addMessage(changedTitleText, chatID, "server", db, true);
 }

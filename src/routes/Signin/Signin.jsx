@@ -38,7 +38,7 @@ const Signin = () => {
         <div>
           <form noValidate onSubmit={handleSubmit((data) => signUserIn(data, null))} className="flex flex-col">
             <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 254, pattern: {value: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/, message: "Not valid email."}})}></input>
-            <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 128, minLength: {value: 6, message: "Passwords are at least 6 characters."}, pattern: {value: /^[A-Za-z0-9$!@#%^&*()-_+=\[\]{};:'",.<>/?`~\\|]+$/, message: "Invalid use of characters inside password"} })}></input>
+            <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 128, minLength: {value: 6, message: "Passwords are at least 6 characters."}, pattern: {value: /^[A-Za-z0-9$!@#%^&*()_\-+=\[\]{};:'",.<>/?`~\\|]+$/, message: "Invalid use of characters inside password"} })}></input>
             <button type="submit" className="border rounded-md bg-zinc-500">Signin</button>
           </form>
           {errors.email?.message}

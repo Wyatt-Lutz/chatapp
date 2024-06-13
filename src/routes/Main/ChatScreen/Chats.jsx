@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { useElementOnScreen } from "../../../IntersectionObserver";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast } from 'firebase/database'
-import {fetchChats, addMessage, editMessage, deleteMessage, updateUserOnlineStatus} from './useChatData';
+import {fetchChats, addMessage, editMessage, deleteMessage, editTitle, updateUserOnlineStatus} from './useChatData';
 
 
 const Chats = () => {
@@ -30,6 +30,7 @@ const Chats = () => {
   const endTimestamp = useRef(0);
   const userSentChat = useRef(false);
   const [unread, setUnread] = useState(0);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
 
   const [containerRef, isVisible] = useElementOnScreen({
@@ -97,11 +98,13 @@ const Chats = () => {
 
 
 
+
   useEffect(() => {
     if (!data.chatID) {
       console.info("chatID undefined");
       return;
     }
+    console.log(data.title);
     updateUserOnlineStatus(true, db, data.chatID, currUser.uid);
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));
     const childAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
@@ -144,7 +147,7 @@ const Chats = () => {
     setClicked(true);
 
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({ chatID: chat.id, text: chat.text });
+    setContextMenuData({ chatID: chat.id, text: chat.text, sender: chat.sender });
     console.log('right cliecked');
   }
 
@@ -163,7 +166,15 @@ const Chats = () => {
   const handleAddMessage = async(text) => {
     resetField('text');
     const prevTimestamp = localStorage.getItem('timestamp');
-    const timeData = await addMessage(text, data.chatID, currUser.displayName, db, chatData, prevTimestamp);
+    let renderTimeAndSender = true;
+    if (chatData.data && prevTimestamp) {
+      const previousMessage = chatData.data[chatData.data.length - 1];
+      if (previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
+        renderTimeAndSender = false;
+      }
+    }
+
+    const timeData = await addMessage(text.text, data.chatID, currUser.displayName, db, renderTimeAndSender);
     userSentChat.current = true;
     if (timeData.renderState) {
       localStorage.setItem('timestamp', timeData.time);
@@ -179,11 +190,27 @@ const Chats = () => {
   }, [chatData.data]);
 
 
+  const onFinishEditTitle = async(text) => {
 
+    resetField('title');
+    setIsEditingTitle(false);
+    if (text.title === "") {
+      return;
+    }
+    await editTitle(text.title, data.chatID, db, currUser.displayName);
 
+  }
 
   return(
     <section className="w-full">
+      {isEditingTitle ? (
+        <form onSubmit={handleSubmit(onFinishEditTitle)}>
+          <input {...register('title', {required: false})} placeholder={data.title} onBlur={handleSubmit(onFinishEditTitle)}></input>
+        </form>
+
+      ) : (
+        <div onMouseOver={() => setIsEditingTitle(true)}>{data.title}</div>
+      )}
       <div ref={messagesContainerRef} className="overflow-y-auto max-h-[400px] no-scrollbar w-full flex flex-col-reverse scroll-smooth">
           <div className="flex-grow">
             {chatData.isError ? (
@@ -253,7 +280,7 @@ const Chats = () => {
 
 
       </div>
-      {clicked && (
+      {(clicked && contextMenuData.sender === currUser.displayName && contextMenuData.sender !== "server") && (
         <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
           <button onClick={() => setEditState((prev) => ({...prev, [contextMenuData.chatID]: true }))}>Edit</button>
           <button onClick={() => deleteMessage(contextMenuData.chatID, db, data.chatID)}>Delete</button>
