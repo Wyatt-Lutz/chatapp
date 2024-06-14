@@ -1,7 +1,7 @@
 
-import { ref, query, set, get, update, endBefore, runTransaction, limitToLast, push, orderByChild, onValue, remove, serverTimestamp } from 'firebase/database';
-
+import { ref, query, set, get, update, endBefore, runTransaction, limitToLast, push, orderByChild, remove, serverTimestamp } from 'firebase/database';
 const NUM_CHATS_PER_PAGE = 10;
+
 
 export const fetchChats = async(time, db, chatID) => {
   console.info('fetchChats run');
@@ -66,15 +66,15 @@ const updateUnreadCount = async(db, chatID) => {
   }
 }
 
-export const updateUserOnlineStatus = async(isOnline, db, chatID, userUid) => {
-  const dataRef = ref(db, "chats/" + chatID);
+export const updateUserOnlineStatus = async(isOnline, db, chatID, username, uid) => {
+  const dataRef = ref(db, "members/" + chatID);
 
   await update(dataRef, {
-    [userUid]: isOnline,
+    [username]: isOnline,
   });
 
   if (isOnline) {
-    const userDataRef = ref(db, "users/" + userUid + "/chatsIn");
+    const userDataRef = ref(db, "users/" + uid + "/chatsIn");
     await update(userDataRef, {[chatID]: 0});
   }
 

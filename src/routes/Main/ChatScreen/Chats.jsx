@@ -7,7 +7,7 @@ import { debounce } from 'lodash';
 import dayjs from "dayjs";
 import { useElementOnScreen } from "../../../IntersectionObserver";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast } from 'firebase/database'
+import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast, update } from 'firebase/database'
 import {fetchChats, addMessage, editMessage, deleteMessage, editTitle, updateUserOnlineStatus} from './useChatData';
 
 
@@ -62,16 +62,15 @@ const Chats = () => {
     }
   }, []);
 
-  const handleUpdateUserStatus = useCallback(() => {
-    updateUserOnlineStatus(false, db, data.chatID, currUser.uid);
-  })
+
 
   const handleChildAdded = useCallback((snap) => {
-    const existingData = queryClient.getQueryData([data.chatID]) ?? [];
+    const existingData = queryClient.getQueryData(['messsages', data.chatID]) ?? [];
     if (existingData.length === 1) {
-      endTimestamp.current = existingData[0].timestamp;
+      endTimestamp.current = existingData.messages[0].timestamp;
     }
-    queryClient.setQueryData([data.chatID], [...existingData, snap.val()]);
+    queryClient.setQueryData(['messsages', data.chatID], [...existingData, snap.val()]);
+
     if (!atBottom) {
       setUnread(prev => prev + 1);
     }
@@ -81,20 +80,37 @@ const Chats = () => {
   }, [data.chatID]);
 
   const handleChildChanged = useCallback((snap) => {
-    const existingData = queryClient.getQueryData([data.chatID]) ?? [];
+    const existingData = queryClient.getQueryData(['messsages', data.chatID]) ?? [];
     const updatedData = existingData.map((chat) =>
       chat.id === snap.key ? snap.val() : chat
     );
 
-    queryClient.setQueryData([data.chatID], updatedData);
+    queryClient.setQueryData(['messsages', data.chatID], updatedData);
 
   }, [data.chatID]);
 
   const handleChildRemoved = useCallback((snap) => {
-    const existingData = queryClient.getQueryData([data.chatID]);
+    const existingData = queryClient.getQueryData(['messsages', data.chatID]) ?? [];
     const updatedData = existingData.filter((chat) => chat.id !== snap.key);
-    queryClient.setQueryData([data.chatID], updatedData);
+    queryClient.setQueryData(['messsages', data.chatID], updatedData);
   }, [data.chatID]);
+
+  const handleMemberAdded = useCallback((snap) => {
+    const existingData = queryClient.getQueryData(['members', data.chatID]) ?? [];
+    queryClient.setQueryData(['members', data.chatID], [...existingData, snap.key]);
+  }, [data.chatID]);
+
+  const handleMemberChanged = useCallback((snap) => {
+    const existingData = queryClient.getQueryData(['members', data.chatID]) ?? [];
+    console.log(snap.val());
+    console.log(snap.key);
+  }, [data.chatID])
+
+  const handleMemberRemoved = useCallback((snap) => {
+    const existingData = queryClient.getQueryData(['members', data.chatID]) ?? [];
+    const updatedData = existingData.members.filter((member) => member.key !== snap.key);
+    queryClient.setQueryData(['members', data.chatID], updatedData);
+  }, [data.chatID])
 
 
 
@@ -104,25 +120,38 @@ const Chats = () => {
       console.info("chatID undefined");
       return;
     }
-    console.log(data.title);
-    updateUserOnlineStatus(true, db, data.chatID, currUser.uid);
+    updateUserOnlineStatus(true, db, data.chatID, currUser.displayName, currUser.uid);
+
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));
+    const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current));
+
+    const membersRef  = ref(db, "members/" + data.chatID);
+    const memberAddedListener = onChildAdded(membersRef, handleMemberAdded);
+    const memberChangedListener = onChildChanged(membersRef, handleMemberChanged);
+    const memberRemovedListener = onChildRemoved(membersRef, handleMemberRemoved);
+
+
     const childAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
-    const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current))
     const childChangedListener = onChildChanged(otherListenersQuery, handleChildChanged);
     const childRemovedListener = onChildRemoved(otherListenersQuery, handleChildRemoved);
+
+
     const container = messagesContainerRef.current;
+
     window.addEventListener("click", handleClick);
     container.addEventListener("scroll", handleScroll);
-    window.addEventListener("beforeunload", handleUpdateUserStatus);
+    window.addEventListener("beforeunload", updateUserOnlineStatus(false, db, data.chatID, currUser.displayName, currUser.uid));
     return () => {
       childAddedListener();
       childChangedListener();
       childRemovedListener();
+      memberAddedListener();
+      memberChangedListener();
+      memberRemovedListener();
       window.removeEventListener("click", handleClick);
       container.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("beforeunload", handleUpdateUserStatus);
-      handleUpdateUserStatus();
+      window.removeEventListener("beforeunload", updateUserOnlineStatus(false, db, data.chatID, currUser.displayName, currUser.uid));
+      updateUserOnlineStatus(false, db, data.chatID, currUser.displayName, currUser.uid);
     }
   }, [data.chatID]);
 
@@ -167,8 +196,8 @@ const Chats = () => {
     resetField('text');
     const prevTimestamp = localStorage.getItem('timestamp');
     let renderTimeAndSender = true;
-    if (chatData.data && prevTimestamp) {
-      const previousMessage = chatData.data[chatData.data.length - 1];
+    if (chatData.data.messages && prevTimestamp) {
+      const previousMessage = chatData.data.messages[chatData.data.messages.length - 1];
       if (previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
         renderTimeAndSender = false;
       }
@@ -218,7 +247,7 @@ const Chats = () => {
             ) : (
               <div>
 
-                {chatData.data?.map((chat, index) => (
+                {chatData.data?.messages?.map((chat, index) => (
                   <Fragment key={chat.id}>
                     <div onContextMenu={(e) => handleContextMenu(e, chat)} className="hover:bg-gray-600">
                       {(chat.renderTimeAndSender || index === 0) && (

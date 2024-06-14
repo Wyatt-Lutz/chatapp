@@ -1,11 +1,9 @@
-import { createContext, useContext, useReducer, useEffect } from "react";
-import { ref, query, onChildChanged} from 'firebase/database';
+import { createContext, useReducer, useEffect } from "react";
+import { ref, onChildChanged} from 'firebase/database';
 import { db } from "../firebase";
-import { AuthContext } from "./AuthProvider";
 export const ChatContext = createContext();
 
 export const ChatContextProvider = ({ children }) => {
-  const { currUser } = useContext(AuthContext);
   const initialState = {
     chatID: null,
     title: '',
@@ -35,7 +33,7 @@ export const ChatContextProvider = ({ children }) => {
     if (!state.chatID) {
       return;
     }
-    const chatTitleQuery = query(ref(db, "chats/" + state.chatID + "/metadata"));
+    const chatTitleQuery = ref(db, "chats/" + state.chatID + "/metadata");
     const titleChangeListener = onChildChanged(chatTitleQuery, (snap) => {
       dispatch({type: "UPDATE_TITLE", payload: snap.val()});
     });

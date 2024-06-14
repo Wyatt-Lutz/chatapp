@@ -104,39 +104,33 @@ const ChatBar = () => {
       const uids = [...addUserUsers.map(user => user.uid)];
       console.log(addUserUsers);
 
-
-
-/*
-      uids.sort((a, b) => {
-        const numA = parseInt(a.match(/\d+/)[0]);
-        const numB = parseInt(b.match(/\d+/)[0]);
-        return numA - numB;
-      });
-  */
-
-
       const chatID = uids.sort().join("");
       if (chats.some(chat => chat.chatID === chatID)) {
         console.log('already chat with those users') //toast
         return;
       }
 
-
-      set(ref(db, "chats/" + chatID + "/metadata"), {
-        title: chatName && chatName.length > 0 ? chatName : "",
+      set(ref(db, "chats/" + chatID), {
+        metadata: {
+          title: chatName && chatName.length > 0 ? chatName : "",
+        },
+        lastMessage: "",
+        timestamp: 0,
       });
 
+      const membersList = addUserUsers.reduce((acc, obj) => {
+        acc[obj.username] = false;
+        return acc
+      }, {});
+      console.log(membersList);
+      set(ref(db, "members/" + chatID), membersList);
 
 
       uids.forEach((uid) => {
         const userChatDataRef = ref(db, "users/" + uid + "/chatsIn");
         const chatData = {[chatID]: 0};
         update(userChatDataRef, chatData)
-
-        const membersDataRef = ref(db, "chats/" + chatID);
-        const userData = {[uid]: false};
-        update(membersDataRef, userData);
-      })
+      });
 
 
       console.info('created chat');
