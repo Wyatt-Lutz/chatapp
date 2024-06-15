@@ -1,4 +1,4 @@
-
+import dayjs from "dayjs";
 import { ref, query, set, get, update, endBefore, runTransaction, limitToLast, push, orderByChild, remove, serverTimestamp } from 'firebase/database';
 const NUM_CHATS_PER_PAGE = 10;
 
@@ -21,9 +21,7 @@ export const fetchChats = async(time, db, chatID) => {
 
 
 
-export const addMessage = async(text, chatID, displayName, db, renderTimeAndSender) => {
-  console.log(text);
-  console.log(displayName);
+export const addMessage = async(text, chatID, displayName, db, renderTimeAndSender, previousSender) => {
   const chatRef = ref(db, "messages/" + chatID + "/");
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
@@ -106,4 +104,19 @@ export const editTitle = async(newTitle, chatID, db, displayName) => {
   });
   const changedTitleText = displayName + " has changed the chat name to " + newTitle;
   await addMessage(changedTitleText, chatID, "server", db, true);
+}
+
+
+export const calcTime = (time) => {
+  const formattedTime = dayjs(time).format('h:mm A');
+  const today = new Date();
+  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const yesterdayMidnight = new Date(todayMidnight);
+  yesterdayMidnight.setDate(todayMidnight.getDate() - 1);
+  if (time - todayMidnight.getTime() > 0) {
+    return 'Today at ' + formattedTime;
+  } else if (time - yesterdayMidnight.getTime() > 0) {
+    return 'Yesterday at' + formattedTime;
+  }
+  return dayjs(time).format('MM/DD/YYYY h:m A');
 }

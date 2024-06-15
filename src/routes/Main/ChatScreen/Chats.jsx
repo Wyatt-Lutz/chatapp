@@ -4,12 +4,14 @@ import { AuthContext } from "../../../AuthProvider";
 import { db } from "../../../../firebase";
 import { useForm } from "react-hook-form";
 import { debounce } from 'lodash';
-import dayjs from "dayjs";
+
 import { useElementOnScreen } from "../../../IntersectionObserver";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast, update } from 'firebase/database'
 import {fetchChats, addMessage, editMessage, deleteMessage, editTitle, updateUserOnlineStatus} from './useChatData';
-
+import Chat from "./Chat";
+import Input from "./Input";
+import ContextMenu from "./ContextMenu";
 
 const Chats = () => {
 
@@ -28,7 +30,6 @@ const Chats = () => {
   const [contextMenuData, setContextMenuData] = useState(null);
   const chatsRef = useMemo(() =>  ref(db, "messages/" + data.chatID + "/"));
   const endTimestamp = useRef(0);
-  const userSentChat = useRef(false);
   const [unread, setUnread] = useState(0);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
@@ -43,7 +44,13 @@ const Chats = () => {
   const chatData = useQuery({
     enabled: false,
     refetchOnWindowFocus: false,
-    queryKey: [data.chatID],
+    queryKey: ['messages', data.chatID],
+  });
+
+  const memberData = useQuery({
+    enabled: false,
+    refetchOnWindowFocus: false,
+    queryKey: ['members', data.chatID],
   });
 
 
@@ -65,11 +72,11 @@ const Chats = () => {
 
 
   const handleChildAdded = useCallback((snap) => {
-    const existingData = queryClient.getQueryData(['messsages', data.chatID]) ?? [];
+    const existingData = queryClient.getQueryData(['messages', data.chatID]) ?? [];
     if (existingData.length === 1) {
-      endTimestamp.current = existingData.messages[0].timestamp;
+      endTimestamp.current = existingData[0].timestamp;
     }
-    queryClient.setQueryData(['messsages', data.chatID], [...existingData, snap.val()]);
+    queryClient.setQueryData(['messages', data.chatID], [...existingData, snap.val()]);
 
     if (!atBottom) {
       setUnread(prev => prev + 1);
@@ -80,19 +87,22 @@ const Chats = () => {
   }, [data.chatID]);
 
   const handleChildChanged = useCallback((snap) => {
-    const existingData = queryClient.getQueryData(['messsages', data.chatID]) ?? [];
+    const existingData = queryClient.getQueryData(['messages', data.chatID]) ?? [];
     const updatedData = existingData.map((chat) =>
       chat.id === snap.key ? snap.val() : chat
     );
 
-    queryClient.setQueryData(['messsages', data.chatID], updatedData);
+    console.log(snap.key);
+    console.log(snap.val());
+
+    queryClient.setQueryData(['messages', data.chatID], updatedData);
 
   }, [data.chatID]);
 
   const handleChildRemoved = useCallback((snap) => {
-    const existingData = queryClient.getQueryData(['messsages', data.chatID]) ?? [];
+    const existingData = queryClient.getQueryData(['messages', data.chatID]) ?? [];
     const updatedData = existingData.filter((chat) => chat.id !== snap.key);
-    queryClient.setQueryData(['messsages', data.chatID], updatedData);
+    queryClient.setQueryData(['messages', data.chatID], updatedData);
   }, [data.chatID]);
 
   const handleMemberAdded = useCallback((snap) => {
@@ -108,9 +118,14 @@ const Chats = () => {
 
   const handleMemberRemoved = useCallback((snap) => {
     const existingData = queryClient.getQueryData(['members', data.chatID]) ?? [];
-    const updatedData = existingData.members.filter((member) => member.key !== snap.key);
+    const updatedData = existingData.filter((member) => member.key !== snap.key);
     queryClient.setQueryData(['members', data.chatID], updatedData);
   }, [data.chatID])
+
+
+  const handleUserOffline = useCallback(() => {
+    updateUserOnlineStatus(false, db, data.chatID, currUser.uid);
+  })
 
 
 
@@ -140,7 +155,7 @@ const Chats = () => {
 
     window.addEventListener("click", handleClick);
     container.addEventListener("scroll", handleScroll);
-    window.addEventListener("beforeunload", updateUserOnlineStatus(false, db, data.chatID, currUser.displayName, currUser.uid));
+    window.addEventListener("beforeunload", handleUserOffline);
     return () => {
       childAddedListener();
       childChangedListener();
@@ -150,25 +165,13 @@ const Chats = () => {
       memberRemovedListener();
       window.removeEventListener("click", handleClick);
       container.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("beforeunload", updateUserOnlineStatus(false, db, data.chatID, currUser.displayName, currUser.uid));
-      updateUserOnlineStatus(false, db, data.chatID, currUser.displayName, currUser.uid);
+      window.removeEventListener("beforeunload", handleUserOffline);
+      handleUserOffline();
     }
   }, [data.chatID]);
 
 
-  const calcTime = (time) => {
-    const formattedTime = dayjs(time).format('h:mm A');
-    const today = new Date();
-    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const yesterdayMidnight = new Date(todayMidnight);
-    yesterdayMidnight.setDate(todayMidnight.getDate() - 1);
-    if (time - todayMidnight.getTime() > 0) {
-      return 'Today at ' + formattedTime;
-    } else if (time - yesterdayMidnight.getTime() > 0) {
-      return 'Yesterday at' + formattedTime;
-    }
-    return dayjs(time).format('MM/DD/YYYY h:m A');
-  }
+
 
 
   const handleContextMenu = (e, chat) => {
@@ -192,23 +195,7 @@ const Chats = () => {
     }
   }, [isVisible]);
 
-  const handleAddMessage = async(text) => {
-    resetField('text');
-    const prevTimestamp = localStorage.getItem('timestamp');
-    let renderTimeAndSender = true;
-    if (chatData.data.messages && prevTimestamp) {
-      const previousMessage = chatData.data.messages[chatData.data.messages.length - 1];
-      if (previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
-        renderTimeAndSender = false;
-      }
-    }
 
-    const timeData = await addMessage(text.text, data.chatID, currUser.displayName, db, renderTimeAndSender);
-    userSentChat.current = true;
-    if (timeData.renderState) {
-      localStorage.setItem('timestamp', timeData.time);
-    }
-  }
 
   useEffect(() => {
 
@@ -220,17 +207,20 @@ const Chats = () => {
 
 
   const onFinishEditTitle = async(text) => {
-
     resetField('title');
     setIsEditingTitle(false);
     if (text.title === "") {
       return;
     }
     await editTitle(text.title, data.chatID, db, currUser.displayName);
+  }
 
-  }//hello
-//hola
-//epioc
+  const changeEditState = useCallback((id, state) => {
+    console.info('i ran')
+    setEditState((prev) => ({...prev, [id]: state}));
+  }, [data.chatID]);
+
+
   return(
     <section className="w-full">
       {isEditingTitle ? (
@@ -241,6 +231,9 @@ const Chats = () => {
       ) : (
         <div onMouseOver={() => setIsEditingTitle(true)}>{data.title}</div>
       )}
+
+
+
       <div ref={messagesContainerRef} className="overflow-y-auto max-h-[400px] no-scrollbar w-full flex flex-col-reverse scroll-smooth">
           <div className="flex-grow">
             {chatData.isError ? (
@@ -248,73 +241,33 @@ const Chats = () => {
             ) : (
               <div>
 
-                {chatData.data?.messages?.map((chat, index) => (
+                {chatData.data?.map((chat, index) => (
                   <Fragment key={chat.id}>
+
                     <div onContextMenu={(e) => handleContextMenu(e, chat)} className="hover:bg-gray-600">
-                      {(chat.renderTimeAndSender || index === 0) && (
-                            <div className="flex">
-                              <div>{chat.sender}</div>
-                              <div>{calcTime(chat.timestamp)}</div>
-
-                            </div>
-
-                        )}
-                      <div className="flex flex-col w-full">
-
-
-
-                        {editState[chat.id] ? (
-                          <form onSubmit={handleSubmit((text) => {
-                            resetField('editMessage');
-                            editMessage(chat.id, text.editMessage, data.chatID, db);
-                            setEditState({id: false});
-                            })}
-                          >
-                            <input placeholder={chat.text} {...register('editMessage', { required: false, maxLength: 200 })} />
-                          </form>
-
-                        ) : (
-                          <div>
-                            <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
-                            {chat.hasBeenEdited && (
-                              <div>Edited</div>
-                            )}
-                          </div>
-
-
-                        )}
-
-
-                      </div>
+                      <Chat chat={chat} index={index} isEditing={editState[chat.id]} changeEditState={changeEditState}/>
                     </div>
+
                     {index === chatData.data.length - 1 && (
                       <div ref = {lastMessageRef} />
                     )}
 
                   </Fragment>
 
+
+
                 ))}
               </div>
             )}
 
 
-          <form onSubmit={handleSubmit(handleAddMessage)}
-
-          >
-            <input placeholder="Type here..." {...register('text', { required: false, maxLength: 200})} />
-
-          </form>
+            <Input />
         </div>
 
         <div className="flex border min-h-10" ref={containerRef}></div>
-
-
       </div>
       {(clicked && contextMenuData.sender === currUser.displayName && contextMenuData.sender !== "server") && (
-        <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
-          <button onClick={() => setEditState((prev) => ({...prev, [contextMenuData.chatID]: true }))}>Edit</button>
-          <button onClick={() => deleteMessage(contextMenuData.chatID, db, data.chatID)}>Delete</button>
-        </div>
+        <ContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
       )}
       {unread > 0 && (
         <div>{unread} new messages</div>
