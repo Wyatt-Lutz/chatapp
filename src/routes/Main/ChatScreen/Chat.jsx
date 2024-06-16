@@ -1,11 +1,18 @@
-import { Fragment, memo } from "react"
-import { calcTime } from "./useChatData";
+import { Fragment, memo, useCallback, useContext } from "react"
+import { calcTime, editMessage } from "./useChatData";
 import { useForm } from "react-hook-form";
+import { ChatContext } from "../../../ChatProvider";
+import { db } from "../../../../firebase";
+
 
 
 
 const Chat = ({chat, index, isEditing, changeEditState }) => {
   const { register, handleSubmit, resetField } = useForm();
+  const { data } = useContext(ChatContext);
+
+
+
   const onSubmitEdit = async(text) => {
     resetField('editMessage');
     editMessage(chat.id, text.editMessage, data.chatID, db);
@@ -30,12 +37,12 @@ const Chat = ({chat, index, isEditing, changeEditState }) => {
             <input placeholder={chat.text} {...register('editMessage', { required: false, maxLength: 200 })} />
           </form>
         ) : (
-          <div>
-          <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
-          {chat.hasBeenEdited && (
-            <div>Edited</div>
-          )}
-        </div>
+          <div className="text-wrap">
+            <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
+            {chat.hasBeenEdited && (
+              <div>Edited</div>
+            )}
+          </div>
         )}
       </div>
 

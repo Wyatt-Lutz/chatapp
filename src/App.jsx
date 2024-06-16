@@ -1,11 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+
 import Signin from "./routes/Signin/Signin";
-import Signup from "./routes/Signup/Signup";
-import Main from "./routes/Main/Main";
 import { Navigate } from "react-router-dom";
-import { useContext } from "react";
+import { Suspense, lazy, useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 
+const Signup = lazy(() => import('./routes/Signup/Signup'));
+const Main = lazy(() => import('./routes/Main/Main'));
 function App() {
   const { currUser } = useContext(AuthContext);
 
@@ -19,13 +20,15 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/">
-          <Route index element={<AuthProtected><Main /></AuthProtected>}></Route>
-          <Route path="signin" element={<Signin/>}/>
-          <Route path="signup" element={<Signup/>}/>
-        </Route>
-      </Routes>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/">
+            <Route index element={<AuthProtected><Main /></AuthProtected>}></Route>
+            <Route path="signin" element={<Signin/>}/>
+            <Route path="signup" element={<Signup/>}/>
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
 
 

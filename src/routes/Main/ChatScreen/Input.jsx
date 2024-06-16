@@ -4,27 +4,17 @@ import { AuthContext } from "../../../AuthProvider";
 import { ChatContext } from "../../../ChatProvider";
 import { db } from "../../../../firebase";
 import { addMessage } from "./useChatData";
-import { useQueryClient } from "@tanstack/react-query";
 
 
-const Input = () => {
+const Input = ({calculateRenderTimeAndSender}) => {
   const { register, handleSubmit, resetField } = useForm();
   const { currUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
-  const queryClient = useQueryClient();
 
   console.log('input run');
   const handleAddMessage = useCallback(async(text) => {
     resetField('text');
-    const prevTimestamp = localStorage.getItem('timestamp');
-    const existingData = queryClient.getQueryData(['messages', data.chatID]);
-    const previousMessage = existingData[existingData?.length - 1];
-    let renderTimeAndSender = true;
-    if (prevTimestamp && previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
-      renderTimeAndSender = false;
-    }
-
-
+    const renderTimeAndSender = await calculateRenderTimeAndSender();
     const timeData = await addMessage(text.text, data.chatID, currUser.displayName, db, renderTimeAndSender);
     if (timeData.renderState) {
       localStorage.setItem('timestamp', timeData.time);

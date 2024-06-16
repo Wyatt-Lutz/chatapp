@@ -1,10 +1,11 @@
 import ChatScreen from './ChatScreen/ChatScreen';
 import { AuthContext } from '../../AuthProvider';
 import SideBar from './SideBar/SideBar';
-import EmailNotVerified from '../../utils/EmailNotVerified';
-import { useEffect, useState, useContext } from 'react';
+
+import { useEffect, useState, useContext, lazy, Suspense } from 'react';
 import { sendEmailVerification, signOut } from 'firebase/auth';
 import { auth } from '../../../firebase';
+const EmailNotVerified = lazy(() => import('../../utils/EmailNotVerified'));
 const Main = () => {
   const [isVerify, setVerify] = useState(false);
   const { currUser } = useContext(AuthContext);
@@ -40,7 +41,10 @@ const Main = () => {
     <section>
       <button onClick={signUserOut} className='text-white font-bold shadow-2xl hover:bg-blue-500 focus:outline-none active:bg-blue-800 bg-blue-400 rounded-lg'>Signout</button>
       {isVerify ? (
-        <EmailNotVerified verifyChange={handleVerifyChange} email={currUser.email} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <EmailNotVerified verifyChange={handleVerifyChange} email={currUser.email} />
+        </Suspense>
+
       ) : (
         <div className='flex justify-center items-center w-full h-screen'>
           <div className='flex ring flex-col'>

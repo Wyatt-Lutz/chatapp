@@ -1,6 +1,7 @@
 import { useContext, memo } from "react";
 import { db } from "../../../../firebase";
 import { ChatContext } from "../../../ChatProvider";
+import { deleteMessage } from "./useChatData";
 const ContextMenu = ({changeEditState, contextMenuData, points}) => {
   const { data } = useContext(ChatContext);
   console.log('contextmenu run');
