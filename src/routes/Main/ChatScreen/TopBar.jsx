@@ -22,7 +22,7 @@ const TopBar = () => {
   }
 
   return (
-    <Fragment>
+    <>
 
       {isEditingTitle ? (
         <form onSubmit={handleSubmit(onFinishEditTitle)}>
@@ -33,7 +33,7 @@ const TopBar = () => {
         <div onMouseOver={() => setIsEditingTitle(true)}>{data.title}</div>
       )}
 
-    </Fragment>
+    </>
 
 
   )

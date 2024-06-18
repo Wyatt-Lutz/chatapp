@@ -3,7 +3,7 @@ import Plus from "../../../svg/Plus";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 import { db } from "../../../../firebase";
-import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved } from 'firebase/database';
+import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved, push } from 'firebase/database';
 import { ChatContext } from "../../../ChatProvider";
 const ChatBar = () => {
 
@@ -21,31 +21,31 @@ const ChatBar = () => {
     const chatRef = ref(db, "chats/" + newChatID);
     const newChatSnap = await get(chatRef);
     const newChatData = newChatSnap.val();
+
     /*
     if (newChatData.metadata.title === "") {
       newChatData.metadata.title = addUserUsers.map(user => user.username).filter(username => username !== currUser.displayName).join(', ')
     }
-      */
+*/
     newChatData.id = newChatID;
     setChats(prev => [...prev, newChatData]);
     setNumUnread(prev => ({
       ...prev,
       [newChatID]: snap.val(),
     }));
-
   }, [currUser]);
 
-  const handleChangeInChat = useCallback((snap) => {
+  const handleChangeInChat = (snap) => {
     setNumUnread(prev => ({
       ...prev,
       [snap.key]: snap.val(),
     }));
-  }, [currUser]);
+  };
 
-  const handleChildRemoved = useCallback((snap) => {
+
+  const handleChildRemoved = (snap) => {
     chats.filter(chat => chat.id !== snap.key);
-  }, [currUser]);
-
+  };
 
 
   useEffect(() => {
@@ -104,13 +104,16 @@ const ChatBar = () => {
       const uids = [...addUserUsers.map(user => user.uid)];
       console.log(addUserUsers);
 
-      const chatID = uids.sort().join("");
+      const chatID = currUser.uid;
       if (chats.some(chat => chat.chatID === chatID)) {
         console.log('already chat with those users') //toast
         return;
       }
 
-      set(ref(db, "chats/" + chatID), {
+      const chatRoomRef = ref(db, "chats/" + chatID);
+
+
+      set(chatRoomRef, {
         metadata: {
           title: chatName && chatName.length > 0 ? chatName : "",
         },
@@ -118,12 +121,13 @@ const ChatBar = () => {
         timestamp: 0,
       });
 
+      const membersRef = ref(db, "members/" + chatID);
       const membersList = addUserUsers.reduce((acc, obj) => {
-        acc[obj.username] = false;
+        acc[obj.uid] = {isOnline: false, username: obj.username};
         return acc
       }, {});
       console.log(membersList);
-      set(ref(db, "members/" + chatID), membersList);
+      set(membersRef, membersList);
 
 
       uids.forEach((uid) => {
@@ -181,8 +185,8 @@ const ChatBar = () => {
 
       <div className="flex flex-col">
         {chats.map((chat) => (
-          <Fragment key={chat.id}>
-            <div  className="flex">
+          <div key={chat.id}>
+            <div className="flex">
               <button className="ring m-2" onClick={() => handleChangeChat(chat.id, chat.metadata.title)}>
                 {(data.chatID === chat.id && data.title) ? data.title : chat.metadata.title}
               </button>
@@ -191,7 +195,7 @@ const ChatBar = () => {
             </div>
 
 
-          </Fragment>
+          </div>
 
 
 

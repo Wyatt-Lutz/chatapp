@@ -15,5 +15,5 @@ export const useContextMenu = () => {
     }
   }, []);
 
-  return {clicked, setClicked, points, setPoints};
+  return {clicked, setClicked, points, setPoints };
 }

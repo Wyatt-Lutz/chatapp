@@ -1,7 +1,7 @@
-import { useContext } from 'react';
+import { Fragment, useContext } from 'react';
 import Chats from './Chats';
 import { ChatContext } from '../../../ChatProvider';
-
+import MembersBar from './MembersBar/MembersBar';
 
 const ChatScreen = () => {
   const { data } = useContext(ChatContext);
@@ -12,8 +12,13 @@ const ChatScreen = () => {
       {!data.chatID ? (
         <div>firends online</div>
       ) : (
-        <Chats />
+        <>
+          <Chats />
+          <MembersBar />
+        </>
+
       )}
+
 
 
     </section>

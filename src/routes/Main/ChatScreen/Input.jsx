@@ -15,7 +15,7 @@ const Input = ({calculateRenderTimeAndSender}) => {
   const handleAddMessage = useCallback(async(text) => {
     resetField('text');
     const renderTimeAndSender = await calculateRenderTimeAndSender();
-    const timeData = await addMessage(text.text, data.chatID, currUser.displayName, db, renderTimeAndSender);
+    const timeData = await addMessage(text.text, data.chatID, currUser.uid, db, renderTimeAndSender);
     if (timeData.renderState) {
       localStorage.setItem('timestamp', timeData.time);
     }
@@ -23,13 +23,13 @@ const Input = ({calculateRenderTimeAndSender}) => {
 
 
   return (
-    <Fragment>
+    <>
 
       <form onSubmit={handleSubmit(handleAddMessage)}>
         <input placeholder="Type here..." {...register('text', { required: false, maxLength: 200})} />
       </form>
 
-    </Fragment>
+    </>
   )
 }
 export default memo(Input);

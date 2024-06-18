@@ -7,7 +7,7 @@ import { db } from "../../../../firebase";
 
 
 
-const Chat = ({chat, index, isEditing, changeEditState }) => {
+const Chat = ({ chat, isFirst, isEditing, changeEditState }) => {
   const { register, handleSubmit, resetField } = useForm();
   const { data } = useContext(ChatContext);
 
@@ -22,8 +22,8 @@ const Chat = ({chat, index, isEditing, changeEditState }) => {
 
 
   return (
-    <Fragment>
-      {(chat.renderTimeAndSender || index === 0) && (
+    <>
+      {(chat.renderTimeAndSender || isFirst) && (
         <div className="flex">
           <img src="" alt="helllo"/>
           <div>{chat.sender}</div>
@@ -46,7 +46,7 @@ const Chat = ({chat, index, isEditing, changeEditState }) => {
         )}
       </div>
 
-    </Fragment>
+    </>
   )
 }
 export default memo(Chat);

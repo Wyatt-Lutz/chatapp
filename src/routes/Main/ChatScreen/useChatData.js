@@ -21,7 +21,7 @@ export const fetchChats = async(time, db, chatID) => {
 
 
 
-export const addMessage = async(text, chatID, displayName, db, renderTimeAndSender, previousSender) => {
+export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) => {
   const chatRef = ref(db, "messages/" + chatID + "/");
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
@@ -29,7 +29,7 @@ export const addMessage = async(text, chatID, displayName, db, renderTimeAndSend
     timestamp,
     text,
     id: newMessageRef.key,
-    sender: displayName,
+    sender: userUID,
     renderTimeAndSender,
     hasBeenEdited: false,
   }
@@ -64,14 +64,14 @@ const updateUnreadCount = async(db, chatID) => {
   }
 }
 
-export const updateUserOnlineStatus = async(isOnline, db, chatID, username, uid) => {
-  const dataRef = ref(db, "members/" + chatID);
+export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, username, uid) => {
+  const dataRef = ref(db, "members/" + chatID + "/" + uid);
 
   await update(dataRef, {
-    [username]: isOnline,
+    "isOnline": newOnlineStatus,
   });
 
-  if (isOnline) {
+  if (newOnlineStatus) {
     const userDataRef = ref(db, "users/" + uid + "/chatsIn");
     await update(userDataRef, {[chatID]: 0});
   }

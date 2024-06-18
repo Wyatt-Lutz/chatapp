@@ -8,24 +8,28 @@ import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild,
 import {fetchChats, updateUserOnlineStatus} from './useChatData';
 import Chat from "./Chat";
 import Input from "./Input";
-import ContextMenu from "./ContextMenu";
+import ChatContextMenu from "./ChatContextMenu";
 import TopBar from "./TopBar";
-import { useContextMenu } from "./MembersBar/useContextMenu";
+import { useContextMenu } from "./useContextMenu";
 
 const Chats = () => {
 
   const { data } = useContext(ChatContext);
   const {currUser} = useContext(AuthContext);
+
   const [chats, setChats] = useState([])
+  const [scrolled, setScrolled] = useState(false);
+  const [unread, setUnread] = useState(0);
+  const [editState, setEditState] = useState({});
+  const [contextMenuData, setContextMenuData] = useState({});
+
+  const chatsRef = useMemo(() =>  ref(db, "messages/" + data.chatID + "/"));
+
+  const endTimestamp = useRef(0);
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
-  const [scrolled, setScrolled] = useState(false);
-  const [atBottom, setAtBottom] = useState(true);
-  const [editState, setEditState] = useState({});
-  const [contextMenuData, setContextMenuData] = useState(null);
-  const chatsRef = useMemo(() =>  ref(db, "messages/" + data.chatID + "/"));
-  const endTimestamp = useRef(0);
-  const [unread, setUnread] = useState(0);
+  const atBottom = useRef(true);
+  const clientSentChat = useRef(false);
 
   const { clicked, setClicked, points, setPoints } = useContextMenu();
 
@@ -46,7 +50,7 @@ const Chats = () => {
       return updatedChats;
     });
 
-    if (!atBottom) {
+    if (!atBottom.current) {
       setUnread(prev => prev + 1);
     }
 
@@ -76,27 +80,6 @@ const Chats = () => {
     });
   };
 
-  /*
-  const handleMemberAdded = useCallback((snap) => {
-    console.log('handleMemberAdded')
-    const existingData = queryClient.getQueryData(['members', data.chatID]) ?? [];
-    queryClient.setQueryData(['members', data.chatID], [...existingData, snap.key]);
-  }, [data.chatID]);
-
-  const handleMemberChanged = useCallback((snap) => {
-    console.log('handleMemberChanged')
-    const existingData = queryClient.getQueryData(['members', data.chatID]) ?? [];
-    console.log(snap.val());
-    console.log(snap.key);
-  }, [data.chatID])
-
-  const handleMemberRemoved = useCallback((snap) => {
-    console.log('handleMemberRemoved')
-    const existingData = queryClient.getQueryData(['members', data.chatID]) ?? [];
-    const updatedData = existingData.filter((member) => member.key !== snap.key);
-    queryClient.setQueryData(['members', data.chatID], updatedData);
-  }, [data.chatID])
-*/
 
 
   useEffect(() => {
@@ -108,12 +91,7 @@ const Chats = () => {
 
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current));
-/*
-    const membersRef  = ref(db, "members/" + data.chatID);
-    const memberAddedListener = onChildAdded(membersRef, handleMemberAdded);
-    const memberChangedListener = onChildChanged(membersRef, handleMemberChanged);
-    const memberRemovedListener = onChildRemoved(membersRef, handleMemberRemoved);
-*/
+
 
     const childAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
     const childChangedListener = onChildChanged(otherListenersQuery, handleChildChanged);
@@ -122,19 +100,13 @@ const Chats = () => {
 
     const container = messagesContainerRef.current;
 
-    window.addEventListener("click", handleClick);
     container.addEventListener("scroll", handleScroll);
     window.addEventListener("beforeunload", handleUserOffline);
     return () => {
       childAddedListener();
       childChangedListener();
       childRemovedListener();
-      /*
-      memberAddedListener();
-      memberChangedListener();
-      memberRemovedListener();
-      */
-      window.removeEventListener("click", handleClick);
+
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
       handleUserOffline();
@@ -148,6 +120,7 @@ const Chats = () => {
 
 
   const calculateRenderTimeAndSender = useCallback(() => {
+    clientSentChat.current = true;
     const prevTimestamp = localStorage.getItem('timestamp');
     let renderTimeAndSender = true;
     setChats(prev => {
@@ -162,19 +135,17 @@ const Chats = () => {
     return renderTimeAndSender;
   }, []);
 
-  const handleClick = useCallback(() => {
-    setClicked(false);
-    setContextMenuData(null);
-  }, []);
-
 
   const handleScroll = useCallback(() => {
     setScrolled(true);
-    if (messagesContainerRef.current.scrollTop !== 0 && atBottom) {
-      setAtBottom(false);
-    } else if (messagesContainerRef.current.scrollTop === 0 && !atBottom) {
-      setAtBottom(true);
+    if (messagesContainerRef.current.scrollTop !== 0 && (atBottom.current)) {
+      atBottom.current = false;
+    } else if (messagesContainerRef.current.scrollTop === 0 && (!atBottom.current)) {
+      atBottom.current = true;
+      setUnread(0);
     }
+    console.log(atBottom);
+
   }, []);
 
 
@@ -190,6 +161,7 @@ const Chats = () => {
     const messageData = await fetchChats(endTimestamp.current, db, data.chatID);
     messageData?.[0]?.timestamp && (endTimestamp.current = messageData[0].timestamp);
     setChats(prev => [...messageData, ...prev]);
+
   }, 300);
 
   useEffect(() => {
@@ -200,7 +172,7 @@ const Chats = () => {
 
 
   useEffect(() => {
-    if(lastMessageRef.current && atBottom) {
+    if(lastMessageRef.current && atBottom.current) {
       lastMessageRef.current.scrollIntoView({behavior: 'smooth'});
     }
   }, [chats]);
@@ -226,24 +198,22 @@ const Chats = () => {
               <div>
 
                 {chats?.map((chat, index) => (
-                  <Fragment key={chat.id}>
+                  <div key={chat.id}>
 
                     <div onContextMenu={(e) => handleContextMenu(e, chat)} className="hover:bg-gray-600">
-                      <Chat chat={chat} index={index} isEditing={editState[chat.id]} changeEditState={changeEditState}/>
+                      <Chat chat={chat} isFirst={index === 0} isEditing={editState[chat.id]} changeEditState={changeEditState}/>
                     </div>
 
                     {index === chats.length - 1 && (
                       <div ref = {lastMessageRef} />
                     )}
 
-                  </Fragment>
+                  </div>
 
 
 
                 ))}
               </div>
-
-
 
             <Input calculateRenderTimeAndSender={calculateRenderTimeAndSender} />
         </div>
@@ -251,7 +221,7 @@ const Chats = () => {
         <div className="flex border min-h-10" ref={containerRef}></div>
       </div>
       {(clicked && contextMenuData.sender === currUser.displayName) && (
-        <ContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
+        <ChatContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
       )}
       {unread > 0 && (
         <div>{unread} new messages</div>
