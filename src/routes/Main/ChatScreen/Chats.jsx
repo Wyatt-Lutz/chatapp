@@ -87,7 +87,7 @@ const Chats = () => {
       console.info("chatID undefined");
       return;
     }
-    updateUserOnlineStatus(true, db, data.chatID, currUser.displayName, currUser.uid);
+    updateUserOnlineStatus(true, db, data.chatID, currUser.uid);
 
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current));
@@ -121,12 +121,14 @@ const Chats = () => {
 
   const calculateRenderTimeAndSender = useCallback(() => {
     clientSentChat.current = true;
-    const prevTimestamp = localStorage.getItem('timestamp');
     let renderTimeAndSender = true;
+    const prevTimestamp = localStorage.getItem('timestamp');
+
+
     setChats(prev => {
       const previousMessage = prev[prev.length -1];
 
-      if (prevTimestamp && previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
+      if (prevTimestamp && previousMessage && previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
         renderTimeAndSender = false;
       }
       return prev;

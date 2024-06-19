@@ -2,18 +2,26 @@ import { useContext, memo } from "react";
 import { ChatContext } from "../../../../ChatProvider";
 import { AuthContext } from "../../../../AuthProvider";
 import { blockUser, removeUserFromChat } from "./useMemberData";
-const MemberContextMenu = ({contextMenuData, points}) => {
+import { db } from "../../../../../firebase";
+const MemberContextMenu = ({contextMenuData, points, clientUserIsOwner}) => {
   const { data } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
-
+  console.log('membercontextmenu run');
   return (
-    <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points?.y, left: points?.x}}>
-      <button onClick={() => blockUser()}>Block User</button>
-      {currUser.uid === data.chatID && (
-        <button onClick={() => removeUserFromChat()}>Remove User</button>
-      )}
+    <>
+      {contextMenuData.uid !== currUser.uid && (
+        <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points?.y, left: points?.x}}>
 
-    </div>
+          <button onClick={() => blockUser(db, currUser.uid, contextMenuData.uid)}>Block User</button>
+          {clientUserIsOwner && (
+            <button onClick={() => removeUserFromChat(db, data.chatID, contextMenuData.uid)}>Remove User</button>
+          )}
+
+        </div>
+      )}
+    </>
+
+
   )
 }
 export default memo(MemberContextMenu);

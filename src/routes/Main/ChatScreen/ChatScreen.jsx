@@ -12,15 +12,15 @@ const ChatScreen = () => {
       {!data.chatID ? (
         <div>firends online</div>
       ) : (
-        <>
+        <div className='flex'>
           <Chats />
-          <MembersBar />
-        </>
+          <div>
+            <div>Members:</div>
+            <MembersBar />
+          </div>
 
+        </div>
       )}
-
-
-
     </section>
   )
 }

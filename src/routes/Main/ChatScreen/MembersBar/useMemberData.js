@@ -1,8 +1,16 @@
+import { ref, remove, update } from "firebase/database";
 
-export const blockUser = () => {
-  console.log('block user run')
+export const blockUser = async(db, clientUserUid, uidToBlock) => {
+  console.log('block user run');
+
+  const userBlockListRef = ref(db, "users/" + clientUserUid + "/blockList");
+  const newBlockData = {[uidToBlock]: true}
+  await update(userBlockListRef, newBlockData);
 }
 
-export const removeUserFromChat = () => {
+export const removeUserFromChat = async(db, chatID, uidToRemove) => {
   console.log('removeUserFromChat run');
+
+  const membersRef = ref(db, "members/" + chatID + "/" + uidToRemove);
+  await remove(membersRef)
 }
