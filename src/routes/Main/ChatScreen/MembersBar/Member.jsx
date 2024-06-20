@@ -6,7 +6,6 @@ const Member = ({ member }) => {
   const fetchProfilePicture = () => {
 
   }
-console.log(Object.keys(member)[0])
   return (
     <div className="flex">
       <div>{Object.values(member)[0].username}</div>

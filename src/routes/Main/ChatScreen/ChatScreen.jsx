@@ -16,7 +16,7 @@ const ChatScreen = () => {
           <Chats />
           <div>
             <div>Members:</div>
-            <MembersBar />
+            <MembersBar/>
           </div>
 
         </div>

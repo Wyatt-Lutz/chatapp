@@ -65,8 +65,6 @@ const ChatBar = () => {
 
 
   useEffect(() => {
-    console.info('use effect run');
-
     const childAddedListener = onChildAdded(chatsInRef, handleNewChatAdded);
     const childChangedListener = onChildChanged(chatsInRef, handleUpdateUnread);
     const childRemovedListener = onChildRemoved(chatsInRef, handleChildRemoved);

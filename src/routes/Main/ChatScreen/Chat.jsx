@@ -8,17 +8,16 @@ import { db } from "../../../../firebase";
 
 
 const Chat = ({ chat, isFirst, isEditing, changeEditState }) => {
+  console.log('chat run');
   const { register, handleSubmit, resetField } = useForm();
   const { data } = useContext(ChatContext);
-
-
 
   const onSubmitEdit = async(text) => {
     resetField('editMessage');
     editMessage(chat.id, text.editMessage, data.chatID, db);
     changeEditState(chat.id, false);
   }
-  console.log('chat run');
+
 
 
   return (
@@ -26,7 +25,7 @@ const Chat = ({ chat, isFirst, isEditing, changeEditState }) => {
       {(chat.renderTimeAndSender || isFirst) && (
         <div className="flex">
           <img src="" alt="helllo"/>
-          <div>{chat.sender}</div>
+          <div>{data.members[chat.sender] && data.members[chat.sender].username}</div>
           <div>{calcTime(chat.timestamp)}</div>
         </div>
       )}

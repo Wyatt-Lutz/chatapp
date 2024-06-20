@@ -127,6 +127,7 @@ const Chats = () => {
 
     setChats(prev => {
       const previousMessage = prev[prev.length -1];
+      console.log(previousMessage);
 
       if (prevTimestamp && previousMessage && previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
         renderTimeAndSender = false;
