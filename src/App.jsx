@@ -7,6 +7,7 @@ import { AuthContext } from "./AuthProvider";
 
 const Signup = lazy(() => import('./routes/Signup/Signup'));
 const Main = lazy(() => import('./routes/Main/Main'));
+
 function App() {
   const { currUser } = useContext(AuthContext);
 

@@ -1,9 +1,9 @@
-import { Fragment, memo, useCallback, useContext, useMemo } from "react";
+import { memo, useCallback, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../AuthProvider";
-import { ChatContext } from "../../../ChatProvider";
-import { db } from "../../../../firebase";
-import { addMessage } from "./useChatData";
+import { AuthContext } from "../../../../AuthProvider";
+import { ChatContext } from "../../../../ChatProvider";
+import { db } from "../../../../../firebase";
+import { addMessage } from "../../../../services/messageDataService";
 
 
 const Input = ({calculateRenderTimeAndSender}) => {

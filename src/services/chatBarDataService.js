@@ -1,18 +1,15 @@
 import { ref, set, update } from "firebase/database";
 
 
-export const createChat = async(db, chatID, chatName, membersList, uids) => {
+export const createChat = async(db, chatID, title, membersList, uids, currUserUid) => {
   try {
     const chatRoomRef = ref(db, "chats/" + chatID);
     const membersRef = ref(db, "members/" + chatID);
 
     await Promise.all([
       set(chatRoomRef, {
-        metadata: {
-          title: chatName && chatName.length > 0 ? chatName : "",
-        },
-        lastMessage: "",
-        timestamp: 0,
+        title: title,
+        owner: currUserUid,
       }),
       set(membersRef, membersList),
     ]);

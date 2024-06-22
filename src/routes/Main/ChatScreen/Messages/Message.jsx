@@ -1,13 +1,11 @@
 import { Fragment, memo, useCallback, useContext } from "react"
-import { calcTime, editMessage } from "./useChatData";
+import { calcTime, editMessage } from "../../../../services/messageDataService";
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../ChatProvider";
-import { db } from "../../../../firebase";
+import { ChatContext } from "../../../../ChatProvider";
+import { db } from "../../../../../firebase";
 
 
-
-
-const Chat = ({ chat, isFirst, isEditing, changeEditState }) => {
+const Message = ({ chat, isFirst, isEditing, changeEditState }) => {
   console.log('chat run');
   const { register, handleSubmit, resetField } = useForm();
   const { data } = useContext(ChatContext);
@@ -17,6 +15,7 @@ const Chat = ({ chat, isFirst, isEditing, changeEditState }) => {
     editMessage(chat.id, text.editMessage, data.chatID, db);
     changeEditState(chat.id, false);
   }
+  const memberObjOfSender = data.members.find(member => member.uid === chat.sender)
 
 
 
@@ -25,7 +24,7 @@ const Chat = ({ chat, isFirst, isEditing, changeEditState }) => {
       {(chat.renderTimeAndSender || isFirst) && (
         <div className="flex">
           <img src="" alt="helllo"/>
-          <div>{data.members[chat.sender] && data.members[chat.sender].username}</div>
+          <div>{memberObjOfSender && memberObjOfSender.username}</div>
           <div>{calcTime(chat.timestamp)}</div>
         </div>
       )}
@@ -48,4 +47,4 @@ const Chat = ({ chat, isFirst, isEditing, changeEditState }) => {
     </>
   )
 }
-export default memo(Chat);
+export default memo(Message);

@@ -1,7 +1,7 @@
 import { useContext, memo } from "react";
 import { ChatContext } from "../../../../ChatProvider";
 import { AuthContext } from "../../../../AuthProvider";
-import { blockUser, removeUserFromChat } from "./useMemberData";
+import { blockUser, removeUserFromChat } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 const MemberContextMenu = ({contextMenuData, points, clientUserIsOwner}) => {
   const { data } = useContext(ChatContext);

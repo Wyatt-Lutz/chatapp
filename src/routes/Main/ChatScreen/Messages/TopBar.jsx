@@ -1,9 +1,9 @@
-import { Fragment, memo, useContext, useState } from "react"
+import { memo, useContext, useState } from "react"
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../ChatProvider";
-import { db } from "../../../../firebase";
-import { AuthContext } from "../../../AuthProvider";
-import { editTitle } from "./useChatData";
+import { ChatContext } from "../../../../ChatProvider";
+import { db } from "../../../../../firebase";
+import { AuthContext } from "../../../../AuthProvider";
+import { editTitle } from "../../../../services/messageDataService";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();

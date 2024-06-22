@@ -1,21 +1,22 @@
-import { useContext, useState, useMemo, useCallback, useEffect, useRef, Fragment} from "react";
-import { ChatContext } from "../../../ChatProvider";
-import { AuthContext } from "../../../AuthProvider";
-import { db } from "../../../../firebase";
+import { useContext, useState, useMemo, memo, useCallback, useEffect, useRef } from "react";
+import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
-import { useElementOnScreen } from "../../../IntersectionObserver";
-import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast, update } from 'firebase/database'
-import {fetchChats, updateUserOnlineStatus} from './useChatData';
-import Chat from "./Chat";
+import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast } from 'firebase/database';
+
+import { ChatContext } from "../../../../ChatProvider";
+import { AuthContext } from "../../../../AuthProvider";
+import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
+import { fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
+import { useContextMenu } from "../../../../hooks/useContextMenu";
+
+import Message from "./Message"
 import Input from "./Input";
-import ChatContextMenu from "./ChatContextMenu";
 import TopBar from "./TopBar";
-import { useContextMenu } from "./useContextMenu";
+import MessagesContextMenu from "./MessagesContextMenu";
 
-const Chats = () => {
-
+const Messages = () => {
   const { data } = useContext(ChatContext);
-  const {currUser} = useContext(AuthContext);
+  const { currUser } = useContext(AuthContext);
 
   const [chats, setChats] = useState([])
   const [scrolled, setScrolled] = useState(false);
@@ -93,9 +94,9 @@ const Chats = () => {
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current));
 
 
-    const childAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
-    const childChangedListener = onChildChanged(otherListenersQuery, handleChildChanged);
-    const childRemovedListener = onChildRemoved(otherListenersQuery, handleChildRemoved);
+    const chatAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
+    const chatChangedListener = onChildChanged(otherListenersQuery, handleChildChanged);
+    const chatRemovedListener = onChildRemoved(otherListenersQuery, handleChildRemoved);
 
 
     const container = messagesContainerRef.current;
@@ -103,9 +104,9 @@ const Chats = () => {
     container.addEventListener("scroll", handleScroll);
     window.addEventListener("beforeunload", handleUserOffline);
     return () => {
-      childAddedListener();
-      childChangedListener();
-      childRemovedListener();
+      chatAddedListener();
+      chatChangedListener();
+      chatRemovedListener();
 
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
@@ -127,7 +128,6 @@ const Chats = () => {
 
     setChats(prev => {
       const previousMessage = prev[prev.length -1];
-      console.log(previousMessage);
 
       if (prevTimestamp && previousMessage && previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
         renderTimeAndSender = false;
@@ -147,7 +147,6 @@ const Chats = () => {
       atBottom.current = true;
       setUnread(0);
     }
-    console.log(atBottom);
 
   }, []);
 
@@ -157,15 +156,18 @@ const Chats = () => {
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
     setContextMenuData({ chatID: chat.id, text: chat.text, sender: chat.sender });
-    console.log('right cliecked');
   }
 
   const handleFetchMore = debounce(async() => {
     const messageData = await fetchChats(endTimestamp.current, db, data.chatID);
+    if (messageData.length === 0) {
+      return;
+    }
     messageData?.[0]?.timestamp && (endTimestamp.current = messageData[0].timestamp);
     setChats(prev => [...messageData, ...prev]);
-
   }, 300);
+
+
 
   useEffect(() => {
     if (isVisible && scrolled) {
@@ -185,7 +187,7 @@ const Chats = () => {
 
   const changeEditState = useCallback((id, state) => {
     console.info('i ran')
-    setEditState((prev) => ({...prev, [id]: state}));
+    setEditState(prev => ({...prev, [id]: state}));
   }, [data.chatID]);
 
 
@@ -204,7 +206,7 @@ const Chats = () => {
                   <div key={chat.id}>
 
                     <div onContextMenu={(e) => handleContextMenu(e, chat)} className="hover:bg-gray-600">
-                      <Chat chat={chat} isFirst={index === 0} isEditing={editState[chat.id]} changeEditState={changeEditState}/>
+                      <Message chat={chat} isFirst={index === 0} isEditing={editState[chat.id]} changeEditState={changeEditState}/>
                     </div>
 
                     {index === chats.length - 1 && (
@@ -224,7 +226,7 @@ const Chats = () => {
         <div className="flex border min-h-10" ref={containerRef}></div>
       </div>
       {(clicked && contextMenuData.sender === currUser.displayName) && (
-        <ChatContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
+        <MessagesContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
       )}
       {unread > 0 && (
         <div>{unread} new messages</div>
@@ -237,4 +239,4 @@ const Chats = () => {
   )
 }
 
-export default Chats;
+export default memo(Messages);

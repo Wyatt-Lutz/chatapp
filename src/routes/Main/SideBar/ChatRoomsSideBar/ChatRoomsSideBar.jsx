@@ -1,12 +1,12 @@
-import { useContext, useState, useEffect, useRef, Fragment, useCallback } from "react";
-import Plus from "../../../svg/Plus";
+import { useContext, useState, useEffect, useRef, memo, Fragment, useCallback } from "react";
+import Plus from "../../../../styling-components/Plus";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../AuthProvider";
-import { db } from "../../../../firebase";
+import { AuthContext } from "../../../../AuthProvider";
+import { db } from "../../../../../firebase";
 import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved, push } from 'firebase/database';
-import { ChatContext } from "../../../ChatProvider";
-import { createChat } from "./useChatBarData";
-const ChatBar = () => {
+import { ChatContext } from "../../../../ChatProvider";
+import { createChat } from "../../../../services/chatBarDataService";
+const ChatRoomsSideBar = () => {
 
   const { data, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
@@ -35,9 +35,9 @@ const ChatBar = () => {
     const membersRef = ref(db, "members/" + newChatID);
     const membersSnap = await get(membersRef);
     const membersData = Object.values(membersSnap.val());
-    if (newChatData.metadata.title === "") {
-      newChatData.metadata.title = membersData.map((member) => member.username).filter(username => username !== currUser.displayName).join(', ');
-    }
+    if (newChatData.title === "") {
+      newChatData.title = membersData.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
+    } 
 
     newChatData.id = newChatID;
     setChatsData(prev => ({
@@ -115,6 +115,8 @@ const ChatBar = () => {
     const uids = [...usersAdded.map(user => user.uid)];
     const chatID = uids.join("");
 
+    const title = chatName && chatName.length > 0 ? chatName : "";
+
     if (chatsData.chats.some(chat => chat.chatID === chatID)) {
       console.log("chat with those members already exists");
       return;
@@ -123,16 +125,17 @@ const ChatBar = () => {
       members[member.uid] = {isOnline: false, username: member.username};
       return members
     }, {});
-    membersList[currUser.uid].isOwner = true;
 
 
-    createChat(db, chatID, chatName, membersList, uids);
+    createChat(db, chatID, title, membersList, uids, currUser.uid);
     setIsCreatingChat(false);
     setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
+
+    handleChangeChat(chatID, title, currUser.uid);
   }
 
-  const handleChangeChat = (chatID, title) => {
-    dispatch({ type: "CHANGE_CHAT", payload: { chatID, title }});
+  const handleChangeChat = (chatID, title, owner) => {
+    dispatch({ type: "CHANGE_CHAT", payload: { chatID, title, owner }});
   };
 
 
@@ -171,8 +174,8 @@ const ChatBar = () => {
         {chatsData.chats.map((chat) => (
           <div key={chat.id}>
             <div className="flex">
-              <button className="ring m-2" onClick={() => handleChangeChat(chat.id, chat.metadata.title)}>
-                {(data.chatID === chat.id && data.title) ? data.title : chat.metadata.title}
+              <button className="ring m-2" onClick={() => handleChangeChat(chat.id, chat.title, chat.owner)}>
+                {(data.chatID === chat.id && data.title) ? data.title : chat.title}
               </button>
               <div>{chatsData.numUnread[chat.id]}</div>
 
@@ -194,4 +197,4 @@ const ChatBar = () => {
 
   )
 }
-export default ChatBar;
+export default memo(ChatRoomsSideBar);

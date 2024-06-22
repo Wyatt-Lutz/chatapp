@@ -1,9 +1,9 @@
 import UserBar from "./UserBar";
-import ChatBar from "./ChatBar";
+import ChatRoomsSideBar from "./ChatRoomsSideBar/ChatRoomsSideBar";
 const SideBar = () => {
   return(
     <section>
-      <ChatBar />
+      <ChatRoomsSideBar />
       <UserBar />
     </section>
 

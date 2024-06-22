@@ -1,5 +1,5 @@
-import { Fragment, useContext } from 'react';
-import Chats from './Chats';
+import { useContext } from 'react';
+import Messages from './Messages/Messages';
 import { ChatContext } from '../../../ChatProvider';
 import MembersBar from './MembersBar/MembersBar';
 
@@ -13,7 +13,7 @@ const ChatScreen = () => {
         <div>firends online</div>
       ) : (
         <div className='flex'>
-          <Chats />
+          <Messages />
           <div>
             <div>Members:</div>
             <MembersBar/>

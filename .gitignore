@@ -11,8 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
-envVars.js
+FIREBASE_CONFIG.js
 other
+
 
 
 # Editor directories and files

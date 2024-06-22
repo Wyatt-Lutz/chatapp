@@ -1,13 +1,17 @@
-import { createContext, useReducer, useEffect } from "react";
+import { createContext, useReducer, useEffect, useContext } from "react";
 import { ref, onChildChanged, onChildAdded, update} from 'firebase/database';
 import { db } from "../firebase";
-export const ChatContext = createContext();
+import { AuthContext } from "./AuthProvider";
 
+
+export const ChatContext = createContext();
 export const ChatContextProvider = ({ children }) => {
+  const { currUser } = useContext(AuthContext);
   const initialState = {
     chatID: null,
     title: '',
     members: [],
+    owner: '',
   };
 
   const chatReducer = (state, action) => {
@@ -17,12 +21,18 @@ export const ChatContextProvider = ({ children }) => {
           ...state,
           chatID: action.payload.chatID,
           title: action.payload.title,
+          owner: action.payload.owner,
         };
       case "UPDATE_TITLE":
         return {
           ...state,
           title: action.payload,
         };
+      case "UPDATE_OWNER":
+        return {
+          ...state,
+          owner: action.payload,
+        }
       case "ADD_MEMBER":
         return {
           ...state,
@@ -31,14 +41,27 @@ export const ChatContextProvider = ({ children }) => {
             action.payload,
           ]
         };
-        /*
+        
       case "CHANGE_MEMBER":
-        return{
-          ...state,
-          members: []
-        }
-          */
+        console.log('changed member');
+        const newMembers = [...state.members]
+        //const filteredMembers = state.members.filter(member => member.uid !== action.payload.uid);
+        newMembers.map(((member, index) => {
+          if (member.uid === action.payload.uid) {
+            newMembers[index] = action.payload;
+          }
+        }))
+        const newTitle = newMembers.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
 
+
+        return {
+          ...state,
+          title: newTitle,
+          members: [
+            ...newMembers,
+          ]
+        };
+          
       default:
         return state;
     }
@@ -49,29 +72,33 @@ export const ChatContextProvider = ({ children }) => {
     if (!state.chatID) {
       return;
     }
-    const chatTitleQuery = ref(db, "chats/" + state.chatID + "/metadata");
+    const chatsRef = ref(db, "chats/" + state.chatID);
     const memberRef = ref(db, "members/" + state.chatID);
 
 
-    const titleChangeListener = onChildChanged(chatTitleQuery, (snap) => {
-      dispatch({type: "UPDATE_TITLE", payload: snap.val()});
+    const chatsChangeListener = onChildChanged(chatsRef, (snap) => {
+      if (snap.val().title) {
+        dispatch({type: "UPDATE_TITLE", payload: snap.val().title});
+      } else {
+        dispatch({type: "UPDATE_OWNER", payload: snap.val().owner});
+      }
     });
 
     const memberAddedListener = onChildAdded(memberRef, (snap) => {
-      dispatch({type: "ADD_MEMBERS", payload: {[snap.key]: snap.val()}});
+      dispatch({type: "ADD_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
     });
-/*
+
     const memberChangedListener = onChildChanged(memberRef, (snap) => {
-      console.log(snap.val())
-      dispatch({type: "CHANGE_MEMBERS", payload: {[snap.key]: snap.val()}});
+
+      dispatch({type: "CHANGE_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
     })
-*/
+
 
 
     return () => {
-      titleChangeListener();
+      chatsChangeListener();
       memberAddedListener();
-      //memberChangedListener();
+      memberChangedListener();
     }
   }, [state.chatID]);
   return (

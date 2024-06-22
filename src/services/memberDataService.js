@@ -16,6 +16,6 @@ export const removeUserFromChat = async(db, chatID, uidToRemove) => {
   const membersRef = ref(db, "members/" + chatID + "/" + uidToRemove);
   await update(membersRef, {hasBeenRemoved: true})
 
-  const userChatsInRef = ref(db, "users/" + uidToRemove + "/chatsIn" + chatID);
+  const userChatsInRef = ref(db, "users/" + uidToRemove + "/chatsIn/" + chatID);
   await remove(userChatsInRef)
 }

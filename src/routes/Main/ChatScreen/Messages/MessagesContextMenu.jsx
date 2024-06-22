@@ -1,8 +1,8 @@
 import { useContext, memo } from "react";
-import { db } from "../../../../firebase";
-import { ChatContext } from "../../../ChatProvider";
-import { deleteMessage } from "./useChatData";
-const ContextMenu = ({changeEditState, contextMenuData, points}) => {
+import { db } from "../../../../../firebase";
+import { ChatContext } from "../../../../ChatProvider";
+import { deleteMessage } from "../../../../services/messageDataService";
+const MessagesContextMenu = ({changeEditState, contextMenuData, points}) => {
   const { data } = useContext(ChatContext);
   console.log('contextmenu run');
   return (
@@ -12,4 +12,4 @@ const ContextMenu = ({changeEditState, contextMenuData, points}) => {
     </div>
   )
 }
-export default memo(ContextMenu);
+export default memo(MessagesContextMenu);
