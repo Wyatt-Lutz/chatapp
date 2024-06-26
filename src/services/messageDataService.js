@@ -65,6 +65,11 @@ const updateUnreadCount = async(db, chatID) => {
 }
 
 export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, uid) => {
+
+  const memberSnap = await get(ref(db, "members/" + chatID));
+  if (!memberSnap.exists()) {
+    return;
+  }
   const dataRef = ref(db, "members/" + chatID + "/" + uid);
 
   await update(dataRef, {

@@ -37,7 +37,7 @@ const ChatRoomsSideBar = () => {
     const membersData = Object.values(membersSnap.val());
     if (newChatData.title === "") {
       newChatData.title = membersData.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
-    } 
+    }
 
     newChatData.id = newChatID;
     setChatsData(prev => ({
@@ -171,23 +171,28 @@ const ChatRoomsSideBar = () => {
       )}
 
       <div className="flex flex-col">
-        {chatsData.chats.map((chat) => (
-          <div key={chat.id}>
-            <div className="flex">
-              <button className="ring m-2" onClick={() => handleChangeChat(chat.id, chat.title, chat.owner)}>
-                {(data.chatID === chat.id && data.title) ? data.title : chat.title}
-              </button>
-              <div>{chatsData.numUnread[chat.id]}</div>
+        {chatsData?.chats?.length > 0 ? (
+          chatsData.chats.map((chat) => (
+            <div key={chat.id}>
+              <div className="flex">
+                <button className="ring m-2" onClick={() => handleChangeChat(chat.id, chat.title, chat.owner)}>
+                  {(data.chatID === chat.id && data.title) ? data.title : chat.title}
+                </button>
+                <div>{chatsData.numUnread[chat.id]}</div>
+
+              </div>
 
             </div>
 
 
-          </div>
 
 
+          ))
 
+        ) : (
+          <div>You aren't in any chats</div>
+        )}
 
-        ))}
 
       </div>
 

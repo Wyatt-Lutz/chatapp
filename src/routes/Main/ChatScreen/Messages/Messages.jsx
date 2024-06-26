@@ -110,6 +110,7 @@ const Messages = () => {
 
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
+      console.log(data.chatID);
       handleUserOffline();
     }
   }, [data.chatID]);

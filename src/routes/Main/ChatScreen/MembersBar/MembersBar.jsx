@@ -17,7 +17,7 @@ const MembersBar = () => {
     e.preventDefault();
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({uid: member.uid});
+    setContextMenuData({uid: member.uid, username: member.username});
   }
   return (
     <div>

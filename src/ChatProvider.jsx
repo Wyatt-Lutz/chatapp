@@ -1,5 +1,5 @@
 import { createContext, useReducer, useEffect, useContext } from "react";
-import { ref, onChildChanged, onChildAdded, update} from 'firebase/database';
+import { ref, onChildChanged, onChildAdded, update, get} from 'firebase/database';
 import { db } from "../firebase";
 import { AuthContext } from "./AuthProvider";
 
@@ -41,34 +41,61 @@ export const ChatContextProvider = ({ children }) => {
             action.payload,
           ]
         };
-        
+
       case "CHANGE_MEMBER":
         console.log('changed member');
-        const newMembers = [...state.members]
-        //const filteredMembers = state.members.filter(member => member.uid !== action.payload.uid);
-        newMembers.map(((member, index) => {
-          if (member.uid === action.payload.uid) {
-            newMembers[index] = action.payload;
-          }
-        }))
-        const newTitle = newMembers.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
+        const newTitle = handleChangeMember(state, action);
 
+        if (newTitle !== "") {
+
+          return {
+            ...state,
+            title: newTitle,
+            members: [
+              ...newMembers,
+            ]
+          };
+        }
 
         return {
           ...state,
-          title: newTitle,
           members: [
             ...newMembers,
           ]
         };
-          
+      case "RESET":
+        console.log('reset context')
+        return initialState;
+
       default:
         return state;
     }
   };
+
+  const handleChangeMember = async(state, action) => {
+
+    const newMembers = [...state.members]
+    newMembers.map(((member, index) => {
+      if (member.uid === action.payload.uid) {
+        newMembers[index] = action.payload;
+      }
+    }));
+    const chatsRef = ref(db, "chats/" + state.chatID);
+    const chatsSnap = await get(chatsRef);
+    console.log(chatsSnap.val());
+
+    if (chatsSnap.val().title === "") {
+      const newTitle = newMembers.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
+      return newTitle;
+
+
+    }
+    return "";
+  }
   const [state, dispatch] = useReducer(chatReducer, initialState);
 
   useEffect(() => {
+    console.log(state.chatID)
     if (!state.chatID) {
       return;
     }
