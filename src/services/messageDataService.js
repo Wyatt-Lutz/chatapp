@@ -103,7 +103,7 @@ export const deleteMessage = async(id, db, chatID) => {
 
 export const editTitle = async(newTitle, chatID, db, displayName) => {
 
-  const titleRef = ref(db, "chats/" + chatID + "/metadata");
+  const titleRef = ref(db, "chats/" + chatID);
   await update(titleRef, {
     title: newTitle,
   });

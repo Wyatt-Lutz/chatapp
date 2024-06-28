@@ -1,13 +1,14 @@
-import { memo, useContext, useState } from "react"
+import { memo, useContext, useState, useEffect } from "react"
 import { useForm } from "react-hook-form";
 import { ChatContext } from "../../../../ChatProvider";
 import { db } from "../../../../../firebase";
 import { AuthContext } from "../../../../AuthProvider";
 import { editTitle } from "../../../../services/messageDataService";
+import { onChildChanged, ref } from 'firebase/database';
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
-  const { data } = useContext(ChatContext);
+  const { data, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
 
   console.log('topbar run')
@@ -20,6 +21,20 @@ const TopBar = () => {
     }
     await editTitle(text.title, data.chatID, db, currUser.displayName);
   }
+
+  useEffect(() => {
+    const titleRef = ref(db, "chats/" + data.chatID + "/title");
+
+    const chatsChangeListener = onChildChanged(titleRef, (snap) => {
+      console.log(snap.val());
+      dispatch({type: "UPDATE_TITLE", payload: snap.val()});
+    });
+
+    return () => {
+      chatsChangeListener();
+    }
+
+  }, [data.chatID]);
 
   return (
     <>

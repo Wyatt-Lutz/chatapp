@@ -44,18 +44,9 @@ export const ChatContextProvider = ({ children }) => {
 
       case "CHANGE_MEMBER":
         console.log('changed member');
-        const newTitle = handleChangeMember(state, action);
+        const newMembers = handleChangeMember(state, action);
+        handleChangeTitle(state, newMembers);
 
-        if (newTitle !== "") {
-
-          return {
-            ...state,
-            title: newTitle,
-            members: [
-              ...newMembers,
-            ]
-          };
-        }
 
         return {
           ...state,
@@ -63,6 +54,9 @@ export const ChatContextProvider = ({ children }) => {
             ...newMembers,
           ]
         };
+
+
+
       case "RESET":
         console.log('reset context')
         return initialState;
@@ -72,62 +66,31 @@ export const ChatContextProvider = ({ children }) => {
     }
   };
 
-  const handleChangeMember = async(state, action) => {
-
+  const handleChangeMember = (state, action) => {
     const newMembers = [...state.members]
     newMembers.map(((member, index) => {
       if (member.uid === action.payload.uid) {
         newMembers[index] = action.payload;
       }
     }));
+    return newMembers;
+  }
+
+  const handleChangeTitle = (state, newMembers) => async (dispatch) => {
     const chatsRef = ref(db, "chats/" + state.chatID);
     const chatsSnap = await get(chatsRef);
-    console.log(chatsSnap.val());
+    let newTitle = "";
 
     if (chatsSnap.val().title === "") {
-      const newTitle = newMembers.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
-      return newTitle;
-
-
+      newTitle = newMembers.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
     }
-    return "";
+
+    dispatch({type: "UPDATE_TITLE", payload: newTitle});
   }
+
+
   const [state, dispatch] = useReducer(chatReducer, initialState);
 
-  useEffect(() => {
-    console.log(state.chatID)
-    if (!state.chatID) {
-      return;
-    }
-    const chatsRef = ref(db, "chats/" + state.chatID);
-    const memberRef = ref(db, "members/" + state.chatID);
-
-
-    const chatsChangeListener = onChildChanged(chatsRef, (snap) => {
-      if (snap.val().title) {
-        dispatch({type: "UPDATE_TITLE", payload: snap.val().title});
-      } else {
-        dispatch({type: "UPDATE_OWNER", payload: snap.val().owner});
-      }
-    });
-
-    const memberAddedListener = onChildAdded(memberRef, (snap) => {
-      dispatch({type: "ADD_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-    });
-
-    const memberChangedListener = onChildChanged(memberRef, (snap) => {
-
-      dispatch({type: "CHANGE_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-    })
-
-
-
-    return () => {
-      chatsChangeListener();
-      memberAddedListener();
-      memberChangedListener();
-    }
-  }, [state.chatID]);
   return (
     <ChatContext.Provider value={{ data: state, dispatch }}>
       {children}

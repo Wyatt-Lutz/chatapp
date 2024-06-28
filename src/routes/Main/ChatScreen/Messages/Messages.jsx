@@ -11,7 +11,6 @@ import { useContextMenu } from "../../../../hooks/useContextMenu";
 
 import Message from "./Message"
 import Input from "./Input";
-import TopBar from "./TopBar";
 import MessagesContextMenu from "./MessagesContextMenu";
 
 const Messages = () => {
@@ -43,6 +42,7 @@ const Messages = () => {
 
 
   const handleChildAdded = (snap) => {
+    console.log(snap.key);
     setChats(prev => {
       const updatedChats = [...prev, snap.val()];
       if (prev.length === 1) {
@@ -195,7 +195,7 @@ const Messages = () => {
   return(
     <section className="w-full">
 
-      <TopBar />
+
 
 
       <div ref={messagesContainerRef} className="overflow-y-auto max-h-[400px] no-scrollbar w-full flex flex-col-reverse scroll-smooth">

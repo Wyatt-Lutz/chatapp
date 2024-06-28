@@ -1,5 +1,8 @@
 import { get, ref, remove, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
+
+
+
 export const blockUser = async(db, clientUserUid, uidToBlock) => {
   console.log('block user run');
 
@@ -16,7 +19,9 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   const membersRef = ref(db, "members/" + chatID);
   const userChatsInRef = ref(db, "users/" + uidToRemove + "/chatsIn/" + chatID);
   const currUserChatsInRef = ref(db, "users/" + currUserUid + "/chatsIn/" + chatID);
-  const userRemovedServerMessage = usernameOfUserRemoved + " has been removed from the chat.";
+
+  // If the current user calls the function for themselves to be removed, if they want to leave the chat, change the message accordingly
+  const userRemovedServerMessage = uidToRemove === currUserUid ? `${usernameOfUserRemoved} has left the chat.` : `${usernameOfUserRemoved} has been removed from the chat.`;
 
   await remove(userChatsInRef);
 
@@ -41,3 +46,13 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
 }
+
+
+export const transferOwnership = async (db, chatID, newOwnerUid) => {
+  const chatMetadataRef = ref(db, "chats/" + chatID);
+  await update(chatMetadataRef, {
+    owner: newOwnerUid,
+  });
+}
+
+

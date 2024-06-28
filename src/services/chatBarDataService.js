@@ -1,16 +1,21 @@
-import { ref, set, update } from "firebase/database";
+import { push, ref, set, update, get, query, orderByChild, equalTo } from "firebase/database";
 
 
-export const createChat = async(db, chatID, title, membersList, uids, currUserUid) => {
+export const createChat = async(db, memberUids, title, membersList, uids, currUserUid) => {
   try {
-    const chatRoomRef = ref(db, "chats/" + chatID);
+    const chatsRef = ref(db, "chats/");
+    const newChatRef = push(chatsRef);
+    const chatID = newChatRef.key;
     const membersRef = ref(db, "members/" + chatID);
 
+    const newChatData = {
+      title: title,
+      owner: currUserUid,
+      memberUids: memberUids,
+    }
+
     await Promise.all([
-      set(chatRoomRef, {
-        title: title,
-        owner: currUserUid,
-      }),
+      set(newChatRef, newChatData),
       set(membersRef, membersList),
     ]);
 
@@ -25,9 +30,43 @@ export const createChat = async(db, chatID, title, membersList, uids, currUserUi
 
 
     console.info('created chat');
-    // see if I can automaitcally go to the chat just created
+    return chatID
   } catch (error) {
     console.error(error);
   }
 
+
+
+}
+
+
+
+export const checkIfDuplicateChat = async(db, currUserUid, newChatMemberUids) => {
+  const chatsInRef = ref(db, "users/" + currUserUid + "/chatsIn");
+  const chatsInSnap = await get(chatsInRef);
+  if (!chatsInSnap.exists()) {
+    return false;
+  }
+  const chatIDs = Object.keys(chatsInSnap.val());
+  for (const chatID of chatIDs) {
+    console.log(chatID);
+    const chatMetadataRef = ref(db, "chats/" + chatID);
+    const metadataSnap = await get(chatMetadataRef);
+    console.log(metadataSnap.val());
+    console.log(metadataSnap.val().memberUids);
+    if (metadataSnap.val().memberUids === newChatMemberUids) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+export const checkIfUserExists = async(db, newUser) => {
+  const usersQuery = query(ref(db, "users"), orderByChild('username'), equalTo(newUser));
+  const usersQuerySnap = await get(usersQuery);
+  if (!usersQuerySnap.exists()) {
+    return null;
+  }
+  return usersQuerySnap.val();
 }
