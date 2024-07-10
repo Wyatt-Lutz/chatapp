@@ -44,7 +44,9 @@ const Messages = () => {
   const handleChildAdded = (snap) => {
     console.log(snap.key);
     setChats(prev => {
-      const updatedChats = [...prev, snap.val()];
+      const fetchedMessageData = snap.val();
+      fetchedMessageData.id = snap.key;
+      const updatedChats = [...prev, fetchedMessageData];
       if (prev.length === 1) {
         endTimestamp.current = prev[0].timestamp;
       }

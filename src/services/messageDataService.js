@@ -28,7 +28,6 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) 
   const newMessage = {
     timestamp,
     text,
-    id: newMessageRef.key,
     sender: userUID,
     renderTimeAndSender,
     hasBeenEdited: false,

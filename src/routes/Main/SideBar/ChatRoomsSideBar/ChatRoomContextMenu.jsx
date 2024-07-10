@@ -9,7 +9,7 @@ const ChatRoomContextMenu = ({contextMenuData, points}) => {
   const { currUser } = useContext(AuthContext);
   return (
     <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points?.y, left: points?.x}}>
-      <button onClick={() => removeUserFromChat(db, contextMenuData.id, currUser.uid, currUser.displayName, currUser.uid, dispatch)}>Leave Group Chat</button>
+      <button onClick={() => removeUserFromChat(db, contextMenuData.chatID, currUser.uid, currUser.displayName, currUser.uid, dispatch)}>Leave Group Chat</button>
     </div>
   )
 }

@@ -7,7 +7,7 @@ import { ChatContext } from "../../../../ChatProvider";
 import { checkIfDuplicateChat, checkIfUserExists, createChat } from "../../../../services/chatBarDataService";
 
 
-const ChatCreation = ({changeCreatingState}) => {
+const ChatCreation = ({changeChatRoomCreationState}) => {
   console.log('chat creation')
   const { data, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
@@ -64,7 +64,7 @@ const ChatCreation = ({changeCreatingState}) => {
     const newChatID = await createChat(db, memberUids, title, membersList, uids, currUser.uid);
     console.log(newChatID);
     setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
-    changeCreatingState(false);
+    changeChatRoomCreationState(false);
     const ownerUid = currUser.uid;
     dispatch({ type: "CHANGE_CHAT", payload: { newChatID, title, ownerUid }});
   }
@@ -97,7 +97,7 @@ const ChatCreation = ({changeCreatingState}) => {
         )}
         <div className="flex">
           <button type="submit" className="ring">Create Chat</button>
-          <button className="ring" onClick={() => {changeCreatingState(false)}}>Cancel</button>
+          <button className="ring" onClick={() => changeChatRoomCreationState(false)}>Cancel</button>
         </div>
 
 

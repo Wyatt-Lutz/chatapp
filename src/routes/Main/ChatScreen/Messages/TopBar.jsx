@@ -37,7 +37,7 @@ const TopBar = () => {
   }, [data.chatID]);
 
   return (
-    <>
+    <div className="ring" onMouseOver={() => setIsEditingTitle(true)} onMouseLeave={() => setIsEditingTitle(false)}>
 
       {isEditingTitle ? (
         <form onSubmit={handleSubmit(onFinishEditTitle)}>
@@ -45,10 +45,10 @@ const TopBar = () => {
         </form>
 
       ) : (
-        <div onMouseOver={() => setIsEditingTitle(true)}>{data.title}</div>
+        <div>{data.title}</div>
       )}
 
-    </>
+    </div>
 
 
   )

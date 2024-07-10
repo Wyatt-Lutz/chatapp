@@ -90,14 +90,15 @@ const ChatRoomsSideBar = () => {
   }, [currUser]);
 
 
-  const changeCreatingState = useContext((state) => {
+  const changeChatRoomCreationState = (state) => {
     setIsCreatingChat(state);
-  }, [data.chatID])
+  };
 
   const handleContextMenu = (e, chat) => {
     e.preventDefault();
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
+    console.log(chat);
     setContextMenuData({ chatID: chat.id });
   }
 
@@ -107,7 +108,7 @@ const ChatRoomsSideBar = () => {
 
       <button className="m-2 ring"onClick={() => setIsCreatingChat(true)}><Plus /></button>
       {isCreatingChat && (
-        <ChatCreation changeCreatingState={changeCreatingState} />
+        <ChatCreation changeChatRoomCreationState={changeChatRoomCreationState} />
       )}
 
       <div className="flex flex-col">

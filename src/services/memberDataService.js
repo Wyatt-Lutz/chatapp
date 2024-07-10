@@ -13,12 +13,15 @@ export const blockUser = async(db, clientUserUid, uidToBlock) => {
 
 export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, dispatch) => {
   console.log('removeUserFromChat run');
-
+  console.log(chatID);
 
   const memberToRemoveRef = ref(db, "members/" + chatID + "/" + uidToRemove);
   const membersRef = ref(db, "members/" + chatID);
   const userChatsInRef = ref(db, "users/" + uidToRemove + "/chatsIn/" + chatID);
   const currUserChatsInRef = ref(db, "users/" + currUserUid + "/chatsIn/" + chatID);
+  const ownerRef = ref(db, "chats/" + chatID + "/owner");
+
+
 
   // If the current user calls the function for themselves to be removed, if they want to leave the chat, change the message accordingly
   const userRemovedServerMessage = uidToRemove === currUserUid ? `${usernameOfUserRemoved} has left the chat.` : `${usernameOfUserRemoved} has been removed from the chat.`;
@@ -26,8 +29,8 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   await remove(userChatsInRef);
 
   const membersListSnap = await get(membersRef);
-  console.log(membersListSnap.val());
-  if (Object.keys(membersListSnap.val()).length < 3) {
+  const membersListUids = Object.keys(membersListSnap.val());
+  if (membersListUids.length < 3) {
     await dispatch({type: "RESET"});
     await Promise.all([
       remove(membersRef),
@@ -43,8 +46,16 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
     addMessage(userRemovedServerMessage, chatID, "server", db, true), // message, id of chat, sender, database reference, bool whether to show timestamp of message
   ]);
 
-
-
+  //If the user being removed is the owner of the chat, then transfer ownership
+  const ownerData = await get(ownerRef);
+  let newOwnerUid = "";
+  if (ownerData.val() === currUserUid) {
+    if (membersListUids[0] === currUserUid) {
+      newOwnerUid = membersListUids[1];
+    }
+    newOwnerUid = membersListUids[0];
+    transferOwnership(db, chatID, newOwnerUid);
+  }
 }
 
 
