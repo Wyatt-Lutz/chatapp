@@ -1,6 +1,10 @@
 const UserBar = () => {
   return (
-    <div className="ring p-2">Settings</div>
+    <>
+      <button className="ring p-2">Settings</button>
+      <button>Log Out</button>
+    </>
+
   )
 }
 export default UserBar;

@@ -15,7 +15,7 @@ const Message = ({ chat, isFirst, isEditing, changeEditState }) => {
     editMessage(chat.id, text.editMessage, data.chatID, db);
     changeEditState(chat.id, false);
   }
-  const memberObjOfSender = data.members.find(member => member.uid === chat.sender)
+  const memberObjOfSender = data.members.find(member => member.uid === chat.sender);
 
 
 

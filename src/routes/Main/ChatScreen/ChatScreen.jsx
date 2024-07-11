@@ -5,6 +5,7 @@ import { ChatContext } from '../../../ChatProvider';
 import MembersBar from './MembersBar/MembersBar';
 import TopBar from './Messages/TopBar';
 import Messages from './Messages/Messages';
+import Search from './Search';
 
 const ChatScreen = () => {
   const { data } = useContext(ChatContext);
@@ -23,7 +24,9 @@ const ChatScreen = () => {
               <MembersBar/>
             </div>
 
+
           </div>
+          <Search />
         </>
 
       )}
