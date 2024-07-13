@@ -17,15 +17,15 @@ const Signin = () => {
   }
 
 
-  const signUserIn = async({email, password}, token) => {
-    await setPersistence(auth, checkboxRef.current.checked ? browserLocalPersistence : browserSessionPersistence).then(() => {
-      if(token) {
-        return signInWithCustomToken(auth, token);
+  const signUserIn = async({email, password}) => {
+    await setPersistence(auth, checkboxRef.current.checked ? browserLocalPersistence : browserSessionPersistence)
+    await signInWithEmailAndPassword(auth, email, password).catch((error) => {
+      if (error.code === 'auth/invalid-credential') {
+        console.error('Your email and/or password are incorrect.');
       }
-      return signInWithEmailAndPassword(auth, email, password);
     });
-    navigate("/");
 
+    navigate("/");
   }
 
 
@@ -36,7 +36,7 @@ const Signin = () => {
         <PasswordReset passChange={handlePassChange}/>
       ) : (
         <div>
-          <form noValidate onSubmit={handleSubmit((data) => signUserIn(data, null))} className="flex flex-col">
+          <form noValidate onSubmit={handleSubmit(signUserIn)} className="flex flex-col">
             <input type="email" placeholder="Email" {...register('email', { required: true, maxLength: 254, pattern: {value: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/, message: "Not valid email."}})} />
             <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 128, minLength: {value: 6, message: "Passwords are at least 6 characters."}, pattern: {value: /^[A-Za-z0-9$!@#%^&*()_\-+=\[\]{};:'",.<>/?`~\\|]+$/, message: "Invalid use of characters inside password"} })} />
             <button type="submit" className="border rounded-md bg-zinc-500">Signin</button>

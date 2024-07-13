@@ -4,7 +4,7 @@ import ChatScreen from './ChatScreen/ChatScreen';
 import { sendEmailVerification, signOut } from 'firebase/auth';
 import { lazy, Suspense, useContext, useEffect, useState } from 'react';
 import { auth } from '../../../firebase';
-import Settings from './Settings';
+import Settings from './Settings/Settings';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 const EmailNotVerified = lazy(() => import('../../utils/EmailNotVerified'));
 const Main = () => {
