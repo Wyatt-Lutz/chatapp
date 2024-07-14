@@ -3,7 +3,6 @@ import { changeUsername } from "../../../services/settingsDataService";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../../AuthProvider";
 import { db } from "../../../../firebase";
-import { checkIfUserExists } from "../../../services/chatBarDataService";
 import { reauthenticateWithCredential, updateEmail, verifyBeforeUpdateEmail } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
 import EmailNotVerified from "../../../utils/EmailNotVerified";

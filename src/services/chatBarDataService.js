@@ -62,11 +62,3 @@ export const checkIfDuplicateChat = async(db, currUserUid, newChatMemberUids) =>
 }
 
 
-export const checkIfUserExists = async(db, newUser) => {
-  const usersQuery = query(ref(db, "users"), orderByChild('username'), equalTo(newUser));
-  const usersQuerySnap = await get(usersQuery);
-  if (!usersQuerySnap.exists()) {
-    return null;
-  }
-  return usersQuerySnap.val();
-}

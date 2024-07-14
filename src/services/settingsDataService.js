@@ -1,7 +1,8 @@
 
 import { updateEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
-import { checkIfUserExists } from "./chatBarDataService"
+
 import { get, update, ref} from "firebase/database";
+import { checkIfUserExists } from "./globalDatService";
 
 export const changeUsername = async(db, newUsername, currUser) => {
   const userData = await checkIfUserExists(db, newUsername);
@@ -43,3 +44,4 @@ export const changeEmail = async(db, currUser, newEmail) => {
     email: newEmail,
   });
 }
+

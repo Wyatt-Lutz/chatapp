@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../../AuthProvider";
 import { useForm } from "react-hook-form";
-import { reauthenticateWithCredential, sendEmailVerification, signInWithEmailAndPassword, updateEmail, verifyBeforeUpdateEmail } from "firebase/auth";
+import { browserLocalPersistence, reauthenticateWithCredential, sendEmailVerification, setPersistence, signInWithEmailAndPassword, updateEmail, verifyBeforeUpdateEmail } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
 import { changeEmail } from "../../../services/settingsDataService";
 import { auth } from "../../../../firebase";
@@ -10,11 +10,7 @@ import Close from "../../../styling-components/Close";
 const ChangeEmail = ({changeEmailDisplayment}) => {
   const { currUser } = useContext(AuthContext);
 
-  const { register, handleSubmit,  formState: { errors }, watch } = useForm({
-    defaultValues: {
-      email: currUser.email,
-    }
-  });
+  const { register, handleSubmit,  formState: { errors }, watch } = useForm();
   const hasMounted = useRef(false);
   const [isDisplayingVerification, setIsDisplayingVerification] = useState(false);
   const newEmail = watch('email');
@@ -23,15 +19,17 @@ const ChangeEmail = ({changeEmailDisplayment}) => {
   const onChangeEmailSubmit = async () => {
     setIsDisplayingVerification(true);
     //Re-authenticate user
-
+    await setPersistence(auth, browserLocalPersistence);
+    console.log(currUser.email);
+    console.log(password);
     const credential = EmailAuthProvider.credential(currUser.email, password);
+    console.log(credential);
     const userCredential = await reauthenticateWithCredential(currUser, credential);
     console.log(userCredential);
 
-
-    await verifyBeforeUpdateEmail(currUser, newEmail);
+    await verifyBeforeUpdateEmail(userCredential.user, newEmail);
   }
-
+/*
   useEffect(() => {
     if (!hasMounted.current) {
       hasMounted.current = true;
@@ -59,7 +57,7 @@ const ChangeEmail = ({changeEmailDisplayment}) => {
 
 
   }, [isDisplayingVerification]);
-
+*/
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-6 bg-black bg-opacity-50">
@@ -70,6 +68,7 @@ const ChangeEmail = ({changeEmailDisplayment}) => {
             <h2 className="mb-4 text-lg font-semibold">Please Verify Your New Email</h2>
             <div>You email has been successfully changed. Before you continue, please verify your email.</div>
             <div>We have sent a email verification link to {newEmail}.</div>
+            <div>After your email is verified, you will have re-sign in for security</div>
 
 
             <div className="flex justify-end space-x-2">

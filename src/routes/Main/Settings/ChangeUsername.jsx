@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../AuthProvider";
 import { changeUsername } from "../../../services/settingsDataService";
 import { db } from "../../../../firebase";
-import { checkIfUserExists } from "../../../services/chatBarDataService";
 import Close from "../../../styling-components/Close";
+import UsernameAvaliability from "../../../utils/UsernameAvaliability";
 
 const ChangeUsername = ({changeUsernameDisplayment}) => {
   const { currUser } = useContext(AuthContext);
@@ -14,40 +14,14 @@ const ChangeUsername = ({changeUsernameDisplayment}) => {
       username: currUser.displayName,
     }
   });
-  const [isUsernameAvaliable, setIsUsernameAvaliable] = useState(null);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const newUsername = watch('username')
-  const hasMounted = useRef(false);
-
-  useEffect(() => {
-    if (!hasMounted.current) {
-      hasMounted.current = true;
-      return;
-    }
-    let timeout;
-    const checkUsernameValidity = async(username) => {
-      console.log('checked')
-      const userData = await checkIfUserExists(db, username);
-      setIsUsernameAvaliable(!userData);
-    }
-
-    if (newUsername) {
-      timeout = setTimeout(() => {
-        checkUsernameValidity(newUsername);
-      }, 500);
-    } else {
-      setIsUsernameAvaliable(null);
-    }
-
-    return () => clearTimeout(timeout)
-  }, [newUsername]);
-
 
   const onChangeUsernameSubmit = async() => {
 
     const isChanged = await changeUsername(db, newUsername, currUser);
     if (isChanged) {
       console.log("username changed successfully");
-      setIsUsernameAvaliable(null);
       changeUsernameDisplayment(false);
     }
   }
@@ -60,19 +34,11 @@ const ChangeUsername = ({changeUsernameDisplayment}) => {
 
         <p>Username</p>
         <input type="text" {...register('username')}  />
-
-        {isUsernameAvaliable === true && (
-          <div className="text-green-500">Username is Avaliable</div>
-        )}
-        {isUsernameAvaliable === false && (
-          <div className="text-red-400">Username is not avaliable. Consider adding numbers and special characters.</div>
-        )}
-
-
+        <UsernameAvaliability newUsername={newUsername} setIsButtonDisabled={setIsButtonDisabled} />
 
         <div className="flex justify-end space-x-2">
           <button onClick={() => changeUsernameDisplayment(false)} className="px-4 py-2 text-white">Cancel</button>
-          <button disabled={!isUsernameAvaliable} onClick={onChangeUsernameSubmit} className="px-4 py-2 text-white bg-indigo-500 rounded">Done</button>
+          <button disabled={isButtonDisabled} onClick={onChangeUsernameSubmit} className="px-4 py-2 text-white bg-indigo-500 rounded">Done</button>
         </div>
 
       </div>

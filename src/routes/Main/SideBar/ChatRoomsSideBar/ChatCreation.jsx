@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../AuthProvider";
 import { db } from "../../../../../firebase";
 import { ChatContext } from "../../../../ChatProvider";
-import { checkIfDuplicateChat, checkIfUserExists, createChat } from "../../../../services/chatBarDataService";
+import { checkIfDuplicateChat, createChat } from "../../../../services/chatBarDataService";
+import { checkIfUserExists } from "../../../../services/globalDatService";
 
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
