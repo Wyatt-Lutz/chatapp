@@ -4,6 +4,8 @@ import { db } from "../../firebase";
 
 
 const UsernameAvaliability = ({newUsername, setIsButtonDisabled}) => {
+
+  console.log('usernameAvaliability run');
   const hasMounted = useRef(false);
   const [isUsernameAvaliable, setIsUsernameAvaliable] = useState(null);
 

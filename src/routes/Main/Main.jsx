@@ -3,7 +3,7 @@ import ChatScreen from './ChatScreen/ChatScreen';
 
 import { sendEmailVerification, signOut } from 'firebase/auth';
 import { lazy, Suspense, useContext, useEffect, useState } from 'react';
-import { auth } from '../../../firebase';
+import { actionCodeSettings, auth } from '../../../firebase';
 import Settings from './Settings/Settings';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 const EmailNotVerified = lazy(() => import('../../utils/EmailNotVerified'));
@@ -11,16 +11,26 @@ const Main = () => {
   const [isVerify, setVerify] = useState(false);
   const { currUser } = useContext(AuthContext);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
     const checkIfUserVerified = async() => {
-      if (!auth.currentUser.emailVerified) {
-        await sendEmailVerification(currUser);
-        console.info("Email Verification sent");
-        setVerify(true);
+      console.log(localStorage.getItem('alreadySentVerification'));
+      if (auth.currentUser.emailVerified) {
+        setLoading(false);
+        return;
       }
+
+      if (!localStorage.getItem('alreadySentVerification')) {
+        await sendEmailVerification(currUser, actionCodeSettings);
+        localStorage.setItem('alreadySentVerification', true);
+        console.info("Email Verification sent");
+      }
+      setLoading(false);
+      setVerify(true);
     }
+
 
     checkIfUserVerified();
   }, [currUser]);
@@ -49,6 +59,8 @@ const Main = () => {
 
       ) : isSettingsOpen ? (
         <Settings />
+      ) : loading ? (
+        <div>Loading...</div>
       ) : (
         <div className='flex justify-center items-center w-full h-screen'>
           <div className='flex ring flex-col'>
@@ -61,6 +73,8 @@ const Main = () => {
           <ChatScreen />
         </div>
       )}
+
+
 
 
     </section>

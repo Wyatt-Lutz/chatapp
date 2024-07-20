@@ -9,48 +9,15 @@ import EmailNotVerified from "../../../utils/EmailNotVerified";
 import ChangeEmail from "./ChangeEmail";
 import ChangePassword from "./ChangePassword";
 import ChangeUsername from "./ChangeUsername";
+import DeleteAccount from "./DeleteAccount";
 
 const Settings = () => {
   const { currUser } = useContext(AuthContext);
-  const [isReauthenticationNeeded, setIsReauthenticationNeeded] = useState(false);
   const [isDisplayingVerification, setIsDisplayingVerification] = useState(false);
   const [isChangingUsername, setIsChangingUsername] = useState(false);
   const [isChangingEmail, setIsChangingEmail] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const { register, handleSubmit,  formState: { errors }, watch } = useForm({
-    defaultValues: {
-      username: currUser.displayName,
-      email: currUser.email,
-    }
-  });
-
-
-  const newEmail = watch('email');
-
-
-  const onChangeEmailSubmit = async({email, password}) => {
-    console.log(email);
-    console.log(password);
-    if (isReauthenticationNeeded) {
-      const credential = EmailAuthProvider.credential(currUser.email, password);
-      reauthenticateWithCredential(currUser, credential);
-      setIsReauthenticationNeeded(false);
-    }
-    await verifyBeforeUpdateEmail(currUser, newEmail).catch((error) => {
-      if (error === 'auth/requires-recent-login') {
-        setIsReauthenticationNeeded(true);
-        return;
-      }
-    });
-    setIsDisplayingVerification(true);
-
-
-
-    const ret = await updateEmail(currUser, email);
-  }
-
-
-
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const handleVerifyChange = (state) => {
     setIsDisplayingVerification(state);
@@ -66,6 +33,10 @@ const Settings = () => {
 
   const changePasswordDisplayment = (state) => {
     setIsChangingPassword(state);
+  }
+
+  const changeDeletingAccountDisplayment = (state) => {
+    setIsDeletingAccount(state);
   }
 
   return (
@@ -107,6 +78,10 @@ const Settings = () => {
             <button onClick={() => setIsChangingPassword(true)} className="bg-gray-500">Change</button>
           </div>
 
+
+
+          <button onClick={() => setIsDeletingAccount(true)} className="bg-red-500">Delete Account</button>
+
           {isChangingUsername && (
             <ChangeUsername changeUsernameDisplayment={changeUsernameDisplayment} />
           )}
@@ -116,24 +91,10 @@ const Settings = () => {
           {isChangingPassword && (
             <ChangePassword changePasswordDisplayment={changePasswordDisplayment} />
           )}
-
-
-
-
-
-
-          <h2>Change Email</h2>
-          <form onSubmit={handleSubmit(onChangeEmailSubmit)}>
-            <input type="text" {...register('email')} />
-          </form>
-          {isReauthenticationNeeded && (
-            <>
-              <form onSubmit={handleSubmit(onChangeEmailSubmit)}>
-                <input type="password" placeholder="******" {...register('password', { required: true, maxLength: 128, minLength: {value: 6, message: "Passwords are at least 6 characters."}, pattern: {value: /^[A-Za-z0-9$!@#%^&*()_\-+=\[\]{};:'",.<>/?`~\\|]+$/, message: "Invalid use of characters inside password"} })} />
-              </form>
-              {errors.password?.message}
-            </>
+          {isDeletingAccount && (
+            <DeleteAccount changeDeletingAccountDisplayment={changeDeletingAccountDisplayment} />
           )}
+
         </>
 
       )}
