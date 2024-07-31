@@ -16,7 +16,6 @@ const Main = () => {
   useEffect(() => {
 
     const checkIfUserVerified = async() => {
-      console.log(localStorage.getItem('alreadySentVerification'));
       if (auth.currentUser.emailVerified) {
         setLoading(false);
         return;

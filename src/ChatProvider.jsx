@@ -57,6 +57,7 @@ export const ChatContextProvider = ({ children }) => {
 
 
 
+
       case "RESET":
         console.log('reset context')
         return initialState;
@@ -71,6 +72,7 @@ export const ChatContextProvider = ({ children }) => {
     newMembers.map(((member, index) => {
       if (member.uid === action.payload.uid) {
         newMembers[index] = action.payload;
+
       }
     }));
     return newMembers;

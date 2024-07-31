@@ -34,12 +34,14 @@ const ChatRoomsSideBar = () => {
 
 
     // If creater of chat didn't set a title, create a title for the client based off the members usernames
-    const membersRef = ref(db, "members/" + newChatID);
-    const membersSnap = await get(membersRef);
-    const membersData = Object.values(membersSnap.val());
     if (newChatData.title === "") {
+      const membersRef = ref(db, "members/" + newChatID);
+      const membersSnap = await get(membersRef);
+      const membersData = Object.values(membersSnap.val()) || {};
       newChatData.title = membersData.filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
     }
+
+
 
     newChatData.id = newChatID;
     setChatsData(prev => ({

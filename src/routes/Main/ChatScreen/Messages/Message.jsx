@@ -24,7 +24,12 @@ const Message = ({ chat, isFirst, isEditing, changeEditState }) => {
       {(chat.renderTimeAndSender || isFirst) && (
         <div className="flex">
           <img src="" alt="helllo"/>
-          <div>{memberObjOfSender && memberObjOfSender.username}</div>
+          {memberObjOfSender && memberObjOfSender.isBlocked ? (
+            <div>Blocked User</div>
+          ) : (
+            <div>{memberObjOfSender && memberObjOfSender.username}</div>
+          )}
+
           <div>{calcTime(chat.timestamp)}</div>
         </div>
       )}
@@ -35,13 +40,21 @@ const Message = ({ chat, isFirst, isEditing, changeEditState }) => {
             <input placeholder={chat.text} {...register('editMessage', { required: false, maxLength: 200 })} />
           </form>
         ) : (
-          <div className="text-wrap">
-            <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
+          <>
+            {memberObjOfSender && memberObjOfSender.isBlocked ? (
+              <div></div>
+            ) : (
+              <div className="text-wrap">
+              <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
 
-            {chat.hasBeenEdited && (
-              <div>Edited</div>
+              {chat.hasBeenEdited && (
+                <div>Edited</div>
+              )}
+              </div>
             )}
-          </div>
+          </>
+
+
         )}
       </div>
 

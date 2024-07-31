@@ -6,6 +6,7 @@ import { ChatContext } from "../../../../ChatProvider";
 import { AuthContext } from "../../../../AuthProvider";
 import { onChildAdded, onChildChanged, ref } from "firebase/database";
 import { db } from "../../../../../firebase";
+import { getBlockData } from "../../../../services/memberDataService";
 const MembersBar = () => {
   console.log('membersBar run')
 
@@ -19,24 +20,42 @@ const MembersBar = () => {
     e.preventDefault();
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({uid: member.uid, username: member.username});
+    setContextMenuData({member: member});
   }
 
+
+
+
   useEffect(() => {
-    const memberRef = ref(db, "members/" + data.chatID);
-    const memberAddedListener = onChildAdded(memberRef, (snap) => {
-      dispatch({type: "ADD_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-    });
-
-    const memberChangedListener = onChildChanged(memberRef, (snap) => {
-
-      dispatch({type: "CHANGE_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-    })
-
-    return () => {
-      memberAddedListener();
-      memberChangedListener();
+    let memberAddedListener, memberChangedListener;
+    const getBlockedData = async() => {
+      const data = await getBlockData(db, currUser.uid);
+      return data;
     }
+
+    const setMemberData = async() => {
+      const blockData = await getBlockedData();
+      console.log(blockData);
+      const memberRef = ref(db, "members/" + data.chatID);
+      memberAddedListener = onChildAdded(memberRef, (snap) => {
+        dispatch({type: "ADD_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, isBlocked: blockData[snap.key] || false, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
+      });
+
+      memberChangedListener = onChildChanged(memberRef, (snap) => {
+
+        dispatch({type: "CHANGE_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, isBlocked: blockData[snap.key] || false, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
+      })
+    }
+    setMemberData();
+    return () => {
+      if(memberAddedListener) {
+        memberAddedListener();
+      }
+      if (memberChangedListener) {
+        memberChangedListener();
+      }
+    }
+
 
   }, [data.chatID]);
   return (

@@ -62,27 +62,4 @@ export const checkIfDuplicateChat = async(db, currUserUid, newChatMemberUids) =>
 }
 
 
-/**
- * Checks if the current user has blocked the user being added to a chatroom, and if the user being added has blocked the current user.
- * @returns True if current user has blocked user being added, false if added user has blocked current user, and null if neither;
- */
-export const checkUsersBlockedStatus = async(db, currUserUid, addedUserUid) => {
-  const currUserRef = ref(db, "users/" + currUserUid +  "/blockList");
-  const addedUserRef = ref(db, "users/" + addedUserUid + "/blockList");
-
-  const currUserBlockDataSnap = await get(currUserRef);
-  const currUserBlockData = currUserBlockDataSnap.val();
-
-  const addedUserBlockDataSnap = await get(addedUserRef);
-  const addedUserBlockData = addedUserBlockDataSnap.val();
-
-  if (Object.keys(currUserBlockData).includes(addedUserUid)) {
-    return true;
-  }
-  if (Object.keys(addedUserBlockData).includes(currUSerUid)) {
-    return false;
-  }
-  return null;
-}
-
 

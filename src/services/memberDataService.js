@@ -2,14 +2,21 @@ import { get, ref, remove, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
 
 
-
-export const blockUser = async(db, clientUserUid, uidToBlock) => {
+/**
+ * Updates the block status of a given user for the current user
+ * @param {Database} db - Realtime Database Reference
+ * @param {string} clientUserUid - Uid for the client user
+ * @param {string} uidToBlock - Uid of the user being blocked by the current user
+ * @param {boolean} newBlockedStatus - New status of whether the user is blocked to the client user, false if no, true if yes
+ */
+export const updateBlockedStatus = async(db, clientUserUid, uidToBlock, newBlockedStatus) => {
   console.log('block user run');
 
   const userBlockListRef = ref(db, "users/" + clientUserUid + "/blockList");
-  const newBlockData = {[uidToBlock]: true}
+  const newBlockData = {[uidToBlock]: newBlockedStatus}
   await update(userBlockListRef, newBlockData);
 }
+
 
 export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, dispatch) => {
   console.log('removeUserFromChat run');
@@ -53,6 +60,22 @@ export const transferOwnership = async (db, chatID, newOwnerUid) => {
   await update(chatMetadataRef, {
     owner: newOwnerUid,
   });
+}
+
+
+/**
+ * Fetches the block status of users blocked by current user
+ * @param {Database} db - Reference to Realtime Database
+ * @param {string} userUid - Uid of the user whose block data is fetched
+ * @returns {Object} - Object of blocked users by current user with true and false values for current blocked status
+ */
+export const getBlockData = async(db, userUid) => {
+  const userBlockListRef = ref(db, "users/" + userUid + "/blockList");
+
+  const userBlockDataSnap = await get(userBlockListRef);
+  const userBlockData = userBlockDataSnap.val() || {};
+
+  return userBlockData;
 }
 
 
