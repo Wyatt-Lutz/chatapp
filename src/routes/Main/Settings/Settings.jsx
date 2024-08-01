@@ -10,39 +10,21 @@ import ChangeEmail from "./ChangeEmail";
 import ChangePassword from "./ChangePassword";
 import ChangeUsername from "./ChangeUsername";
 import DeleteAccount from "./DeleteAccount";
+import BlockedUsersModel from "./BlockedUsersModel";
 
 const Settings = () => {
   const { currUser } = useContext(AuthContext);
-  const [isDisplayingVerification, setIsDisplayingVerification] = useState(false);
-  const [isChangingUsername, setIsChangingUsername] = useState(false);
-  const [isChangingEmail, setIsChangingEmail] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [modelDisplayment, setModelDisplayment] = useState("");
 
-  const handleVerifyChange = (state) => {
-    setIsDisplayingVerification(state);
-  }
 
-  const changeUsernameDisplayment = (state) => {
-    setIsChangingUsername(state);
-  }
-
-  const changeEmailDisplayment = (state) => {
-    setIsChangingEmail(state);
-  }
-
-  const changePasswordDisplayment = (state) => {
-    setIsChangingPassword(state);
-  }
-
-  const changeDeletingAccountDisplayment = (state) => {
-    setIsDeletingAccount(state);
+  const handleModelDisplaymentChange = (model) => {
+    setModelDisplayment(model);
   }
 
   return (
     <>
-      {isDisplayingVerification ? (
-        <EmailNotVerified verifyChange={handleVerifyChange} email={newEmail} isUpdatingEmail={true} />
+      {modelDisplayment === "verification" ? (
+        <EmailNotVerified changeDisplayment={handleModelDisplaymentChange} email={newEmail} isUpdatingEmail={true} />
       ) : (
         <>
           <h1>Settings</h1>
@@ -59,7 +41,7 @@ const Settings = () => {
               <div>Username</div>
               <div>{currUser.displayName}</div>
             </div>
-            <button onClick={() => setIsChangingUsername(true)} className="bg-gray-500">Edit</button>
+            <button onClick={() => handleModelDisplaymentChange("changeUsername")} className="bg-gray-500">Edit</button>
           </div>
 
           <div className="flex">
@@ -67,7 +49,7 @@ const Settings = () => {
               <div>Email</div>
               <div>{currUser.email}</div>
             </div>
-            <button onClick={() => setIsChangingEmail(true)} className="bg-gray-500">Edit</button>
+            <button onClick={() => handleModelDisplaymentChange("changeEmail")} className="bg-gray-500">Edit</button>
           </div>
 
           <div className="flex">
@@ -75,24 +57,32 @@ const Settings = () => {
               <div>Password</div>
               <div>******</div>
             </div>
-            <button onClick={() => setIsChangingPassword(true)} className="bg-gray-500">Change</button>
+            <button onClick={() => handleModelDisplaymentChange("changePassword")} className="bg-gray-500">Change</button>
           </div>
 
 
+          <button onClick={() => handleModelDisplaymentChange("blockedUsers")} className="bg-gray-500">Blocked Users</button>
 
-          <button onClick={() => setIsDeletingAccount(true)} className="bg-red-500">Delete Account</button>
 
-          {isChangingUsername && (
-            <ChangeUsername changeUsernameDisplayment={changeUsernameDisplayment} />
+
+
+
+          <button onClick={() => handleModelDisplaymentChange("deleteAccount")} className="bg-red-500">Delete Account</button>
+
+          {modelDisplayment === "changeUsername" && (
+            <ChangeUsername changeDisplayment={handleModelDisplaymentChange} />
           )}
-          {isChangingEmail && (
-            <ChangeEmail changeEmailDisplayment={changeEmailDisplayment} />
+          {modelDisplayment === "changeEmail" && (
+            <ChangeEmail changeDisplayment={handleModelDisplaymentChange} />
           )}
-          {isChangingPassword && (
-            <ChangePassword changePasswordDisplayment={changePasswordDisplayment} />
+          {modelDisplayment === "changePassword" && (
+            <ChangePassword changeDisplayment={handleModelDisplaymentChange} />
           )}
-          {isDeletingAccount && (
-            <DeleteAccount changeDeletingAccountDisplayment={changeDeletingAccountDisplayment} />
+          {modelDisplayment === "deleteAccount" && (
+            <DeleteAccount changeDisplayment={handleModelDisplaymentChange} />
+          )}
+          {modelDisplayment === "blockedUsers" && (
+            <BlockedUsersModel changeDisplayment={handleModelDisplaymentChange} />
           )}
 
         </>

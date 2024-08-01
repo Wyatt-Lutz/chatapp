@@ -22,6 +22,7 @@ export const ChatContextProvider = ({ children }) => {
           chatID: action.payload.chatID,
           title: action.payload.title,
           owner: action.payload.owner,
+          members: [],
         };
       case "UPDATE_TITLE":
         return {

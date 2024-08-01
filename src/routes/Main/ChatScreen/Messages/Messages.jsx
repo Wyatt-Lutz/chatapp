@@ -90,6 +90,7 @@ const Messages = () => {
       console.info("chatID undefined");
       return;
     }
+
     updateUserOnlineStatus(true, db, data.chatID, currUser.uid);
 
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));

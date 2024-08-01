@@ -49,6 +49,7 @@ const MembersBar = () => {
     setMemberData();
     return () => {
       if(memberAddedListener) {
+        console.log('hello')
         memberAddedListener();
       }
       if (memberChangedListener) {

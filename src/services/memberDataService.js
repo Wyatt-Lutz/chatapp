@@ -67,7 +67,7 @@ export const transferOwnership = async (db, chatID, newOwnerUid) => {
  * Fetches the block status of users blocked by current user
  * @param {Database} db - Reference to Realtime Database
  * @param {string} userUid - Uid of the user whose block data is fetched
- * @returns {Object} - Object of blocked users by current user with true and false values for current blocked status
+ * @returns {Object} Object of blocked users by current user with true and false values for current blocked status
  */
 export const getBlockData = async(db, userUid) => {
   const userBlockListRef = ref(db, "users/" + userUid + "/blockList");
@@ -76,6 +76,23 @@ export const getBlockData = async(db, userUid) => {
   const userBlockData = userBlockDataSnap.val() || {};
 
   return userBlockData;
+}
+
+/**
+ * Fetches a users username using their uid
+ * @param {Database} db - Realtime Database Reference
+ * @param {string} userUid - Uid of the user
+ * @returns username of the user
+ */
+export const getUsernameFromUid = async(db, userUid) => {
+
+  const userRef = ref(db, "users/" + userUid + "/username");
+
+  const usernameSnap = await get(userRef);
+  const username = usernameSnap.val();
+  console.log(username);
+  return username;
+
 }
 
 

@@ -15,7 +15,7 @@ const ChatScreen = () => {
       {!data.chatID ? (
         <div>Chat Requests</div>
       ) : (
-        <>
+        <div key={data.chatID}>
           <TopBar />
           <div className='flex'>
             <Messages />
@@ -27,7 +27,7 @@ const ChatScreen = () => {
 
           </div>
           <Search />
-        </>
+        </div>
 
       )}
     </section>

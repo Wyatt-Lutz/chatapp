@@ -4,7 +4,7 @@ import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 
 import { useForm } from "react-hook-form";
 import Close from "../../../styling-components/Close";
 
-const ChangePassword = ({changePasswordDisplayment}) => {
+const ChangePassword = ({changeDisplayment}) => {
   const { currUser } = useContext(AuthContext);
 
   const [isPasswordsMatching, setIsPasswordsMatching] = useState(true);
@@ -24,33 +24,32 @@ const ChangePassword = ({changePasswordDisplayment}) => {
     await reauthenticateWithCredential(currUser, credential);
 
     await updatePassword(currUser, newPassword);
-    changePasswordDisplayment(false);
+    changeDisplayment(null);
   }
 
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-6 bg-black bg-opacity-50">
-    <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
-      <button onClick={() => changePasswordDisplayment(false)} className="absolute top-4 right-4"><Close /></button>
-      <h2 className="mb-4 text-lg font-semibold">Change your Password</h2>
+      <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
+        <button onClick={() => changeDisplayment(null)} className="absolute top-4 right-4"><Close /></button>
+        <h2 className="mb-4 text-lg font-semibold">Change your Password</h2>
 
-      <p>Old Password</p>
-      <input type="password" {...register('oldPassword')} />
-      <p>New Password</p>
-      <input type="password" {...register('newPassword')} />
-      <p>Confirm New Password</p>
-      <input type="password" {...register('confirmNewPassword')} />
+        <p>Old Password</p>
+        <input type="password" {...register('oldPassword')} />
+        <p>New Password</p>
+        <input type="password" {...register('newPassword')} />
+        <p>Confirm New Password</p>
+        <input type="password" {...register('confirmNewPassword')} />
 
-      {!isPasswordsMatching && (
-        <div>Passwords do not match</div> //Toast
-      )}
-      <div className="flex justify-end space-x-2">
-        <button onClick={() => changePasswordDisplayment(false)} className="px-4 py-2 text-white">Cancel</button>
-        <button onClick={onChangePasswordSubmit} className="px-4 py-2 text-white bg-indigo-500 rounded">Done</button>
+        {!isPasswordsMatching && (
+          <div>Passwords do not match</div> //Toast
+        )}
+        <div className="flex justify-end space-x-2">
+          <button onClick={() => changeDisplayment(null)} className="px-4 py-2 text-white">Cancel</button>
+          <button onClick={onChangePasswordSubmit} className="px-4 py-2 text-white bg-indigo-500 rounded">Done</button>
+        </div>
       </div>
     </div>
-
-  </div>
 
 
 

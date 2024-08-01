@@ -7,7 +7,7 @@ import { changeEmail } from "../../../services/settingsDataService";
 import { actionCodeSettings, auth, db } from "../../../../firebase";
 import Close from "../../../styling-components/Close";
 
-const ChangeEmail = ({changeEmailDisplayment}) => {
+const ChangeEmail = ({changeDisplayment}) => {
   const { currUser } = useContext(AuthContext);
 
   const { register, handleSubmit,  formState: { errors }, watch } = useForm();
@@ -38,7 +38,7 @@ const ChangeEmail = ({changeEmailDisplayment}) => {
       await currUser.reload();
       if (currUser.emailVerified) {
         console.log('they clicked on link');
-        changeEmailDisplayment(false);
+        changeDisplayment(null);
       } else {
         timeout = setTimeout(checkIfVerified, 1000);
       }
@@ -59,7 +59,7 @@ const ChangeEmail = ({changeEmailDisplayment}) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center p-6 bg-black bg-opacity-50">
       <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
-        <button onClick={() => changeEmailDisplayment(false)} className="absolute top-4 right-4"><Close /></button>
+        <button onClick={() => changeDisplayment(null)} className="absolute top-4 right-4"><Close /></button>
         {isDisplayingVerification ? (
           <>
             <h2 className="mb-4 text-lg font-semibold">Please Verify Your New Email</h2>
@@ -68,7 +68,7 @@ const ChangeEmail = ({changeEmailDisplayment}) => {
 
 
             <div className="flex justify-end space-x-2">
-              <button onClick={() => changeEmailDisplayment(false)} className="px-4 py-2 text-white">Cancel</button>
+              <button onClick={() => changeDisplayment(null)} className="px-4 py-2 text-white">Cancel</button>
               <button onClick={onChangeEmailSubmit}>Resend Email</button>
             </div>
 
@@ -85,7 +85,7 @@ const ChangeEmail = ({changeEmailDisplayment}) => {
 
 
             <div className="flex justify-end space-x-2">
-              <button onClick={() => changeEmailDisplayment(false)} className="px-4 py-2 text-white">Cancel</button>
+              <button onClick={() => changeDisplayment(null)} className="px-4 py-2 text-white">Cancel</button>
               <button onClick={onChangeEmailSubmit} className="px-4 py-2 text-white bg-indigo-500 rounded">Done</button>
             </div>
           </>

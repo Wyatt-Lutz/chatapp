@@ -36,6 +36,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
         uid: Object.keys(userData)[0],
         username: Object.values(userData)[0].username,
       }
+      console.log(user);
 
 
       await checkUsersBlockedStatus(currUser.uid, user);
@@ -54,7 +55,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
       return;
     }
     if ((currUserBlockData[addedUser.uid] || false)) {
-      setIsUserBlockedWarning(user);
+      setIsUserBlockedWarning(addedUser);
       return;
     }
     setUsersAdded(prev => [...prev, addedUser]);
