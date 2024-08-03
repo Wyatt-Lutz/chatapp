@@ -10,8 +10,6 @@ import { addMessage } from "./messageDataService";
  * @param {boolean} newBlockedStatus - New status of whether the user is blocked to the client user, false if no, true if yes
  */
 export const updateBlockedStatus = async(db, clientUserUid, uidToBlock, newBlockedStatus) => {
-  console.log('block user run');
-
   const userBlockListRef = ref(db, "users/" + clientUserUid + "/blockList");
   const newBlockData = {[uidToBlock]: newBlockedStatus}
   await update(userBlockListRef, newBlockData);

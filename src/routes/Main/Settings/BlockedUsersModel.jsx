@@ -1,17 +1,27 @@
 import { memo, useContext, useEffect, useState } from "react"
 import Close from "../../../styling-components/Close";
-import { getBlockData, getUsernameFromUid } from "../../../services/memberDataService";
+import { getBlockData, getUsernameFromUid, updateBlockedStatus } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";
 import { AuthContext } from "../../../AuthProvider";
+import Minus from "../../../styling-components/Minus";
 
 const BlockedUsersModel = ({changeDisplayment}) => {
   const { currUser } = useContext(AuthContext);
   const [blockedUsers, setBlockedUsers] = useState({});
+  const [usernames, setUsernames] = useState({});
   useEffect(() => {
     const fetchBlockedUsers = async() => {
       const blockedUsers = await getBlockData(db, currUser.uid);
-      console.log(Object.keys(blockedUsers));
       setBlockedUsers(blockedUsers);
+
+      const usernameData = {};
+      for (const uid of Object.keys(blockedUsers)) {
+        if (blockedUsers[uid]) {
+          const username = await fetchUsername(uid);
+          usernameData[uid] = username;
+        }
+      }
+      setUsernames(usernameData);
     }
     fetchBlockedUsers();
   }, []);
@@ -20,6 +30,12 @@ const BlockedUsersModel = ({changeDisplayment}) => {
     const username = await getUsernameFromUid(db, uid);
     return username;
   }
+
+  const unBlockUser = async(uid) => {
+    await updateBlockedStatus(db, currUser.uid, uid, false);
+  }
+
+
 
 
 
@@ -30,9 +46,13 @@ const BlockedUsersModel = ({changeDisplayment}) => {
         <button onClick={() => changeDisplayment(null)} className="absolute top-4 right-4"><Close /></button>
         <h2 className="mb-4 text-lg font-semibold">Blocked Users</h2>
 
-        {Object.keys(blockedUsers).map((uid, index) => (
-          blockedUsers[uid] ===false && (
-            <div key={index}>{fetchUsername(uid)}</div>
+        {Object.keys(blockedUsers).map((uid) => (
+          blockedUsers[uid] && (
+            <div key={uid} className="flex">
+              <div>{usernames[uid] || "Loading..."}</div>
+              <button onClick={() => unBlockUser(uid)}><Minus /></button>
+            </div>
+
           )
         ))}
 
