@@ -8,35 +8,38 @@ import Settings from './Settings/Settings';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 const EmailNotVerified = lazy(() => import('../../utils/EmailNotVerified'));
 const Main = () => {
-  const [isVerify, setVerify] = useState(false);
+  const [emailVerificationModal, setEmailVerificationModal] = useState(false);
   const { currUser } = useContext(AuthContext);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
+
     const checkIfUserVerified = async() => {
-      if (auth.currentUser.emailVerified) {
-        setLoading(false);
-        return;
+
+      const alreadySentVerification = localStorage.getItem('alreadySentVerification');
+
+      if (!auth.currentUser.emailVerified) {
+        setEmailVerificationModal(true);
+
+        if (!alreadySentVerification) {
+          await sendEmailVerification(currUser, actionCodeSettings);
+          localStorage.setItem('alreadySentVerification', true);
+          console.info("Email Verification sent");
+        }
+      } else if (alreadySentVerification) {
+        localStorage.removeItem('alreadySentVerification');
       }
 
-      if (!localStorage.getItem('alreadySentVerification')) {
-        await sendEmailVerification(currUser, actionCodeSettings);
-        localStorage.setItem('alreadySentVerification', true);
-        console.info("Email Verification sent");
-      }
       setLoading(false);
-      setVerify(true);
+
     }
 
 
     checkIfUserVerified();
   }, [currUser]);
 
-  const handleVerifyChange = (state) => {
-    setVerify(state);
-  }
 
   const signCurrUserOut = () => {
     signOut(auth).then(() => {
@@ -51,9 +54,9 @@ const Main = () => {
   return (
 
     <section>
-      {isVerify ? (
+      {emailVerificationModal ? (
         <Suspense fallback={<div>Loading...</div>}>
-          <EmailNotVerified verifyChange={handleVerifyChange} email={currUser.email} />
+          <EmailNotVerified email={currUser.email} />
         </Suspense>
 
       ) : isSettingsOpen ? (

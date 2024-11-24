@@ -1,31 +1,89 @@
 import { useForm } from "react-hook-form";
 import { changeUsername } from "../../../services/settingsDataService";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../../AuthProvider";
-import { db } from "../../../../firebase";
-import { reauthenticateWithCredential, updateEmail, verifyBeforeUpdateEmail } from "firebase/auth";
-import { EmailAuthProvider } from "firebase/auth/web-extension";
+import { db, actionCodeSettings } from "../../../../firebase";
+import { updateEmail, sendEmailVerification } from "firebase/auth";
+import ConfirmPassModal from "./ConfirmPassModal";
 import EmailNotVerified from "../../../utils/EmailNotVerified";
-import ChangeEmail from "./ChangeEmail";
-import ChangePassword from "./ChangePassword";
-import ChangeUsername from "./ChangeUsername";
-import DeleteAccount from "./DeleteAccount";
-import BlockedUsersModel from "./BlockedUsersModel";
+import { changeEmail } from "../../../services/settingsDataService";
 
 const Settings = () => {
   const { currUser } = useContext(AuthContext);
-  const [modelDisplayment, setModelDisplayment] = useState("");
+
+  const {register, watch} = useForm({
+    defaultValues: {
+      newUsername: currUser.displayName,
+      newEmail: currUser.email,
+    }
+  });
+
+  const [modalDisplayment, setModalDisplayment] = useState(null);
+
+  const newUsername = watch('newUsername')
+  const newEmail = watch('newEmail');
+  const newPassword = watch('newPassword');
+  const confirmNewPassword = watch('confirmNewPassword');
+
+  const passwordModalHeader = "Confirm Current Password"
+  const passwordModalText = "Please enter your current password to confirm these changes."
 
 
-  const handleModelDisplaymentChange = (model) => {
-    setModelDisplayment(model);
+
+
+
+  const displayPassModal = (header, text) => {
+    return new Promise((resolve) => {
+
+      const handleModalDisplayment = (modal) => setModalDisplayment(modal);
+
+      const handlePasswordConfirmation = (state) => {
+        resolve(state);
+      }
+
+      setModalDisplayment(
+        <ConfirmPassModal
+          changeDisplayment={handleModalDisplayment}
+          changeConfirmation={handlePasswordConfirmation}
+          modalHeader={header}
+          modalText={text}
+        />
+      )
+    })
+  }
+
+
+  const editUsername = async() => {
+    const isConfirmed = await displayPassModal(passwordModalHeader, passwordModalText);
+    if (!isConfirmed) {
+      return;
+    }
+
+    const isChanged = await changeUsername(db, newUsername, currUser);
+    if (isChanged) {
+      console.log("username changed");
+    }
+
+  }
+
+
+  const editEmail = async() => {
+    const isConfirmed = await displayPassModal(passwordModalHeader, passwordModalText);
+    if (!isConfirmed) {
+      return;
+    }
+
+    await updateEmail(currUser, newEmail);
+    await sendEmailVerification(currUser, actionCodeSettings);
+    setModalDisplayment(
+      <EmailNotVerified
+        email={currUser.email}
+      />
+    )
+    await changeEmail(db, currUser, newEmail);
   }
 
   return (
-    <>
-      {modelDisplayment === "verification" ? (
-        <EmailNotVerified changeDisplayment={handleModelDisplaymentChange} email={newEmail} isUpdatingEmail={true} />
-      ) : (
         <>
           <h1>Settings</h1>
 
@@ -36,29 +94,38 @@ const Settings = () => {
             <div>{currUser.displayName}</div>
           </div>
 
-          <div className="flex">
-            <div>
-              <div>Username</div>
-              <div>{currUser.displayName}</div>
-            </div>
-            <button onClick={() => handleModelDisplaymentChange("changeUsername")} className="bg-gray-500">Edit</button>
-          </div>
 
           <div className="flex">
-            <div>
-              <div>Email</div>
-              <div>{currUser.email}</div>
-            </div>
-            <button onClick={() => handleModelDisplaymentChange("changeEmail")} className="bg-gray-500">Edit</button>
+            <div>Username</div>
+            <input type="text" {...register('newUsername')} />
+            {newUsername !== currUser.displayName && (
+              <button onClick={editUsername}>Save Username</button>
+            )}
           </div>
 
+
           <div className="flex">
-            <div>
-              <div>Password</div>
-              <div>******</div>
-            </div>
-            <button onClick={() => handleModelDisplaymentChange("changePassword")} className="bg-gray-500">Change</button>
+            <div>Email</div>
+            <input type="email" {...register('newEmail')} />
+            {newEmail !== currUser.email && (
+              <button onClick={editEmail}>Save Email</button>
+            )}
           </div>
+
+
+
+
+
+          <div className="flex">
+            <div>Change Password</div>
+            <input type="password" {...register('newPassword')} />
+            <input type="password" {...register('confirmNewPassword')}/>
+            {(newPassword.length > 0 && confirmNewPassword.length > 0) && (
+              <button onClick={editPassword}>Save Password</button>
+            )}
+          </div>
+
+
 
 
           <button onClick={() => handleModelDisplaymentChange("blockedUsers")} className="bg-gray-500">Blocked Users</button>
@@ -69,38 +136,10 @@ const Settings = () => {
 
           <button onClick={() => handleModelDisplaymentChange("deleteAccount")} className="bg-red-500">Delete Account</button>
 
-          {modelDisplayment === "changeUsername" && (
-            <ChangeUsername changeDisplayment={handleModelDisplaymentChange} />
-          )}
-          {modelDisplayment === "changeEmail" && (
-            <ChangeEmail changeDisplayment={handleModelDisplaymentChange} />
-          )}
-          {modelDisplayment === "changePassword" && (
-            <ChangePassword changeDisplayment={handleModelDisplaymentChange} />
-          )}
-          {modelDisplayment === "deleteAccount" && (
-            <DeleteAccount changeDisplayment={handleModelDisplaymentChange} />
-          )}
-          {modelDisplayment === "blockedUsers" && (
-            <BlockedUsersModel changeDisplayment={handleModelDisplaymentChange} />
-          )}
 
+
+          {modalDisplayment}
         </>
-
-      )}
-    </>
-
-
-
-
-    //change email
-
-
-    //change password
-
-    //change pfp
-
-    //delete account
   )
 }
 export default Settings;

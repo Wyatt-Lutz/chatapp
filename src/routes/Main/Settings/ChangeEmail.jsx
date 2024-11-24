@@ -16,12 +16,13 @@ const ChangeEmail = ({changeDisplayment}) => {
   const newEmail = watch('email');
   const password = watch('password');
 
-  const onChangeEmailSubmit = async () => {
+  const onChangeEmailSubmit = async() => {
 
     //Re-authenticate user
     const credential = EmailAuthProvider.credential(currUser.email, password);
     await reauthenticateWithCredential(currUser, credential);
 
+    //update email in firebase auth and in db
     await updateEmail(currUser, newEmail);
     await sendEmailVerification(currUser, actionCodeSettings);
     setIsDisplayingVerification(true);

@@ -21,47 +21,42 @@ const Signup = () => {
   const onSubmit = async({email, password, username}) => {
     try {
 
-      await createUserWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
-        console.log(userCredential);
-        const trimmedUsername = username.trim();
-        await updateProfile(userCredential.user, {displayName: trimmedUsername});
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(userCredential);
+      const trimmedUsername = username.trim();
+      await updateProfile(userCredential.user, {displayName: trimmedUsername});
 
-        const uid = userCredential.user.uid;
+      const uid = userCredential.user.uid;
 
-        set(ref(db, "users/" + uid), {
-          username: trimmedUsername,
-          email: email,
-          blocked: [],
-          chatsIn: [],
-        });
-
-        console.info('registration successful');
-
-        navigate("/");
-      }).catch(error => {
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            console.log(`Email address ${email} already in use.`);
-            break;
-          case 'auth/invalid-email':
-            console.log(`Email address ${email} is invalid.`);
-            break;
-          case 'auth/operation-not-allowed':
-            console.log(`Error during sign up.`);
-            break;
-          case 'auth/weak-password':
-            console.log('Password is not strong enough. Add additional characters including special characters and numbers.');
-            break;
-          default:
-            console.log(error.message);
-            break;
-        }
+      set(ref(db, "users/" + uid), {
+        username: trimmedUsername,
+        email: email,
+        blocked: [],
+        chatsIn: [],
       });
 
+      console.info('registration successful');
 
-    } catch (error) {
-      console.error(error);
-    }
+      navigate("/");
+    } catch(error) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          console.log(`Email address ${email} already in use.`);
+          break;
+        case 'auth/invalid-email':
+          console.log(`Email address ${email} is invalid.`);
+          break;
+        case 'auth/operation-not-allowed':
+          console.log(`Error during sign up.`);
+          break;
+        case 'auth/weak-password':
+          console.log('Password is not strong enough. Add additional characters including special characters and numbers.');
+          break;
+        default:
+          console.log(error.message);
+          break;
+      }
+    };
   }
 
 
