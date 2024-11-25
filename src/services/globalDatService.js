@@ -2,6 +2,7 @@ import { push, ref, set, update, get, query, orderByChild, equalTo } from "fireb
 
 
 export const fetchUsernameData = async(db) => {
+  console.log('yooo')
   const usersQuery = query(ref(db, "users"), orderByChild('username'));
   const usersQuerySnap = await get(usersQuery);
   return usersQuerySnap.val();

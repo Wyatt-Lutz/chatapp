@@ -3,22 +3,26 @@ import { changeUsername } from "../../../services/settingsDataService";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../AuthProvider";
 import { db, actionCodeSettings } from "../../../../firebase";
-import { updateEmail, sendEmailVerification } from "firebase/auth";
+import { updateEmail, sendEmailVerification, updatePassword } from "firebase/auth";
 import ConfirmPassModal from "./ConfirmPassModal";
 import EmailNotVerified from "../../../utils/EmailNotVerified";
 import { changeEmail } from "../../../services/settingsDataService";
+import UsernameAvaliability from "../../../utils/UsernameAvaliability";
 
 const Settings = () => {
   const { currUser } = useContext(AuthContext);
 
-  const {register, watch} = useForm({
+  const {register, watch, resetField} = useForm({
     defaultValues: {
       newUsername: currUser.displayName,
       newEmail: currUser.email,
+      newPassword: "",
+      confirmNewPassword: "",
     }
   });
 
   const [modalDisplayment, setModalDisplayment] = useState(null);
+  const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
 
   const newUsername = watch('newUsername')
   const newEmail = watch('newEmail');
@@ -38,6 +42,10 @@ const Settings = () => {
       const handleModalDisplayment = (modal) => setModalDisplayment(modal);
 
       const handlePasswordConfirmation = (state) => {
+        if (!state) {
+          console.error('something went wrong') //add error handling
+          return;
+        }
         resolve(state);
       }
 
@@ -54,10 +62,7 @@ const Settings = () => {
 
 
   const editUsername = async() => {
-    const isConfirmed = await displayPassModal(passwordModalHeader, passwordModalText);
-    if (!isConfirmed) {
-      return;
-    }
+    await displayPassModal(passwordModalHeader, passwordModalText);
 
     const isChanged = await changeUsername(db, newUsername, currUser);
     if (isChanged) {
@@ -68,10 +73,7 @@ const Settings = () => {
 
 
   const editEmail = async() => {
-    const isConfirmed = await displayPassModal(passwordModalHeader, passwordModalText);
-    if (!isConfirmed) {
-      return;
-    }
+    await displayPassModal(passwordModalHeader, passwordModalText);
 
     await updateEmail(currUser, newEmail);
     await sendEmailVerification(currUser, actionCodeSettings);
@@ -81,6 +83,15 @@ const Settings = () => {
       />
     )
     await changeEmail(db, currUser, newEmail);
+  }
+
+
+  const editPassword = async() => {
+    await displayPassModal(passwordModalHeader, passwordModalText);
+
+    await updatePassword(currUser, newPassword);
+    resetField("newPassword");
+    resetField("confirmNewPassword");
   }
 
   return (
@@ -96,16 +107,21 @@ const Settings = () => {
 
 
           <div className="flex">
-            <div>Username</div>
+            <label>Username</label>
             <input type="text" {...register('newUsername')} />
+
             {newUsername !== currUser.displayName && (
-              <button onClick={editUsername}>Save Username</button>
+              <div>
+                <UsernameAvaliability newUsername={newUsername} setIsButtonDisabled={setIsEditUsernameDisabled} />
+                <button disabled={isEditUsernameDisabled} onClick={editUsername}>Save Username</button>
+              </div>
+
             )}
           </div>
 
 
           <div className="flex">
-            <div>Email</div>
+            <label>Email</label>
             <input type="email" {...register('newEmail')} />
             {newEmail !== currUser.email && (
               <button onClick={editEmail}>Save Email</button>
@@ -117,11 +133,11 @@ const Settings = () => {
 
 
           <div className="flex">
-            <div>Change Password</div>
-            <input type="password" {...register('newPassword')} />
-            <input type="password" {...register('confirmNewPassword')}/>
+            <label>Change Password</label>
+            <input type="password" placeholder="New password" {...register('newPassword')} />
+            <input type="password" placeholder="Confirm new password "{...register('confirmNewPassword')}/>
             {(newPassword.length > 0 && confirmNewPassword.length > 0) && (
-              <button onClick={editPassword}>Save Password</button>
+              <button disabled={!(newPassword === confirmNewPassword)} onClick={editPassword}>Save Password</button>
             )}
           </div>
 
