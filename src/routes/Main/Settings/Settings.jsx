@@ -3,11 +3,12 @@ import { changeUsername } from "../../../services/settingsDataService";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../AuthProvider";
 import { db, actionCodeSettings } from "../../../../firebase";
-import { updateEmail, sendEmailVerification, updatePassword } from "firebase/auth";
+import { updateEmail, sendEmailVerification, updatePassword, deleteUser } from "firebase/auth";
 import ConfirmPassModal from "./ConfirmPassModal";
 import EmailNotVerified from "../../../utils/EmailNotVerified";
 import { changeEmail } from "../../../services/settingsDataService";
 import UsernameAvaliability from "../../../utils/UsernameAvaliability";
+import BlockedUsersModel from "./BlockedUsersModel";
 
 const Settings = () => {
   const { currUser } = useContext(AuthContext);
@@ -36,25 +37,25 @@ const Settings = () => {
 
 
 
-  const displayPassModal = (header, text) => {
+  const displayPassModal = (header, text, isDeleteAccount) => {
     return new Promise((resolve) => {
 
-      const handleModalDisplayment = (modal) => setModalDisplayment(modal);
-
+    
       const handlePasswordConfirmation = (state) => {
         if (!state) {
           console.error('something went wrong') //add error handling
           return;
         }
-        resolve(state);
+        resolve();
       }
 
       setModalDisplayment(
         <ConfirmPassModal
-          changeDisplayment={handleModalDisplayment}
+          changeDisplayment={setModalDisplayment}
           changeConfirmation={handlePasswordConfirmation}
           modalHeader={header}
           modalText={text}
+          isDeleteAccount={isDeleteAccount}
         />
       )
     })
@@ -92,6 +93,14 @@ const Settings = () => {
     await updatePassword(currUser, newPassword);
     resetField("newPassword");
     resetField("confirmNewPassword");
+  }
+
+  const handleDeleteAccount = async() => {
+    const deleteAccountHeader = "Delete your Account";
+    const deleteAccountText = "To delete your account, please enter your current password."
+    await displayPassModal(deleteAccountHeader, deleteAccountText);
+
+    await deleteUser(currUser);
   }
 
   return (
@@ -144,13 +153,13 @@ const Settings = () => {
 
 
 
-          <button onClick={() => handleModelDisplaymentChange("blockedUsers")} className="bg-gray-500">Blocked Users</button>
+          <button onClick={() => setModalDisplayment(<BlockedUsersModel changeDisplayment={setModalDisplayment} />)} className="bg-gray-500">Blocked Users</button>
 
 
 
 
 
-          <button onClick={() => handleModelDisplaymentChange("deleteAccount")} className="bg-red-500">Delete Account</button>
+          <button onClick={handleDeleteAccount} className="bg-red-500">Delete Account</button>
 
 
 
