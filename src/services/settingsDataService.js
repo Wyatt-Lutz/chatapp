@@ -1,5 +1,5 @@
 
-import { updateEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
+import { deleteUser, updateEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 
 import { get, update, ref} from "firebase/database";
 import { checkIfUserExists } from "./globalDatService";
@@ -43,5 +43,20 @@ export const changeEmail = async(db, currUser, newEmail) => {
   await update(userDataRef, {
     email: newEmail,
   });
+}
+
+
+export const deleteAccount = async(db, currUser) => {
+  
+  
+  
+  await deleteUser(currUser);
+
+
+
+
+
+  //remove user data except for username and make it user deleted
+  //and transfer ownership in owned chats
 }
 

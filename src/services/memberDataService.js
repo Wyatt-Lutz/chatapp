@@ -94,3 +94,23 @@ export const getUsernameFromUid = async(db, userUid) => {
 }
 
 
+export const fetchOnlineUsersForChat = async(db, chatID, status) => {
+  const membersRef = ref(db, "members/" + chatID);
+  const membersSnap = await get(membersRef);
+  const membersData = membersSnap.val();
+
+  const onlineMembers = [];
+
+  for (const userUid in membersData) {
+    const userData = membersData[userUid];
+    if (userData.isOnline === status) {
+      onlineMembers.push(userUid);
+    }
+  }
+
+  return onlineMembers;
+
+  
+}
+
+

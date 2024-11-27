@@ -10,7 +10,7 @@ import { EmailAuthProvider } from "firebase/auth/web-extension";
 
 
 
-const ConfirmPassModal = ({ changeDisplayment, changeConfirmation, modalHeader, modalText }) => {
+const ConfirmPassModal = ({ changeDisplayment, changeConfirmation, modalHeader, modalText, isDeleteAccount }) => {
   const { currUser } = useContext(AuthContext);
 
   const { register, getValues,  formState: { errors }} = useForm();
@@ -38,7 +38,12 @@ const ConfirmPassModal = ({ changeDisplayment, changeConfirmation, modalHeader, 
 
         <div className="flex justify-end space-x-2">
           <button onClick={() => {changeDisplayment(null); changeConfirmation(false)}} className="px-4 py-2 text-white">Cancel</button>
-          <button onClick={onCurrPassSubmit} className="px-4 py-2 text-white bg-indigo-500 rounded">Done</button>
+          {isDeleteAccount ? (
+            <button onClick={onCurrPassSubmit} className="bg-red-600">Delete</button>
+          ) : (
+            <button onClick={onCurrPassSubmit} className="px-4 py-2 text-white bg-indigo-500 rounded">Done</button>
+          )}
+          
         </div>
 
       </div>

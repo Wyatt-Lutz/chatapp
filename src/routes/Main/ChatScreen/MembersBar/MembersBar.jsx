@@ -42,9 +42,8 @@ const MembersBar = () => {
       });
 
       memberChangedListener = onChildChanged(memberRef, (snap) => {
-
         dispatch({type: "CHANGE_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, isBlocked: blockData[snap.key] || false, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-      })
+      });
     }
     setMemberData();
     return () => {

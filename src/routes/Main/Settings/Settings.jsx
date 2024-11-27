@@ -1,12 +1,11 @@
 import { useForm } from "react-hook-form";
-import { changeUsername } from "../../../services/settingsDataService";
+import { changeUsername, deleteAccount, changeEmail } from "../../../services/settingsDataService";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../AuthProvider";
 import { db, actionCodeSettings } from "../../../../firebase";
-import { updateEmail, sendEmailVerification, updatePassword, deleteUser } from "firebase/auth";
+import { updateEmail, sendEmailVerification, updatePassword } from "firebase/auth";
 import ConfirmPassModal from "./ConfirmPassModal";
 import EmailNotVerified from "../../../utils/EmailNotVerified";
-import { changeEmail } from "../../../services/settingsDataService";
 import UsernameAvaliability from "../../../utils/UsernameAvaliability";
 import BlockedUsersModel from "./BlockedUsersModel";
 
@@ -100,7 +99,7 @@ const Settings = () => {
     const deleteAccountText = "To delete your account, please enter your current password."
     await displayPassModal(deleteAccountHeader, deleteAccountText);
 
-    await deleteUser(currUser);
+    await deleteAccount(db, currUser);
   }
 
   return (

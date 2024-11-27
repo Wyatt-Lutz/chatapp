@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { ref, query, set, get, update, endBefore, runTransaction, limitToLast, push, orderByChild, remove, serverTimestamp } from 'firebase/database';
+import { fetchOnlineUsersForChat } from "./memberDataService";
 const NUM_CHATS_PER_PAGE = 10;
 
 
@@ -33,35 +34,30 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) 
     hasBeenEdited: false,
   }
   await set(newMessageRef, newMessage);
-
+  await fetchOnlineUsersForChat(db, chatID);
   await updateUnreadCount(db, chatID);
   return {renderState: renderTimeAndSender, time: Date.now()};
 
 };
 
 const updateUnreadCount = async(db, chatID) => {
-  const usersRef = ref(db, "chats/" + chatID);
-  const usersSnap = await get(usersRef);
-  if (!usersSnap.exists()) {
-    return;
-  }
-
-  for(const userUid in usersSnap.val()) {
-    if (usersSnap.val()[userUid] === false) {
-      const userDataRef = ref(db, "users/" + userUid + `/chatsIn/${chatID}`);
-      const transactionUpdate = (currData) => {
-        if (currData === null) {
-          return 0;
-        } else {
-          return currData + 1;
-        }
+  const offlineMembers = await fetchOnlineUsersForChat(db, chatID, false);
+  for (const userUid of offlineMembers) {
+    const userDataRef = ref(db, `users/${userUid}/chatsIn/${chatID}`);
+    const transactionUpdate = (currData) => {
+      if (currData === null) {
+        return 0;
+      } else {
+        return currData + 1;
       }
-      runTransaction(userDataRef, transactionUpdate).catch((error) => {
-        console.error('update unreadcount transaction failed:' + error);
-      })
     }
+    runTransaction(userDataRef, transactionUpdate).catch((error) => {
+      console.error('update unreadcount transaction failed:' + error);
+    });
   }
 }
+
+
 
 export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, uid) => {
 
