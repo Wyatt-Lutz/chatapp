@@ -12,7 +12,7 @@ const ChatRoomsSideBar = () => {
   const { data } = useContext(ChatContext);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const { currUser } = useContext(AuthContext);
-  const [chatsData, setChatsData] = useState({
+  const [chatsData, setChatsData] = useState({ //aaaa
     chats: [],
     numUnread: {},
   });
