@@ -1,18 +1,18 @@
 import { useContext, useState, useEffect, useRef, memo, Fragment, useCallback } from "react";
 import Plus from "../../../../styling-components/Plus";
-import { AuthContext } from "../../../../AuthProvider";
+import { AuthContext } from "../../../../providers/AuthProvider";
 import { db } from "../../../../../firebase";
 import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved, push } from 'firebase/database';
 import ChatRoom from "./ChatRoom";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import ChatRoomContextMenu from "./ChatRoomContextMenu";
 import ChatCreation from "./ChatCreation";
-import { ChatContext } from "../../../../ChatProvider";
+import { ChatContext } from "../../../../providers/ChatProvider";
 const ChatRoomsSideBar = () => {
   const { data } = useContext(ChatContext);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const { currUser } = useContext(AuthContext);
-  const [chatsData, setChatsData] = useState({ //aaaa
+  const [chatsData, setChatsData] = useState({ 
     chats: [],
     numUnread: {},
   });

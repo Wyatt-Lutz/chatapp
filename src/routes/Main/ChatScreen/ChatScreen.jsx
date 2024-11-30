@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ChatContext } from '../../../ChatProvider';
+import { ChatContext } from '../../../providers/ChatProvider';
 
 
 import MembersBar from './MembersBar/MembersBar';

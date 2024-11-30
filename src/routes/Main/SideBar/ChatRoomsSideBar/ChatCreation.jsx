@@ -1,9 +1,9 @@
 
 import { useContext, useState, useEffect, useRef, memo, Fragment, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../../AuthProvider";
+import { AuthContext } from "../../../../providers/AuthProvider";
 import { db } from "../../../../../firebase";
-import { ChatContext } from "../../../../ChatProvider";
+import { ChatContext } from "../../../../providers/ChatProvider";
 import { checkIfDuplicateChat, createChat } from "../../../../services/chatBarDataService";
 import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../styling-components/Close";
@@ -74,12 +74,13 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
       return;
     }
 
-    const title = chatName && chatName.length > 0 ? chatName : "";
-
     const membersList = usersAdded.reduce((members, member) => {
       members[member.uid] = {isOnline: false, username: member.username};
       return members
     }, {});
+    console.log(membersList);
+
+    const title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
 
 
     const newChatID = await createChat(db, memberUids, title, membersList, uids, currUser.uid);

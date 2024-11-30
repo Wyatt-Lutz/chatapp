@@ -3,8 +3,8 @@ import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
 import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast } from 'firebase/database';
 
-import { ChatContext } from "../../../../ChatProvider";
-import { AuthContext } from "../../../../AuthProvider";
+import { ChatContext } from "../../../../providers/ChatProvider";
+import { AuthContext } from "../../../../providers/AuthProvider";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
 import { fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";

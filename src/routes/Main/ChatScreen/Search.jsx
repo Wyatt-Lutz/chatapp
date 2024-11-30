@@ -2,7 +2,7 @@ import { endAt, startAt, orderByChild, ref, get } from "firebase/database";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { db } from "../../../../firebase";
-import { ChatContext } from "../../../ChatProvider";
+import { ChatContext } from "../../../providers/ChatProvider";
 import { queryMessages } from "../../../services/searchDataService";
 import { calcTime } from "../../../services/messageDataService";
 

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { changeUsername, deleteAccount, changeEmail } from "../../../services/settingsDataService";
 import { useContext, useState } from "react";
-import { AuthContext } from "../../../AuthProvider";
+import { AuthContext } from "../../../providers/AuthProvider";
 import { db, actionCodeSettings } from "../../../../firebase";
 import { updateEmail, sendEmailVerification, updatePassword } from "firebase/auth";
 import ConfirmPassModal from "./ConfirmPassModal";

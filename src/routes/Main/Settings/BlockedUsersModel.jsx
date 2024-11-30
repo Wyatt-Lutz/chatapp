@@ -2,7 +2,7 @@ import { memo, useContext, useEffect, useState } from "react"
 import Close from "../../../styling-components/Close";
 import { getBlockData, getUsernameFromUid, updateBlockedStatus } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";
-import { AuthContext } from "../../../AuthProvider";
+import { AuthContext } from "../../../providers/AuthProvider";
 import Minus from "../../../styling-components/Minus";
 
 const BlockedUsersModel = ({changeDisplayment}) => {

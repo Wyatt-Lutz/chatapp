@@ -1,5 +1,5 @@
 import { memo, useContext } from "react"
-import { ChatContext } from "../../../../ChatProvider"
+import { ChatContext } from "../../../../providers/ChatProvider"
 
 const Member = ({ member }) => {
   console.log('member run')

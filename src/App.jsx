@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Signin from "./routes/Signin/Signin";
 import { Navigate } from "react-router-dom";
 import { Suspense, lazy, useContext } from "react";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext } from "./providers/AuthProvider";
 
 const Signup = lazy(() => import('./routes/Signup/Signup'));
 const Main = lazy(() => import('./routes/Main/Main'));

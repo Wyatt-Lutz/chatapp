@@ -1,4 +1,4 @@
-import { AuthContext } from '../../AuthProvider';
+import { AuthContext } from '../../providers/AuthProvider';
 import ChatScreen from './ChatScreen/ChatScreen';
 
 import { sendEmailVerification, signOut } from 'firebase/auth';

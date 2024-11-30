@@ -1,8 +1,8 @@
 import { memo, useContext, useState, useEffect } from "react"
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../../ChatProvider";
+import { ChatContext } from "../../../../providers/ChatProvider";
 import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../AuthProvider";
+import { AuthContext } from "../../../../providers/AuthProvider";
 import { editTitle } from "../../../../services/messageDataService";
 import { onChildChanged, ref } from 'firebase/database';
 const TopBar = () => {
