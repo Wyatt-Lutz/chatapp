@@ -1,7 +1,7 @@
 import { push, ref, set, update, get, query, orderByChild, equalTo } from "firebase/database";
 
 
-export const createChat = async(db, memberUids, title, membersList, uids, currUserUid) => {
+export const createChat = async(db, memberUids, title, tempTitle, membersList, uids, currUserUid) => {
   try {
     const chatsRef = ref(db, "chats/");
     const newChatRef = push(chatsRef);
@@ -10,6 +10,7 @@ export const createChat = async(db, memberUids, title, membersList, uids, currUs
 
     const newChatData = {
       title: title,
+      tempTitle: tempTitle,
       owner: currUserUid,
       memberUids: memberUids,
     }

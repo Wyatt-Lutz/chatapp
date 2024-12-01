@@ -1,6 +1,6 @@
 import { useContext, memo } from "react";
 import { db } from "../../../../../firebase";
-import { ChatContext } from "../../../../providers/ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { deleteMessage } from "../../../../services/messageDataService";
 const MessagesContextMenu = ({changeEditState, contextMenuData, points}) => {
   const { data } = useContext(ChatContext);

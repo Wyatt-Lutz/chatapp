@@ -1,5 +1,5 @@
 import { useContext, memo } from "react";
-import { ChatContext } from "../../../../providers/ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { removeUserFromChat, transferOwnership, updateBlockedStatus } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";

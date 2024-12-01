@@ -7,9 +7,9 @@ import { AuthContext } from "./AuthProvider";
 export const ChatContext = createContext();
 
 const initialState = {
-  chatrooms: [],
   chatID: null,
   title: '',
+  tempTitle: '',
   owner: '',
 };
 
@@ -22,43 +22,22 @@ const chatReducer = (state, action) => {
         chatID: action.payload.chatID,
         title: action.payload.title,
         owner: action.payload.owner,
-        members: [],
       };
     case "UPDATE_TITLE":
       return {
         ...state,
         title: action.payload,
       };
+    case "UPDATE_TEMP_TITLE":
+      return {
+        ...state,
+        tempTitle: action.payload,
+      };
     case "UPDATE_OWNER":
       return {
         ...state,
         owner: action.payload,
       }
-    case "ADD_MEMBER":
-      return {
-        ...state,
-        members: [
-          ...state.members,
-          action.payload,
-        ]
-      };
-
-    case "CHANGE_MEMBER":
-      console.log('changed member');
-      const newMembers = handleChangeMember(state, action);
-      handleChangeTitle(state, newMembers);
-
-
-      return {
-        ...state,
-        members: [
-          ...newMembers,
-        ]
-      };
-
-
-
-
     case "RESET":
       console.log('reset context')
       return initialState;
@@ -70,48 +49,9 @@ const chatReducer = (state, action) => {
 
 export const ChatContextProvider = ({ children }) => {
   const { currUser } = useContext(AuthContext);
-/*
-  const handleNewChatAdded = useCallback(async(snap) => {
 
-    const newChatID = snap.key;
-    const chatsRef = ref(db, "chats/" + newChatID);
-    const newChatSnap = await get(chatsRef);
-    const newChatData = newChatSnap.val();
+  /*
 
-
-    // If creater of chat didn't set a title, create a title for the client based off the members usernames
-
-
-
-
-    newChatData.id = newChatID;
-    setChatsData(prev => ({
-      chats: [...prev.chats, newChatData],
-      numUnread: {
-        ...prev.numUnread,
-        [newChatID]: snap.val(),
-      }
-    }));
-    setIsLoadingChats(false);
-
-  });
-
-
-  useEffect(() => {
-
-    const childAddedListener = onChildAdded(chatsInRef, handleNewChatAdded);
-    const childChangedListener = onChildChanged(chatsInRef, handleUpdateUnread);
-    const childRemovedListener = onChildRemoved(chatsInRef, handleChildRemoved);
-
-
-    return () => {
-      childAddedListener();
-      childChangedListener();
-      childRemovedListener();
-    }
-  })
-*/
-  
   const handleChangeMember = (state, action) => {
     const newMembers = [...state.members]
     newMembers.map(((member, index) => {
@@ -134,7 +74,7 @@ export const ChatContextProvider = ({ children }) => {
 
     dispatch({type: "UPDATE_TITLE", payload: newTitle});
   }
-
+*/
 
   const [state, dispatch] = useReducer(chatReducer, initialState);
 

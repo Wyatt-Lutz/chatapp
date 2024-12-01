@@ -1,1 +1,0 @@
-when user is remvoed/ they leave, recalcualtate title if there is no set title

@@ -3,7 +3,7 @@ import { useContext, useState, useEffect, useRef, memo, Fragment, useCallback } 
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { db } from "../../../../../firebase";
-import { ChatContext } from "../../../../providers/ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { checkIfDuplicateChat, createChat } from "../../../../services/chatBarDataService";
 import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../styling-components/Close";
@@ -67,6 +67,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
     const uids = [...usersAdded.map(user => user.uid)];
     const memberUids = uids.sort().join("");
+    let title, tempTitle;
 
     const isDuplicate = await checkIfDuplicateChat(db, currUser.uid, memberUids);
     if (isDuplicate) {
@@ -80,10 +81,18 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     }, {});
     console.log(membersList);
 
-    const title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).filter(member => member.username !== currUser.displayName).map(member => member.username).join(', ');
+    //if the user entered a title, use it, if not, take the members list and map them out to use as the title
+    //const title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).map(member => member.username).join(', ');
+    if (chatName && chatName.length > 0) {
+      title = chatName;
+      tempTitle = "";
 
+    } else {
+      title = chatName;
+      tempTitle = Object.values(membersList).map(member => member.username).join(', ');
+    }
 
-    const newChatID = await createChat(db, memberUids, title, membersList, uids, currUser.uid);
+    const newChatID = await createChat(db, memberUids, title, tempTitle, membersList, uids, currUser.uid);
     console.log(newChatID);
     setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);

@@ -1,7 +1,7 @@
 import { Fragment, memo, useCallback, useContext } from "react"
 import { calcTime, editMessage } from "../../../../services/messageDataService";
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../../providers/ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { db } from "../../../../../firebase";
 
 

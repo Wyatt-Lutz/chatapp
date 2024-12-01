@@ -1,7 +1,7 @@
 import { memo, useCallback, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../providers/AuthProvider";
-import { ChatContext } from "../../../../providers/ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { db } from "../../../../../firebase";
 import { addMessage } from "../../../../services/messageDataService";
 
