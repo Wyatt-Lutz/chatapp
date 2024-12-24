@@ -23,7 +23,6 @@ const Messages = () => {
   const [editState, setEditState] = useState({});
   const [contextMenuData, setContextMenuData] = useState({});
 
-  const chatsRef = useMemo(() =>  ref(db, "messages/" + data.chatID + "/"));
 
   const endTimestamp = useRef(0);
   const messagesContainerRef = useRef(null);
@@ -41,50 +40,6 @@ const Messages = () => {
   });
 
 
-  const handleChildAdded = (snap) => {
-    console.log(snap.key);
-    setChats(prev => {
-      const fetchedMessageData = snap.val();
-      fetchedMessageData.id = snap.key;
-      const updatedChats = [...prev, fetchedMessageData];
-      if (prev.length === 1) {
-        endTimestamp.current = prev[0].timestamp;
-      }
-      return updatedChats;
-    });
-
-    if (!atBottom.current) {
-      setUnread(prev => prev + 1);
-    }
-
-  };
-
-  const handleChildChanged = (snap) => {
-
-    setChats(prev => {
-      const index = prev.findIndex(chat => chat.id === snap.key);
-      if (index === -1) {
-        return prev;
-      }
-      const updatedChats = [...prev];
-      updatedChats[index] = snap.val();
-      return updatedChats;
-    });
-
-
-  };
-
-  const handleChildRemoved = (snap) => {
-
-    setChats(prev => {
-      const updatedChats = [...prev];
-      updatedChats.filter(chat => chat.id !== snap.key);
-      return updatedChats;
-    });
-  };
-
-
-
   useEffect(() => {
     if (!data.chatID) {
       console.info("chatID undefined");
@@ -93,35 +48,21 @@ const Messages = () => {
 
     updateUserOnlineStatus(true, db, data.chatID, currUser.uid);
 
-    const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current), limitToLast(10));
-    const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp.current));
-
-
-    const chatAddedListener = onChildAdded(addedListenerQuery, handleChildAdded);
-    const chatChangedListener = onChildChanged(otherListenersQuery, handleChildChanged);
-    const chatRemovedListener = onChildRemoved(otherListenersQuery, handleChildRemoved);
-
 
     const container = messagesContainerRef.current;
 
     container.addEventListener("scroll", handleScroll);
     window.addEventListener("beforeunload", handleUserOffline);
     return () => {
-      chatAddedListener();
-      chatChangedListener();
-      chatRemovedListener();
-
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
-      console.log(data.chatID);
-      handleUserOffline();
     }
   }, [data.chatID]);
 
 
-  const handleUserOffline = useCallback(() => {
+  const handleUserOffline = () => {
     updateUserOnlineStatus(false, db, data.chatID, currUser.uid);
-  }, [data.chatID]);
+  };
 
 
   const calculateRenderTimeAndSender = useCallback(() => {
@@ -143,7 +84,7 @@ const Messages = () => {
   }, []);
 
 
-  const handleScroll = useCallback(() => {
+  const handleScroll = () => {
     setScrolled(true);
     if (messagesContainerRef.current.scrollTop !== 0 && (atBottom.current)) {
       atBottom.current = false;
@@ -152,7 +93,7 @@ const Messages = () => {
       setUnread(0);
     }
 
-  }, []);
+  };
 
 
   const handleContextMenu = (e, chat) => {
@@ -164,11 +105,11 @@ const Messages = () => {
 
   const handleFetchMore = debounce(async() => {
     const messageData = await fetchChats(endTimestamp.current, db, data.chatID);
-    if (messageData.length === 0) {
-      return;
+
+    if (messageData && messageData.length > 0 && messageData[0]) {
+      dispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
+      dispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
     }
-    messageData?.[0]?.timestamp && (endTimestamp.current = messageData[0].timestamp);
-    setChats(prev => [...messageData, ...prev]);
   }, 300);
 
 

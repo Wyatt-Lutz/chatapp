@@ -23,7 +23,7 @@ const membersReducer = (state, action) => {
     case "REMOVE_MEMBER":
       return {
         ...state,
-        members: state.members.filter(member => member.uid !== action.payload),
+        members: delete members.action.payload,
       };
     case "UPDATE_MEMBER_DATA":
       return {

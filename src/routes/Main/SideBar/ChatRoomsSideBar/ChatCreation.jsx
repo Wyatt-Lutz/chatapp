@@ -68,6 +68,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     const uids = [...usersAdded.map(user => user.uid)];
     const memberUids = uids.sort().join("");
     let title, tempTitle;
+    title = tempTitle = "";
 
     const isDuplicate = await checkIfDuplicateChat(db, currUser.uid, memberUids);
     if (isDuplicate) {
@@ -85,10 +86,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     //const title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).map(member => member.username).join(', ');
     if (chatName && chatName.length > 0) {
       title = chatName;
-      tempTitle = "";
-
     } else {
-      title = chatName;
       tempTitle = Object.values(membersList).map(member => member.username).join(', ');
     }
 
