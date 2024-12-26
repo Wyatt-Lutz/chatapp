@@ -3,17 +3,22 @@ import { ChatContext } from "../../../../providers/ChatProvider"
 
 const Member = ({ member }) => {
   console.log('member run')
-  const { data } = useContext(ChatContext);
+  const { chatRoomData } = useContext(ChatContext);
 
+  const {memberUid, memberData} = member;
+  
+
+  /*
   const fetchProfilePicture = () => {
 
   }
+  */
   
   return (
     <div className="flex">
-      <div>{member.username}</div>
+      <div>{memberData.username}</div>
 
-      {data.owner === member.uid && (
+      {chatRoomData.owner === memberUid && (
         <div>Owner</div>
       )}
     </div>

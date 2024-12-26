@@ -8,7 +8,7 @@ import { AuthContext } from "../../../../providers/AuthProvider";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
 import { fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
-
+import { MessagesContext } from "../../../../providers/MessagesContext";
 import Message from "./Message"
 import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
@@ -16,6 +16,7 @@ import MessagesContextMenu from "./MessagesContextMenu";
 const Messages = () => {
   const { data } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
+  const { dispatch } = useContext(MessagesContext);
 
   const [chats, setChats] = useState([])
   const [scrolled, setScrolled] = useState(false);
@@ -24,11 +25,9 @@ const Messages = () => {
   const [contextMenuData, setContextMenuData] = useState({});
 
 
-  const endTimestamp = useRef(0);
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
   const atBottom = useRef(true);
-  const clientSentChat = useRef(false);
 
   const { clicked, setClicked, points, setPoints } = useContextMenu();
 
@@ -65,25 +64,6 @@ const Messages = () => {
   };
 
 
-  const calculateRenderTimeAndSender = useCallback(() => {
-    clientSentChat.current = true;
-    let renderTimeAndSender = true;
-    const prevTimestamp = localStorage.getItem('timestamp');
-
-
-    setChats(prev => {
-      const previousMessage = prev[prev.length -1];
-
-      if (prevTimestamp && previousMessage && previousMessage.sender === currUser.displayName && Date.now() - prevTimestamp < 180000) {
-        renderTimeAndSender = false;
-      }
-      return prev;
-    })
-
-    return renderTimeAndSender;
-  }, []);
-
-
   const handleScroll = () => {
     setScrolled(true);
     if (messagesContainerRef.current.scrollTop !== 0 && (atBottom.current)) {
@@ -118,7 +98,7 @@ const Messages = () => {
     if (isVisible && scrolled) {
       handleFetchMore();
     }
-  }, [isVisible]);
+  }, [isVisible, scrolled]);
 
 
   useEffect(() => {
@@ -130,17 +110,14 @@ const Messages = () => {
 
 
 
-  const changeEditState = useCallback((id, state) => {
-    console.info('i ran')
+  const changeEditState = (id, state) => {
+    console.info('i ran');
     setEditState(prev => ({...prev, [id]: state}));
-  }, [data.chatID]);
+  };
 
 
   return(
     <section className="w-full">
-
-
-
 
       <div ref={messagesContainerRef} className="overflow-y-auto max-h-[400px] no-scrollbar w-full flex flex-col-reverse scroll-smooth">
           <div className="flex-grow">

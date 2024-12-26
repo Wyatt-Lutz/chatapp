@@ -22,6 +22,8 @@ export const fetchChats = async(time, db, chatID) => {
 
 
 
+
+
 export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) => {
   const chatRef = ref(db, "messages/" + chatID + "/");
   const newMessageRef = push(chatRef);
@@ -55,6 +57,22 @@ const updateUnreadCount = async(db, chatID) => {
       console.error('update unreadcount transaction failed:' + error);
     });
   }
+}
+
+/**
+ * Determines whether to show the timestamp and the sender of each message. 
+ * Does not render them if the last message was sent by the client user and the last message was less than 5 minutes ago. 
+ * @param {*} lastMessage 
+ * @param {*} currUser 
+ * @returns 
+ */
+
+export const calculateRenderTimeAndSender = (lastMessage, currUser) => {
+
+  if (lastMessage && lastMessage.sender === currUser.displayName && (Date.now() - lastMessage.timestamp < 180000)) {
+    return false;
+  }
+  return true;
 }
 
 

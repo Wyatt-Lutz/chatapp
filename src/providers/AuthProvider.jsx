@@ -16,7 +16,7 @@ export const AuthContextProvider = ({ children }) => {
     return () => {
       authState();
     };
-  }, []);
+  }, [auth]);
 
   if (loading) {
     return <div>...</div>

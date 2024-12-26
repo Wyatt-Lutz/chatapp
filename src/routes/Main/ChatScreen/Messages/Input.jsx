@@ -2,6 +2,7 @@ import { memo, useCallback, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { ChatContext } from "../../../../providers/ChatContext";
+import { MessagesContext } from "../../../../providers/MessagesContext";
 import { db } from "../../../../../firebase";
 import { addMessage } from "../../../../services/messageDataService";
 
@@ -10,17 +11,18 @@ const Input = ({calculateRenderTimeAndSender}) => {
   const { register, handleSubmit, resetField } = useForm();
   const { currUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
+  const { messagesData } = useContext(MessagesContext);
 
   console.log('input run');
-  const handleAddMessage = useCallback(async(text) => {
+  const handleAddMessage = async(text) => {
     resetField('text');
-    const renderTimeAndSender = await calculateRenderTimeAndSender();
-    const timeData = await addMessage(text.text, data.chatID, currUser.uid, db, renderTimeAndSender);
-    if (timeData.renderState) {
-      localStorage.setItem('timestamp', timeData.time);
-    }
-  }, [data.chatID]);
 
+    const lastMessage = messagesData[messagesData.length - 1];
+    const willRenderTimeAndSender = await calculateRenderTimeAndSender(lastMessage);
+    await addMessage(text.text, data.chatID, currUser.uid, db, willRenderTimeAndSender);
+
+
+  };
 
   return (
     <>

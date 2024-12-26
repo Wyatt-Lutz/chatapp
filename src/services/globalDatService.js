@@ -15,5 +15,7 @@ export const checkIfUserExists = async(db, newUser) => {
   if (!usersQuerySnap.exists()) {
     return null;
   }
+  console.log(usersQuerySnap.val());
   return usersQuerySnap.val();
+
 }

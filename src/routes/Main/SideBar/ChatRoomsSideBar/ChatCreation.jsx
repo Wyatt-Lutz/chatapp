@@ -20,31 +20,28 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
 
   const addUser = async ({newUser}) => {
-    try {
-      resetField('newUser');
-      if (usersAdded.some(user => user.username === newUser)) {
-        console.info('user already added') //toast
-        return;
-      }
-      const userData = await checkIfUserExists(db, newUser);
-      if (!userData) {
-        console.log('user doenst exist');
-        return;
-      }
-
-      const user = {
-        uid: Object.keys(userData)[0],
-        username: Object.values(userData)[0].username,
-      }
-      console.log(user);
-
-
-      await checkUsersBlockedStatus(currUser.uid, user);
-      console.info('added user to chatbar');
-
-    } catch (error) {
-      console.error(error);
+    resetField('newUser');
+    if (usersAdded.some(user => user.username === newUser)) {
+      console.info('user already added') //toast
+      return;
     }
+    const userData = await checkIfUserExists(db, newUser);
+    if (!userData) {
+      console.log('user doenst exist');
+      return;
+    }
+
+    const user = {
+      uid: Object.keys(userData)[0],
+      username: Object.values(userData)[0].username,
+    }
+    console.log(user);
+
+
+    await checkUsersBlockedStatus(currUser.uid, user);
+    console.info('added user to chatbar');
+
+
   }
 
   const checkUsersBlockedStatus = async(currUserUid, addedUser) => {
@@ -77,7 +74,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     }
 
     const membersList = usersAdded.reduce((members, member) => {
-      members[member.uid] = {isOnline: false, username: member.username};
+      members[member.uid] = {isOnline: false, username: member.username, hasBeenRemoved: false, is};
       return members
     }, {});
     console.log(membersList);

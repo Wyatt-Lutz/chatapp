@@ -2,12 +2,13 @@ import { onChildAdded, onChildChanged, onChildRemoved, ref } from "firebase/data
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { db } from "../../firebase";
 import { ChatContext } from "./ChatContext";
+import { ChatroomsContext } from "./ChatroomsContext";
 
 
 
 export const MembersContext = createContext();
 
-const { data } = useContext(ChatContext);
+
 
 const initialState = {
   members: [],
@@ -38,26 +39,35 @@ const membersReducer = (state, action) => {
 }
 
 export const MembersContextProvider = ({ children }) => {
+  
   const [state, dispatch] = useReducer(membersReducer, initialState);
-  const membersRef = ref(db, `members/${data.chatID}`);
 
-  const handleMemberAdded = (snap) => {
-    dispatch({type:"ADD_MEMBER", payload: {[snap.key]: snap.val()}});
-  }
-
-  const handleMemberRemoved = (snap) => {
-    dispatch({type: "REMOVE_MEMBER", payload: snap.key});
-  }
-
-  const handleUpdateMember = (snap) => {
-    dispatch({type: "UPDATE_MEMBER_DATA", payload: {[snap.key]: snap.val()}});
-  }
+  const { chatRoomData } = useContext(ChatContext);
 
 
   useEffect(() => {
+    if (!chatRoomData) return;
+
+    const membersRef = ref(db, `members/${chatRoomData.chatID}`);
+
+    const handleMemberAdded = async(snap) => {
+      const userBlockData = await getBlockData(db, currUser.uid);
+      const memberObj = {[snap.key]: {...snap.val(), isBlocked: userBlockData[snap.key]}};
+      dispatch({type:"ADD_MEMBER", payload: memberObj});
+    }
+  
+    const handleMemberRemoved = (snap) => {
+      dispatch({type: "REMOVE_MEMBER", payload: snap.key});
+    }
+  
+    const handleUpdateMember = (snap) => {
+      dispatch({type: "UPDATE_MEMBER_DATA", payload: {[snap.key]: snap.val()}});
+    }
+
+
+    
     const memberAddedListener = onChildAdded(membersRef, handleMemberAdded);
     const memberRemovedListener = onChildRemoved(membersRef, handleMemberRemoved);
-
     const memberUpdatedListener = onChildChanged(membersRef, handleUpdateMember);
 
 
@@ -66,12 +76,7 @@ export const MembersContextProvider = ({ children }) => {
       memberRemovedListener();
       memberUpdatedListener();
     }
-  }, [data.chatID]);
-
-
-
-
-
+  }, [chatRoomData]);
 
 
   return(

@@ -18,16 +18,14 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
     await Promise.all([
       set(newChatRef, newChatData),
       set(membersRef, membersList),
-    ]);
 
-    await Promise.all(
-      uids.map(uid => {
+
+      ...uids.map(uid => {
         const userChatDataRef = ref(db, "users/" + uid + "/chatsIn");
         const chatData = {[chatID]: 0};
         update(userChatDataRef, chatData)
       }),
-    );
-
+    ]);
 
 
     console.info('created chat');

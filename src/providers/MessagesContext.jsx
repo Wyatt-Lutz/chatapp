@@ -1,5 +1,7 @@
 import { limitToLast, orderByChild, query, startAt, ref } from "firebase/database";
-import { createContext, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import { db } from "../../firebase";
+import { ChatContext } from "./ChatContext";
 
 
 export const MessagesContext = createContext();
@@ -59,35 +61,40 @@ const messagesReducer = (state, action) => {
 
 
 export const MessagesContextProvider = ({ children }) => {
+  const { chatRoomData } = useContext(ChatContext);
+  
   const [state, dispatch] = useReducer(messagesReducer, initialState);
-  const chatsRef = ref(db, "messages/" + data.chatID + "/");
-  const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(state.endTimestamp), limitToLast(10));
-  const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(state.endTimestamp));
-
-  const handleMessageAdded = (snap) => {
-    console.log("key:" + snap.key);
-    console.log("data:" + snap.val());
-    if (state.messages.length === 0) {
-      dispatch({type: "UPDATE_END_TIMESTAMP", payload: snap.val().timestamp});
-    }
-
-    if (!state.isAtBottom) {
-      dispatch({type: "UPDATE_UNREAD", payload: (state.numUnread + 1)});
-    }
-
-    dispatch({type: "ADD_MESSAGE", payload: {[snap.key]: snap.val()}});
-  }
-
-  const handleMessageEdited = (snap) => {
-    dispatch({type: "EDIT_MESSAGE", payload: {[snap.key]: snap.val()}});
-  }
-
-  const handleMessageDeleted = (snap) => {
-    dispatch({type: "REMOVE_MESSAGE", payload: snap.key});
-
-  }
 
   useEffect(() => {
+    if (!chatRoomData) return;
+    const handleMessageAdded = (snap) => {
+      console.log("key:" + snap.key);
+      console.log("data:" + snap.val());
+      if (state.messages.length === 0) {
+        dispatch({type: "UPDATE_END_TIMESTAMP", payload: snap.val().timestamp});
+      }
+  
+      if (!state.isAtBottom) {
+        dispatch({type: "UPDATE_UNREAD", payload: (state.numUnread + 1)});
+      }
+  
+      dispatch({type: "ADD_MESSAGE", payload: {[snap.key]: snap.val()}});
+    }
+  
+    const handleMessageEdited = (snap) => {
+      dispatch({type: "EDIT_MESSAGE", payload: {[snap.key]: snap.val()}});
+    }
+  
+    const handleMessageDeleted = (snap) => {
+      dispatch({type: "REMOVE_MESSAGE", payload: snap.key});
+  
+    }
+
+    const chatsRef = ref(db, "messages/" + chatRoomData.chatID + "/");
+    const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(state.endTimestamp), limitToLast(10));
+    const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(state.endTimestamp));
+
+    
     const chatAddedListener = onChildAdded(addedListenerQuery, handleMessageAdded);
     const chatChangedListener = onChildChanged(otherListenersQuery, handleMessageEdited);
     const chatRemovedListener = onChildRemoved(otherListenersQuery, handleMessageDeleted);
@@ -97,7 +104,7 @@ export const MessagesContextProvider = ({ children }) => {
       chatChangedListener();
       chatRemovedListener();
     };
-  },[])
+  },[chatRoomData])
 
   return (
     <MessagesContext.Provider value={{ data: state, dispatch }}>

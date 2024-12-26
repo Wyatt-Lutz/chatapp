@@ -7,12 +7,13 @@ import { AuthContext } from "../../../../providers/AuthProvider";
 import { onChildAdded, onChildChanged, ref } from "firebase/database";
 import { db } from "../../../../../firebase";
 import { getBlockData } from "../../../../services/memberDataService";
+import { MembersContext } from "../../../../providers/MembersContext";
 const MembersBar = () => {
   console.log('membersBar run')
 
-  const { data, dispatch } = useContext(ChatContext);
-  console.log(data.members);
-  const { currUser } = useContext(AuthContext);
+  const { memberData } = useContext(MembersContext);
+
+  console.log(memberData.members);
   const { clicked, setClicked, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
@@ -20,60 +21,25 @@ const MembersBar = () => {
     e.preventDefault();
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({member: member});
+    setContextMenuData(member);
   }
-
-
-
-
-  useEffect(() => {
-    let memberAddedListener, memberChangedListener;
-    const getBlockedData = async() => {
-      const data = await getBlockData(db, currUser.uid);
-      return data;
-    }
-
-    const setMemberData = async() => {
-      const blockData = await getBlockedData();
-      console.log(blockData);
-      const memberRef = ref(db, "members/" + data.chatID);
-      memberAddedListener = onChildAdded(memberRef, (snap) => {
-        dispatch({type: "ADD_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, isBlocked: blockData[snap.key] || false, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-      });
-
-      memberChangedListener = onChildChanged(memberRef, (snap) => {
-        dispatch({type: "CHANGE_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, isBlocked: blockData[snap.key] || false, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-      });
-    }
-    setMemberData();
-    return () => {
-      if(memberAddedListener) {
-        console.log('hello')
-        memberAddedListener();
-      }
-      if (memberChangedListener) {
-        memberChangedListener();
-      }
-    }
-
-
-  }, [data.chatID]);
   return (
     <div>
-
-
-      {data.members?.map(member => (
-        <div key={member.uid}>
-          {!member.hasBeenRemoved && (
-            <div onContextMenu={(e) => handleContextMenu(e, member)} className="hover:bg-gray-600">
-              <Member member={member} />
-            </div>
-          )}
-        </div>
-      ))}
+      {memberData.members.map(member => {
+        const {id, memberData} = member;
+        return (
+          <div key={id}>
+            {!memberData.hasBeenRemoved && (
+              <div onContextMenu={(e) => handleContextMenu(e, member)} className="hover:bg-gray-600">
+                <Member member={member} />
+              </div>
+            )}
+          </div>
+        )
+      })}
 
       {clicked && (
-        <MemberContextMenu contextMenuData={contextMenuData} clientUserIsOwner={data.owner === currUser.uid ? true : false} points={points} />
+        <MemberContextMenu contextMenuData={contextMenuData} points={points} />
       )}
 
 

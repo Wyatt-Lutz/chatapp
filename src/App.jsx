@@ -11,8 +11,8 @@ const Main = lazy(() => import('./routes/Main/Main'));
 function App() {
   const { currUser } = useContext(AuthContext);
 
-
   const AuthProtected = ({ children }) => {
+ 
     if (!currUser) {
       return <Navigate to="/signin"/>
     }

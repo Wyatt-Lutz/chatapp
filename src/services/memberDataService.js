@@ -1,4 +1,6 @@
 import { get, ref, remove, update } from "firebase/database";
+import { useContext } from "react";
+import { ChatContext } from "../providers/ChatContext";
 import { addMessage } from "./messageDataService";
 
 
@@ -16,8 +18,9 @@ export const updateBlockedStatus = async(db, clientUserUid, uidToBlock, newBlock
 }
 
 
-export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, dispatch) => {
+export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid) => {
   console.log('removeUserFromChat run');
+  const { dispatch } = useContext(ChatContext);
 
 
   const memberToRemoveRef = ref(db, "members/" + chatID + "/" + uidToRemove);
