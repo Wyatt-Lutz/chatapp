@@ -1,5 +1,5 @@
 
-import { useContext, useState, useEffect, useRef, memo, Fragment, useCallback } from "react";
+import { useContext, useState, memo } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { db } from "../../../../../firebase";
@@ -12,7 +12,7 @@ import { getBlockData } from "../../../../services/memberDataService";
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
   console.log('chat creation')
-  const { data, dispatch } = useContext(ChatContext);
+  const { chatRoomData, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
   const [usersAdded, setUsersAdded] = useState([{uid: currUser.uid, username: currUser.displayName}]);
   const [isUserBlockedWarning, setIsUserBlockedWarning] = useState(null);
@@ -74,7 +74,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     }
 
     const membersList = usersAdded.reduce((members, member) => {
-      members[member.uid] = {isOnline: false, username: member.username, hasBeenRemoved: false, is};
+      members[member.uid] = {isOnline: false, username: member.username, hasBeenRemoved: false };
       return members
     }, {});
     console.log(membersList);
@@ -157,4 +157,4 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
   )
 }
-export default memo(ChatCreation);
+export default ChatCreation;

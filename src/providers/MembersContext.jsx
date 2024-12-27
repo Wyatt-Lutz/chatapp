@@ -1,14 +1,11 @@
 import { onChildAdded, onChildChanged, onChildRemoved, ref } from "firebase/database";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { db } from "../../firebase";
+import { getBlockData } from "../services/memberDataService";
+import { AuthContext } from "./AuthProvider";
 import { ChatContext } from "./ChatContext";
-import { ChatroomsContext } from "./ChatroomsContext";
-
-
 
 export const MembersContext = createContext();
-
-
 
 const initialState = {
   members: [],
@@ -24,7 +21,7 @@ const membersReducer = (state, action) => {
     case "REMOVE_MEMBER":
       return {
         ...state,
-        members: delete members.action.payload,
+        members: delete state.members.action.payload,
       };
     case "UPDATE_MEMBER_DATA":
       return {
@@ -39,14 +36,14 @@ const membersReducer = (state, action) => {
 }
 
 export const MembersContextProvider = ({ children }) => {
+
   
   const [state, dispatch] = useReducer(membersReducer, initialState);
-
   const { chatRoomData } = useContext(ChatContext);
-
+  const { currUser } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!chatRoomData) return;
+    if (!chatRoomData.chatID) return;
 
     const membersRef = ref(db, `members/${chatRoomData.chatID}`);
 
@@ -76,11 +73,11 @@ export const MembersContextProvider = ({ children }) => {
       memberRemovedListener();
       memberUpdatedListener();
     }
-  }, [chatRoomData]);
+  }, [chatRoomData.chatID]);
 
 
   return(
-    <MembersContext.Provider value={{ data: state, dispatch }}>
+    <MembersContext.Provider value={{ memberData: state, dispatch }}>
       {children}
     </MembersContext.Provider>
   )

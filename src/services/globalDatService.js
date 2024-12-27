@@ -1,4 +1,4 @@
-import { push, ref, set, update, get, query, orderByChild, equalTo } from "firebase/database";
+import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 
 
 export const fetchUsernameData = async(db) => {

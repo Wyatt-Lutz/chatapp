@@ -2,12 +2,14 @@ import { memo, useContext } from "react"
 import { removeUserFromChat } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 import { AuthContext } from "../../../../providers/AuthProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 const ChatRoomContextMenu = ({chatRoomID, points}) => {
   console.log('chatroom context menu')
   const { currUser } = useContext(AuthContext);
+  const { dispatch } = useContext(ChatContext);
 
   const onRemoveUserFromChat = async() => {
-    await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid);
+    await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid, dispatch);
   }
 
   return (

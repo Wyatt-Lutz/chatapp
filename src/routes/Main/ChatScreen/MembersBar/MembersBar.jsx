@@ -1,12 +1,7 @@
-import { memo, useContext, useEffect, useRef, useState } from "react"
+import { memo, useContext, useState } from "react"
 import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
-import { ChatContext } from "../../../../providers/ChatProvider";
-import { AuthContext } from "../../../../providers/AuthProvider";
-import { onChildAdded, onChildChanged, ref } from "firebase/database";
-import { db } from "../../../../../firebase";
-import { getBlockData } from "../../../../services/memberDataService";
 import { MembersContext } from "../../../../providers/MembersContext";
 const MembersBar = () => {
   console.log('membersBar run')
@@ -46,4 +41,4 @@ const MembersBar = () => {
     </div>
   )
 }
-export default memo(MembersBar);
+export default MembersBar;

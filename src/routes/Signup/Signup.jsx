@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import { db, auth } from "../../../firebase";
 import { createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
-import { ref, set, get, query, orderByChild, equalTo } from 'firebase/database'
+import { ref, set } from 'firebase/database'
 import UsernameAvaliability from "../../utils/UsernameAvaliability.jsx";
 import { useState } from "react";
 
@@ -11,7 +11,7 @@ import { useState } from "react";
 
 
 const Signup = () => {
-  const { register, formState: { errors }, handleSubmit, watch, resetField } = useForm();
+  const { register, formState: { errors }, handleSubmit, watch } = useForm();
 
   const newUsername = watch('username');
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
@@ -10,16 +10,22 @@ import { MembersContextProvider } from './providers/MembersContext.jsx';
 import { MessagesContextProvider } from './providers/MessagesContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <AuthContextProvider>
-    <ChatroomsContextProvider>
-      <ChatContextProvider>
-        <MembersContextProvider>
-          <MessagesContextProvider>
-            <App />
-          </MessagesContextProvider>
-        </MembersContextProvider>
-      </ChatContextProvider>
-    </ChatroomsContextProvider>
-  </AuthContextProvider>
+  <StrictMode>
+    <AuthContextProvider>
+      <ChatroomsContextProvider>
+        <ChatContextProvider>
+          <>
+            <MembersContextProvider>
+              <MessagesContextProvider>
+                <App />
+              </MessagesContextProvider>
+            </MembersContextProvider>
+          </>
+
+        </ChatContextProvider>
+      </ChatroomsContextProvider>
+    </AuthContextProvider>
+  </StrictMode>
+
 
 )

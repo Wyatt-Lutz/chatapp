@@ -1,13 +1,9 @@
-import { useContext, useState, useEffect, useRef, memo, Fragment, useCallback } from "react";
+import { useContext, useState, memo } from "react";
 import Plus from "../../../../styling-components/Plus";
-import { AuthContext } from "../../../../providers/AuthProvider";
-import { db } from "../../../../../firebase";
-import { ref, query, set, get, orderByChild, equalTo, onChildAdded, update, onChildChanged, onChildRemoved, push } from 'firebase/database';
 import ChatRoom from "./ChatRoom";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import ChatRoomContextMenu from "./ChatRoomContextMenu";
 import ChatCreation from "./ChatCreation";
-import { ChatContext } from "../../../../providers/ChatProvider";
 import { ChatroomsContext } from "../../../../providers/ChatroomsContext";
 const ChatRoomsSideBar = () => {
   const {chatRoomsData} = useContext(ChatroomsContext);
@@ -41,7 +37,7 @@ const ChatRoomsSideBar = () => {
         {chatRoomsData.chatrooms.length > 0 ? (
           chatRoomsData.chatrooms.map(chatroom => (
             <div key={chatroom.chatID} onContextMenu={(e) => handleContextMenu(e, chatroom)}>
-              <ChatRoom chatroom={chatroom} numUnread={chatroom.unreadCount[chatroom.chatID]}/>
+              <ChatRoom chatroom={chatroom} numUnread={chatRoomsData.unreadCount[chatroom.chatID]}/>
             </div>
           ))
 

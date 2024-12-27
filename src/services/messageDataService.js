@@ -6,7 +6,7 @@ const NUM_CHATS_PER_PAGE = 10;
 
 export const fetchChats = async(time, db, chatID) => {
   console.info('fetchChats run');
-  const chatsRef = ref(db, "messages/" + chatID + "/");
+  const chatsRef = ref(db, `messages/${chatID}/`);
   const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(time), limitToLast(NUM_CHATS_PER_PAGE));
   const snap = await get(messageQuery);
 
@@ -25,7 +25,7 @@ export const fetchChats = async(time, db, chatID) => {
 
 
 export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) => {
-  const chatRef = ref(db, "messages/" + chatID + "/");
+  const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
   const newMessage = {

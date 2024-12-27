@@ -1,5 +1,5 @@
 import { memo, useContext } from "react"
-import { ChatContext } from "../../../../providers/ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 
 const ChatRoom = ({chatroom, numUnread}) => {
   console.log('chat room')

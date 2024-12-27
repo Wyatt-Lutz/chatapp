@@ -1,4 +1,4 @@
-import { limitToLast, orderByChild, query, startAt, ref } from "firebase/database";
+import { limitToLast, orderByChild, query, startAt, ref, onChildAdded, onChildChanged, onChildRemoved } from "firebase/database";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { db } from "../../firebase";
 import { ChatContext } from "./ChatContext";
@@ -33,14 +33,14 @@ const messagesReducer = (state, action) => {
     case "REMOVE_MESSAGE":
       return {
         ...state,
-        messages: delete messages.action.payload,
+        messages: delete state.messages.action.payload,
       };
     case "UPDATE_END_TIMESTAMP":
       return {
         ...state,
         endTimestamp: action.payload,
       };
-    case "EDIT_AT_BOTTOM_STATUS":
+    case "UPDATE_AT_BOTTOM":
       return {
         ...state,
         isAtBottom: action.payload,
@@ -104,10 +104,10 @@ export const MessagesContextProvider = ({ children }) => {
       chatChangedListener();
       chatRemovedListener();
     };
-  },[chatRoomData])
+  },[chatRoomData, state.endTimestamp, state.isAtBottom, state.messages.length, state.numUnread])
 
   return (
-    <MessagesContext.Provider value={{ data: state, dispatch }}>
+    <MessagesContext.Provider value={{ messageData: state, dispatch }}>
       { children }
     </MessagesContext.Provider>
   )

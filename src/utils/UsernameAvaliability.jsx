@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchUsernameData } from "../services/globalDatService";
 import { db } from "../../firebase";
 
@@ -31,7 +31,7 @@ const UsernameAvaliability = ({newUsername, setIsButtonDisabled}) => {
 
 
     return () => clearTimeout(timeout);
-  }, [newUsername]);
+  }, [newUsername, setIsButtonDisabled]);
 
 
   return (

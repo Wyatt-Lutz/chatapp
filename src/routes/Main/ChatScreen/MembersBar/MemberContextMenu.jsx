@@ -1,4 +1,4 @@
-import { useContext, memo } from "react";
+import { useContext } from "react";
 import { ChatContext } from "../../../../providers/ChatContext";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { removeUserFromChat, transferOwnership, updateBlockedStatus } from "../../../../services/memberDataService";
@@ -23,7 +23,7 @@ const MemberContextMenu = ({contextMenuData, points}) => {
   }
 
   const onRemoveMemberFromChat = async() => {
-    await removeUserFromChat(db, chatRoomData.chatID, memberUid, memberData.username, currUser.uid);
+    await removeUserFromChat(db, chatRoomData.chatID, memberUid, memberData.username, currUser.uid, dispatch);
   }
 
 
@@ -42,7 +42,7 @@ const MemberContextMenu = ({contextMenuData, points}) => {
             <button onClick={() => onChangeBlockStatus(true)}>Block User</button>
           )}
 
-          {currUser.uid === data.owner && (
+          {currUser.uid === chatRoomData.owner && (
             <>
               <button onClick={onRemoveMemberFromChat}>Remove User</button>
               <button onClick={onTransferOwnship}>Transfer Ownership</button>
@@ -55,4 +55,4 @@ const MemberContextMenu = ({contextMenuData, points}) => {
 
   )
 }
-export default memo(MemberContextMenu);
+export default MemberContextMenu;

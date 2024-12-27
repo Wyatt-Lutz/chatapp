@@ -1,14 +1,14 @@
 import { memo, useContext, useState, useEffect } from "react"
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../../providers/ChatProvider";
 import { db } from "../../../../../firebase";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { editTitle } from "../../../../services/messageDataService";
 import { onChildChanged, ref } from 'firebase/database';
+import { ChatContext } from "../../../../providers/ChatContext";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
-  const { data, dispatch } = useContext(ChatContext);
+  const { chatRoomData, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
 
   console.log('topbar run')
@@ -19,11 +19,11 @@ const TopBar = () => {
     if (text.title === "") {
       return;
     }
-    await editTitle(text.title, data.chatID, db, currUser.displayName);
+    await editTitle(text.title, chatRoomData.chatID, db, currUser.displayName);
   }
 
   useEffect(() => {
-    const titleRef = ref(db, "chats/" + data.chatID + "/title");
+    const titleRef = ref(db, "chats/" + chatRoomData.chatID + "/title");
 
     const chatsChangeListener = onChildChanged(titleRef, (snap) => {
       console.log(snap.val());
@@ -34,18 +34,18 @@ const TopBar = () => {
       chatsChangeListener();
     }
 
-  }, [data.chatID]);
+  }, [dispatch, chatRoomData.chatID]);
 
   return (
     <div className="ring" onMouseOver={() => setIsEditingTitle(true)} onMouseLeave={() => setIsEditingTitle(false)}>
 
       {isEditingTitle ? (
         <form onSubmit={handleSubmit(onFinishEditTitle)}>
-          <input {...register('title', {required: false})} placeholder={data.title} onBlur={handleSubmit(onFinishEditTitle)}></input>
+          <input {...register('title', {required: false})} placeholder={chatRoomData.title} onBlur={handleSubmit(onFinishEditTitle)}></input>
         </form>
 
       ) : (
-        <div>{data.title}</div>
+        <div>{chatRoomData.title}</div>
       )}
 
     </div>

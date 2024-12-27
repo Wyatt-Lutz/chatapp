@@ -1,4 +1,4 @@
-import { memo, useCallback, useContext } from "react";
+import { memo, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { ChatContext } from "../../../../providers/ChatContext";
@@ -34,4 +34,4 @@ const Input = ({calculateRenderTimeAndSender}) => {
     </>
   )
 }
-export default memo(Input);
+export default Input;

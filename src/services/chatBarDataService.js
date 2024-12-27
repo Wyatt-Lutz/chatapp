@@ -1,4 +1,4 @@
-import { push, ref, set, update, get, query, orderByChild, equalTo } from "firebase/database";
+import { push, ref, set, update, get  } from "firebase/database";
 
 
 export const createChat = async(db, memberUids, title, tempTitle, membersList, uids, currUserUid) => {

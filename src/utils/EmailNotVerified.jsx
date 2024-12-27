@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { sendEmailVerification } from "firebase/auth";
 import { actionCodeSettings, auth } from "../../firebase";
 

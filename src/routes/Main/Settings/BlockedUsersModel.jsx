@@ -9,6 +9,8 @@ const BlockedUsersModel = ({changeDisplayment}) => {
   const { currUser } = useContext(AuthContext);
   const [blockedUsers, setBlockedUsers] = useState({});
   const [usernames, setUsernames] = useState({});
+
+  
   useEffect(() => {
     const fetchBlockedUsers = async() => {
       const blockedUsers = await getBlockData(db, currUser.uid);
@@ -24,7 +26,7 @@ const BlockedUsersModel = ({changeDisplayment}) => {
       setUsernames(usernameData);
     }
     fetchBlockedUsers();
-  }, []);
+  }, [currUser.uid]);
 
   const fetchUsername = async(uid) => {
     const username = await getUsernameFromUid(db, uid);

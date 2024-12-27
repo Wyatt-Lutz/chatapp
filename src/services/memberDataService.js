@@ -1,6 +1,4 @@
 import { get, ref, remove, update } from "firebase/database";
-import { useContext } from "react";
-import { ChatContext } from "../providers/ChatContext";
 import { addMessage } from "./messageDataService";
 
 
@@ -18,9 +16,8 @@ export const updateBlockedStatus = async(db, clientUserUid, uidToBlock, newBlock
 }
 
 
-export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid) => {
+export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, dispatch) => {
   console.log('removeUserFromChat run');
-  const { dispatch } = useContext(ChatContext);
 
 
   const memberToRemoveRef = ref(db, "members/" + chatID + "/" + uidToRemove);
@@ -29,7 +26,9 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   const currUserChatsInRef = ref(db, "users/" + currUserUid + "/chatsIn/" + chatID);
 
   // If the current user calls the function for themselves to be removed, if they want to leave the chat, change the message accordingly
-  const userRemovedServerMessage = uidToRemove === currUserUid ? `${usernameOfUserRemoved} has left the chat.` : `${usernameOfUserRemoved} has been removed from the chat.`;
+  const userRemovedServerMessage = uidToRemove === currUserUid 
+  ? `${usernameOfUserRemoved} has left the chat.` 
+  : `${usernameOfUserRemoved} has been removed from the chat.`;
 
   await remove(userChatsInRef);
 

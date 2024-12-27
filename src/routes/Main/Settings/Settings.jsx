@@ -11,7 +11,7 @@ import BlockedUsersModel from "./BlockedUsersModel";
 
 const Settings = () => {
   const { currUser } = useContext(AuthContext);
-
+  const navigate = useNavigate();
   const {register, watch, resetField} = useForm({
     defaultValues: {
       newUsername: currUser.displayName,
@@ -159,7 +159,7 @@ const Settings = () => {
 
 
           <button onClick={handleDeleteAccount} className="bg-red-500">Delete Account</button>
-
+          <button onClick={navigate("/")}>Go Home</button>
 
 
           {modalDisplayment}

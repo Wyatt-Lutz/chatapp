@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { auth } from "../../firebase";
-import { onAuthStateChanged, setPersistence, browserLocalPersistence} from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 
 export const AuthContext = createContext();
@@ -16,7 +16,7 @@ export const AuthContextProvider = ({ children }) => {
     return () => {
       authState();
     };
-  }, [auth]);
+  }, []);
 
   if (loading) {
     return <div>...</div>

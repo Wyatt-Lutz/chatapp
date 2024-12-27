@@ -1,5 +1,5 @@
 
-import { deleteUser, updateEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
+import { deleteUser, updateProfile } from "firebase/auth";
 
 import { get, update, ref} from "firebase/database";
 import { checkIfUserExists } from "./globalDatService";

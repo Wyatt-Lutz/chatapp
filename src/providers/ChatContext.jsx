@@ -1,4 +1,6 @@
-import { createContext, useContext, useReducer } from "react";
+import { onChildChanged, ref } from "firebase/database";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import { db } from "../../firebase";
 import { ChatroomsContext } from "./ChatroomsContext";
 
 
@@ -12,7 +14,7 @@ const initialState = {
 };
 
 
-const chatReducer = (state, action) => {
+const ChatReducer = (state, action) => {
   const { chatRoomDispatch } = useContext(ChatroomsContext);
   switch (action.type) {
     case "CHANGE_CHAT":
@@ -51,10 +53,27 @@ const chatReducer = (state, action) => {
 };
 
 export const ChatContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(chatReducer, initialState);
+  const [state, dispatch] = useReducer(ChatReducer, initialState);
+  
+
+  const onChatroomEdited = (snap) => {
+    console.log("key" + snap.key);
+    console.log("val" + snap.val());
+  }
+
+  useEffect(() => {
+    const chatroomRef = ref(db, `chats/${state.chatID}`);
+    const chatRoomEditedListener = onChildChanged(chatroomRef, onChatroomEdited);
+  
+    return () => {
+      chatRoomEditedListener();
+      
+    }
+  }, [state.chatID])
+  
 
   return (
-    <ChatContext.Provider value={{ data: state, dispatch }}>
+    <ChatContext.Provider value={{ chatRoomData: state, dispatch }}>
       {children}
     </ChatContext.Provider>
   );

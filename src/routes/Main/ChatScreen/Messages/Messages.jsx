@@ -1,12 +1,10 @@
-import { useContext, useState, useMemo, memo, useCallback, useEffect, useRef } from "react";
+import { useContext, useState, memo, useEffect, useRef } from "react";
 import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
-import { ref, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, startAt, limitToLast } from 'firebase/database';
-
 import { ChatContext } from "../../../../providers/ChatContext";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
-import { fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
+import { calculateRenderTimeAndSender, fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import { MessagesContext } from "../../../../providers/MessagesContext";
 import Message from "./Message"
@@ -14,20 +12,18 @@ import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
 
 const Messages = () => {
-  const { data } = useContext(ChatContext);
+  const { chatRoomData } = useContext(ChatContext);
+  const { messageData } = useContext(MessagesContext);
   const { currUser } = useContext(AuthContext);
   const { dispatch } = useContext(MessagesContext);
 
-  const [chats, setChats] = useState([])
   const [scrolled, setScrolled] = useState(false);
-  const [unread, setUnread] = useState(0);
   const [editState, setEditState] = useState({});
   const [contextMenuData, setContextMenuData] = useState({});
 
 
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
-  const atBottom = useRef(true);
 
   const { clicked, setClicked, points, setPoints } = useContextMenu();
 
@@ -40,12 +36,30 @@ const Messages = () => {
 
 
   useEffect(() => {
-    if (!data.chatID) {
+    if (!chatRoomData.chatID) {
       console.info("chatID undefined");
       return;
     }
 
-    updateUserOnlineStatus(true, db, data.chatID, currUser.uid);
+    const handleUserOffline = () => {
+      updateUserOnlineStatus(false, db, chatRoomData.chatID, currUser.uid);
+    };
+
+    const handleScroll = () => {
+      const atBottom = messageData.atBottom
+      const scrollTop = messagesContainerRef.current.scrollTop;
+      setScrolled(true);
+  
+      if (scrollTop !== 0 && (atBottom)) {
+        dispatch({type: "UPDATE_AT_BOTTOM", payload: false});
+      } else if (scrollTop === 0 && (!atBottom)) {
+        dispatch({type: "UPDATE_AT_BOTTOM", payload: true});
+        dispatch({type: "UPDATE_UNREAD", payload: 0});
+      }
+  
+    };
+
+    updateUserOnlineStatus(true, db, chatRoomData.chatID, currUser.uid);
 
 
     const container = messagesContainerRef.current;
@@ -56,41 +70,23 @@ const Messages = () => {
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
     }
-  }, [data.chatID]);
+  }, [chatRoomData.chatID, currUser.uid, dispatch, messageData.atBottom]);
 
 
-  const handleUserOffline = () => {
-    updateUserOnlineStatus(false, db, data.chatID, currUser.uid);
-  };
 
 
-  const handleScroll = () => {
-    setScrolled(true);
-    if (messagesContainerRef.current.scrollTop !== 0 && (atBottom.current)) {
-      atBottom.current = false;
-    } else if (messagesContainerRef.current.scrollTop === 0 && (!atBottom.current)) {
-      atBottom.current = true;
-      setUnread(0);
-    }
-
-  };
 
 
-  const handleContextMenu = (e, chat) => {
+
+
+  const handleContextMenu = (e, id, text, sender) => {
     e.preventDefault();
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({ chatID: chat.id, text: chat.text, sender: chat.sender });
+    setContextMenuData({ id, text, sender });
   }
 
-  const handleFetchMore = debounce(async() => {
-    const messageData = await fetchChats(endTimestamp.current, db, data.chatID);
 
-    if (messageData && messageData.length > 0 && messageData[0]) {
-      dispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
-      dispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
-    }
-  }, 300);
 
 
 
@@ -98,14 +94,23 @@ const Messages = () => {
     if (isVisible && scrolled) {
       handleFetchMore();
     }
-  }, [isVisible, scrolled]);
+
+    const handleFetchMore = debounce(async() => {
+      const messageData = await fetchChats(messageData.endTimestamp, db, chatRoomData.chatID);
+  
+      if (messageData && messageData.length > 0 && messageData[0]) {
+        dispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
+        dispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
+      }
+    }, 300);
+  }, [isVisible, scrolled, dispatch, chatRoomData.chatID]);
 
 
   useEffect(() => {
-    if(lastMessageRef.current && atBottom.current) {
+    if(lastMessageRef.current && messageData.atBottom) {
       lastMessageRef.current.scrollIntoView({behavior: 'smooth'});
     }
-  }, [chats]);
+  }, [messageData.atBottom]);
 
 
 
@@ -124,22 +129,22 @@ const Messages = () => {
 
               <div>
 
-                {chats?.map((chat, index) => (
-                  <div key={chat.id}>
+                {messageData?.map((chat, index) => {
+                  const {id, message} = chat;
+                  return (
+                    <div key={id}>
 
-                    <div onContextMenu={(e) => handleContextMenu(e, chat)} className="hover:bg-gray-600">
-                      <Message chat={chat} isFirst={index === 0} isEditing={editState[chat.id]} changeEditState={changeEditState}/>
+                    <div onContextMenu={(e) => handleContextMenu(e, id, message.text, message.sender)} className="hover:bg-gray-600">
+                      <Message chat={chat} isFirst={index === 0} isEditing={editState[id]} changeEditState={changeEditState}/>
                     </div>
 
-                    {index === chats.length - 1 && (
+                    {index === messageData.length - 1 && (
                       <div ref = {lastMessageRef} />
                     )}
 
                   </div>
-
-
-
-                ))}
+                  )
+                })}
               </div>
 
             <Input calculateRenderTimeAndSender={calculateRenderTimeAndSender} />
@@ -150,8 +155,8 @@ const Messages = () => {
       {(clicked && contextMenuData.sender === currUser.displayName) && (
         <MessagesContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
       )}
-      {unread > 0 && (
-        <div>{unread} new messages</div>
+      {messageData.numUnread > 0 && (
+        <div>{messageData.numUnread} new messages</div>
       )}
 
 

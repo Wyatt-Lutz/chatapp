@@ -2,14 +2,16 @@ import { endAt, startAt, orderByChild, ref, get } from "firebase/database";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { db } from "../../../../firebase";
-import { ChatContext } from "../../../providers/ChatProvider";
 import { queryMessages } from "../../../services/searchDataService";
 import { calcTime } from "../../../services/messageDataService";
+import { MembersContext } from "../../../providers/MembersContext";
+import { ChatContext } from "../../../providers/ChatContext";
 
 const Search = () => {
   const { register, watch } = useForm();
   const searchQuery = watch('searchQuery', '');
-  const { data } = useContext(ChatContext);
+  const { chatRoomData } = useContext(ChatContext);
+  const {membersData} = useContext(MembersContext);
   const [searchedMessages, setSearchedMessages] = useState([]);
 
   useEffect(() => {
@@ -17,7 +19,8 @@ const Search = () => {
       return;
     }
     const fetchMessagesWithQuery = async() => {
-      const messagesObject = await queryMessages(db, data.chatID, searchQuery);
+      const messagesObject = await queryMessages(db, chatRoomData.chatID, searchQuery);
+      console.log("uisng object.keys: " + messagesObject);
       const messagesArray = Object.keys(messagesObject).map(key => ({
         id: key,
         ...messagesObject[key],
@@ -25,11 +28,11 @@ const Search = () => {
       setSearchedMessages(messagesArray);
     }
     fetchMessagesWithQuery();
-  }, [searchQuery]);
+  }, [searchQuery, chatRoomData.chatID]);
 
   const fetchUsername = (message) => {
-    const memberObjOfSender = data.members.find(member => member.uid === message.sender);
-    return memberObjOfSender;
+    const memberObjOfSender = membersData.members[message.sender];
+    return memberObjOfSender.username;
   }
 
   return (
@@ -41,7 +44,7 @@ const Search = () => {
             <>
               <div className="flex">
                 <img src="" alt="helllo"/>
-                <div>{fetchUsername(message).username}</div>
+                <div>{fetchUsername(message)}</div>
                 <div>{calcTime(message.timestamp)}</div>
               </div>
               <div className="text-wrap">
