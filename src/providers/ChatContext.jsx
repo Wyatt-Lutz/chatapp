@@ -15,10 +15,9 @@ const initialState = {
 
 
 const ChatReducer = (state, action) => {
-  const { chatRoomDispatch } = useContext(ChatroomsContext);
   switch (action.type) {
     case "CHANGE_CHAT":
-      chatRoomDispatch({type: "UPDATE_CHATROOM", payload: state})
+      //dispatch({type: "UPDATE_CHATROOM", payload: state});
 
 
       return {

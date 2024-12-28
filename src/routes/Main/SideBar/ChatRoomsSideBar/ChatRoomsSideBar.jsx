@@ -34,7 +34,7 @@ const ChatRoomsSideBar = () => {
       )}
 
       <div className="flex flex-col">
-        {chatRoomsData.chatrooms.length > 0 ? (
+        {chatRoomsData.chatrooms && chatRoomsData.chatrooms.length > 0 ? (
           chatRoomsData.chatrooms.map(chatroom => (
             <div key={chatroom.chatID} onContextMenu={(e) => handleContextMenu(e, chatroom)}>
               <ChatRoom chatroom={chatroom} numUnread={chatRoomsData.unreadCount[chatroom.chatID]}/>
@@ -56,4 +56,4 @@ const ChatRoomsSideBar = () => {
 
   )
 }
-export default memo(ChatRoomsSideBar);
+export default ChatRoomsSideBar;

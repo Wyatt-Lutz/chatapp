@@ -89,10 +89,10 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
     const newChatID = await createChat(db, memberUids, title, tempTitle, membersList, uids, currUser.uid);
     console.log(newChatID);
-    setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
+    //setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);
     const ownerUid = currUser.uid;
-    dispatch({ type: "CHANGE_CHAT", payload: { newChatID, title, ownerUid }});
+    //dispatch({ type: "CHANGE_CHAT", payload: { newChatID, title, ownerUid }});
   }
 
 

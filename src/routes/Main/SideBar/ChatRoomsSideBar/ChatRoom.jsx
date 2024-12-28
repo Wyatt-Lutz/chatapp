@@ -13,8 +13,8 @@ const ChatRoom = ({chatroom, numUnread}) => {
 
     <div className="flex">
       <button className="ring m-2" onClick={handleChangeChat}>
-        {chatroom.title}
-      </button>
+        {chatroom.title || chatroom.tempTitle}
+      </button> 
       <div>{numUnread}</div>
 
     </div>
@@ -22,4 +22,4 @@ const ChatRoom = ({chatroom, numUnread}) => {
   )
 }
 
-export default memo(ChatRoom);
+export default ChatRoom;
