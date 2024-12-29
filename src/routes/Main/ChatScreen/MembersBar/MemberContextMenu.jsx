@@ -7,13 +7,11 @@ import { MembersContext } from "../../../../providers/MembersContext";
 
 
 
-const MemberContextMenu = ({contextMenuData, points}) => {
+const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
   const { chatRoomData, dispatch } = useContext(ChatContext);
   const { dispatchMember } = useContext(MembersContext);
   const { currUser } = useContext(AuthContext);
   console.log('membercontextmenu run');
-
-  const {memberUid, memberData} = contextMenuData;
   
 
   const onChangeBlockStatus = async(newBlockStatus) => {

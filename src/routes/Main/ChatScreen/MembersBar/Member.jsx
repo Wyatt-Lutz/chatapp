@@ -1,11 +1,10 @@
 import { memo, useContext } from "react"
 import { ChatContext } from "../../../../providers/ChatContext";
 
-const Member = ({ member }) => {
+const Member = ({ memberUid, memberData }) => {
   console.log('member run')
   const { chatRoomData } = useContext(ChatContext);
-
-  const {memberUid, memberData} = member;
+  console.log(memberData);
   
 
   /*
@@ -16,7 +15,7 @@ const Member = ({ member }) => {
   
   return (
     <div className="flex">
-      <div>{memberData.username}</div>
+      <div>{memberData?.username}</div>
 
       {chatRoomData.owner === memberUid && (
         <div>Owner</div>
@@ -25,4 +24,4 @@ const Member = ({ member }) => {
 
   )
 }
-export default memo(Member);
+export default Member;

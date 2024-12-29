@@ -6,32 +6,29 @@ import { MembersContext } from "../../../../providers/MembersContext";
 const MembersBar = () => {
   console.log('membersBar run')
 
-  const { memberData } = useContext(MembersContext);
+  const { membersData } = useContext(MembersContext);
 
-  console.log(memberData.members);
+  console.log(membersData.members);
   const { clicked, setClicked, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
-  const handleContextMenu = (e, member) => {
+  const handleContextMenu = (e, memberUid, memberData) => {
     e.preventDefault();
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData(member);
+    setContextMenuData({memberUid: memberUid, memberData: memberData});
   }
   return (
     <div>
-      {memberData.members.map(member => {
-        const {id, memberData} = member;
-        return (
-          <div key={id}>
-            {!memberData.hasBeenRemoved && (
-              <div onContextMenu={(e) => handleContextMenu(e, member)} className="hover:bg-gray-600">
-                <Member member={member} />
-              </div>
-            )}
+      <div>Members:</div>
+      {Array.from(membersData.members.entries()).map(([memberUid, memberData]) => (
+        <div key={memberUid}>
+          <div onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
+            <Member memberUid={memberUid} memberData={memberData} />
           </div>
-        )
-      })}
+        </div>
+      ))}
+
 
       {clicked && (
         <MemberContextMenu contextMenuData={contextMenuData} points={points} />
@@ -42,3 +39,21 @@ const MembersBar = () => {
   )
 }
 export default MembersBar;
+
+/*
+array1.forEach(obj => {
+  Object.entries(obj).forEach(([key, value]) => {
+    console.log(`Key: ${key}, Username: ${value.username}, Age: ${value.age}`);
+  });
+});
+*/
+
+/*
+          <div key={id}>
+            {!memberData?.hasBeenRemoved && (
+              <div onContextMenu={(e) => handleContextMenu(e, member)} className="hover:bg-gray-600">
+                <Member member={member} />
+              </div>
+            )}
+          </div>
+*/

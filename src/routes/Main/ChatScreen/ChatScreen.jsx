@@ -20,7 +20,6 @@ const ChatScreen = () => {
           <div className='flex'>
             <Messages />
             <div>
-              <div>Members:</div>
               <MembersBar/>
             </div>
 

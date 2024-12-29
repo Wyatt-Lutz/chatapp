@@ -129,7 +129,7 @@ const Messages = () => {
 
               <div>
 
-                {messageData?.map((chat, index) => {
+                {messageData?.messages.map((chat, index) => {
                   const {id, message} = chat;
                   return (
                     <div key={id}>
