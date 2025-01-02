@@ -9,13 +9,20 @@ const ChatRoomContextMenu = ({chatRoomID, points}) => {
   const { dispatch } = useContext(ChatContext);
 
   const onRemoveUserFromChat = async() => {
-    await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid, dispatch);
+    try {
+      await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid);
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+    dispatch({type: "RESET"});
+
   }
 
   return (
-    <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points?.y, left: points?.x}}>
+    <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
       <button onClick={onRemoveUserFromChat}>Leave Group Chat</button>
     </div>
   )
 }
-export default memo(ChatRoomContextMenu);
+export default ChatRoomContextMenu;

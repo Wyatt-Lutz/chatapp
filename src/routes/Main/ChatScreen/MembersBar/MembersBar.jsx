@@ -2,13 +2,11 @@ import { memo, useContext, useState } from "react"
 import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
-import { MembersContext } from "../../../../providers/MembersContext";
+import { ChatContext } from "../../../../providers/ChatContext";
 const MembersBar = () => {
-  console.log('membersBar run')
+  const { currChat } = useContext(ChatContext);
+  const members = currChat.memberData.members;
 
-  const { membersData } = useContext(MembersContext);
-
-  console.log(membersData.members);
   const { clicked, setClicked, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
@@ -21,7 +19,7 @@ const MembersBar = () => {
   return (
     <div>
       <div>Members:</div>
-      {Array.from(membersData.members.entries()).map(([memberUid, memberData]) => (
+      {[...members].map(([memberUid, memberData]) => (
         <div key={memberUid}>
           <div onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
             <Member memberUid={memberUid} memberData={memberData} />
@@ -39,21 +37,3 @@ const MembersBar = () => {
   )
 }
 export default MembersBar;
-
-/*
-array1.forEach(obj => {
-  Object.entries(obj).forEach(([key, value]) => {
-    console.log(`Key: ${key}, Username: ${value.username}, Age: ${value.age}`);
-  });
-});
-*/
-
-/*
-          <div key={id}>
-            {!memberData?.hasBeenRemoved && (
-              <div onContextMenu={(e) => handleContextMenu(e, member)} className="hover:bg-gray-600">
-                <Member member={member} />
-              </div>
-            )}
-          </div>
-*/

@@ -1,18 +1,15 @@
-import { endAt, startAt, orderByChild, ref, get } from "firebase/database";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { db } from "../../../../firebase";
 import { queryMessages } from "../../../services/searchDataService";
-import { calcTime } from "../../../services/messageDataService";
-import { MembersContext } from "../../../providers/MembersContext";
 import { ChatContext } from "../../../providers/ChatContext";
 import Message from "./Messages/Message";
 
 const Search = () => {
   const { register, watch } = useForm();
   const searchQuery = watch('searchQuery', '');
-  const { chatRoomData } = useContext(ChatContext);
-  const { membersData } = useContext(MembersContext);
+  const { currChat } = useContext(ChatContext);
+  const chatID = currChat.chatData.chatID;
   const [searchedMessages, setSearchedMessages] = useState([]);
 
   useEffect(() => {
@@ -20,18 +17,18 @@ const Search = () => {
     if (!searchQuery) {
       return;
     }
-    const fetchMessagess = async() => {
-      const messagesObject = await queryMessages(db, chatRoomData.chatID, searchQuery);
-      console.log("uisng object.keys: " + messagesObject);
+    const fetchMessages = async() => {
+      const messagesObject = await queryMessages(db, chatID, searchQuery);
+      console.log("using object.keys: " + messagesObject);
       const messagesArray = Object.keys(messagesObject).map(key => ({
         id: key,
         ...messagesObject[key],
       }));
       setSearchedMessages(messagesArray);
     }
-    fetchMessagess();
+    fetchMessages();
 
-  }, [searchQuery, chatRoomData.chatID]);
+  }, [searchQuery, chatID]);
 
   return (
     <>
@@ -39,8 +36,8 @@ const Search = () => {
       {searchQuery && (
         <div>
           {searchedMessages?.map((message, index) => (
-            <div className="flex">
-              <Message />
+            <div key={message.id} className="flex">
+              <Message messageUid={message.id} messageData={message} isFirst={index === 0} />
             </div>
           ))}
         </div>

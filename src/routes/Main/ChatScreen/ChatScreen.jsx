@@ -8,25 +8,25 @@ import Search from './Search';
 import { ChatContext } from '../../../providers/ChatContext';
 
 const ChatScreen = () => {
-  const { chatRoomData } = useContext(ChatContext);
-
+  const { currChat } = useContext(ChatContext);
+  const chatID = currChat.chatData.chatID
   return(
     <section>
-      {!chatRoomData.chatID ? (
+      {!chatID ? (
         <div>Chat Requests</div>
       ) : (
-        <div key={chatRoomData.chatID}>
+        <>
           <TopBar />
           <div className='flex'>
             <Messages />
-            <div>
+            <>
               <MembersBar/>
-            </div>
+            </>
 
 
           </div>
           <Search />
-        </div>
+        </>
 
       )}
     </section>

@@ -12,7 +12,6 @@ import { getBlockData } from "../../../../services/memberDataService";
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
   console.log('chat creation')
-  const { chatRoomData, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
   const [usersAdded, setUsersAdded] = useState([{uid: currUser.uid, username: currUser.displayName}]);
   const [isUserBlockedWarning, setIsUserBlockedWarning] = useState(null);

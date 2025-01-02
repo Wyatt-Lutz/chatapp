@@ -6,7 +6,7 @@ import ChatRoomContextMenu from "./ChatRoomContextMenu";
 import ChatCreation from "./ChatCreation";
 import { ChatroomsContext } from "../../../../providers/ChatroomsContext";
 const ChatRoomsSideBar = () => {
-  const {chatRoomsData} = useContext(ChatroomsContext);
+  const { chatRoomsData } = useContext(ChatroomsContext);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const { clicked, setClicked, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});

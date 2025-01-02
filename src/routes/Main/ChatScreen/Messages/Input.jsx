@@ -10,19 +10,14 @@ import { addMessage, calculateRenderTimeAndSender } from "../../../../services/m
 const Input = () => {
   const { register, handleSubmit, resetField } = useForm();
   const { currUser } = useContext(AuthContext);
-  const { chatRoomData } = useContext(ChatContext);
-  const { messagesData } = useContext(MessagesContext);
+  const { currChat } = useContext(ChatContext);
 
   console.log('input run');
-  const handleAddMessage = async(text) => {
+  const handleAddMessage = async({ text }) => {
     resetField('text');
-    
-    const lastMessage = [...messagesData.messages.entries()].pop() || {};
-    console.log(lastMessage);
-    const willRenderTimeAndSender = await calculateRenderTimeAndSender(lastMessage, currUser.displayName);
-    await addMessage(text.text, chatRoomData.chatID, currUser.uid, db, willRenderTimeAndSender);
-
-
+    const lastMessage = [...currChat.messagesData.messages].pop() || {};
+    const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.displayName);
+    await addMessage(text, currChat.chatData.chatID, currUser.uid, db, willRenderTimeAndSender);
   };
 
   return (

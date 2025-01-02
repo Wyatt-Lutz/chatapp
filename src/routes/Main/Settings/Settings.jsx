@@ -6,8 +6,8 @@ import { db, actionCodeSettings } from "../../../../firebase";
 import { updateEmail, sendEmailVerification, updatePassword } from "firebase/auth";
 import ConfirmPassModal from "./ConfirmPassModal";
 import EmailNotVerified from "../../../utils/EmailNotVerified";
-import UsernameAvaliability from "../../../utils/UsernameAvaliability";
-import BlockedUsersModel from "./BlockedUsersModel";
+import UsernameAvailability from "../../../utils/UsernameAvailability";
+import BlockedUsersModal from "./BlockedUsersModal";
 import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
@@ -40,7 +40,7 @@ const Settings = () => {
   const displayPassModal = (header, text, isDeleteAccount) => {
     return new Promise((resolve) => {
 
-    
+
       const handlePasswordConfirmation = (state) => {
         if (!state) {
           console.error('something went wrong') //add error handling
@@ -121,7 +121,7 @@ const Settings = () => {
 
             {newUsername !== currUser.displayName && (
               <div>
-                <UsernameAvaliability newUsername={newUsername} setIsButtonDisabled={setIsEditUsernameDisabled} />
+                <UsernameAvailability newUsername={newUsername} setIsButtonDisabled={setIsEditUsernameDisabled} />
                 <button disabled={isEditUsernameDisabled} onClick={editUsername}>Save Username</button>
               </div>
 
@@ -151,7 +151,7 @@ const Settings = () => {
 
 
 
-          <button onClick={() => setModalDisplayment(<BlockedUsersModel changeDisplayment={setModalDisplayment} />)} className="bg-gray-500">Blocked Users</button>
+          <button onClick={() => setModalDisplayment(<BlockedUsersModal changeDisplayment={setModalDisplayment} />)} className="bg-gray-500">Blocked Users</button>
 
 
 

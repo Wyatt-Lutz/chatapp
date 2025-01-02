@@ -8,22 +8,22 @@ import { ChatContext } from "../../../../providers/ChatContext";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
-  const { chatRoomData, dispatch } = useContext(ChatContext);
+  const { currChat, dispatch } = useContext(ChatContext);
+  const chatID = currChat.chatData.chatID;
   const { currUser } = useContext(AuthContext);
 
-  console.log('topbar run')
 
-  const onFinishEditTitle = async(text) => {
+  const onFinishEditTitle = async({ title }) => {
     resetField('title');
     setIsEditingTitle(false);
-    if (text.title === "") {
+    if (title === "") {
       return;
     }
-    await editTitle(text.title, chatRoomData.chatID, db, currUser.displayName);
+    await editTitle(title, chatID , db, currUser.displayName);
   }
 
   useEffect(() => {
-    const titleRef = ref(db, "chats/" + chatRoomData.chatID + "/title");
+    const titleRef = ref(db, `chats/${chatID}/title`);
 
     const chatsChangeListener = onChildChanged(titleRef, (snap) => {
       console.log(snap.val());
@@ -34,18 +34,18 @@ const TopBar = () => {
       chatsChangeListener();
     }
 
-  }, [dispatch, chatRoomData.chatID]);
+  }, [dispatch, chatID]);
 
   return (
     <div className="ring" onMouseOver={() => setIsEditingTitle(true)} onMouseLeave={() => setIsEditingTitle(false)}>
 
       {isEditingTitle ? (
         <form onSubmit={handleSubmit(onFinishEditTitle)}>
-          <input {...register('title', {required: false})} placeholder={chatRoomData.title} onBlur={handleSubmit(onFinishEditTitle)}></input>
+          <input {...register('title', {required: false})} placeholder={currChat.chatData.title || currChat.chatData.tempTitle} onBlur={handleSubmit(onFinishEditTitle)}></input>
         </form>
 
       ) : (
-        <div>{chatRoomData.title}</div>
+        <div>{currChat.chatData.title || currChat.chatData.tempTitle}</div>
       )}
 
     </div>
@@ -54,4 +54,4 @@ const TopBar = () => {
   )
 }
 
-export default memo(TopBar);
+export default TopBar;

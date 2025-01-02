@@ -5,12 +5,12 @@ import { db } from "../../../../firebase";
 import { AuthContext } from "../../../providers/AuthProvider";
 import Minus from "../../../styling-components/Minus";
 
-const BlockedUsersModel = ({changeDisplayment}) => {
+const BlockedUsersModal = ({changeDisplayment}) => {
   const { currUser } = useContext(AuthContext);
   const [blockedUsers, setBlockedUsers] = useState({});
   const [usernames, setUsernames] = useState({});
 
-  
+
   useEffect(() => {
     const fetchBlockedUsers = async() => {
       const blockedUsers = await getBlockData(db, currUser.uid);
@@ -68,4 +68,4 @@ const BlockedUsersModel = ({changeDisplayment}) => {
 
 }
 
-export default memo(BlockedUsersModel);
+export default BlockedUsersModal;

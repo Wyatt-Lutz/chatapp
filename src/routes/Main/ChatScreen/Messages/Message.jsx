@@ -10,10 +10,8 @@ import { AuthContext } from "../../../../providers/AuthProvider";
 
 
 const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState }) => {
-  const { membersData } = useContext(MembersContext);
-  console.log('chat run');
   const { register, handleSubmit, resetField } = useForm();
-  const { chatRoomData } = useContext(ChatContext);
+  const { currChat } = useContext(ChatContext);
 
   const { currUser } = useContext(AuthContext);
   const { clicked, setClicked, points, setPoints } = useContextMenu();
@@ -21,23 +19,19 @@ const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState 
 
 
 
-  //const memberObjOfSender = membersData.members.get(messageData.sender);
-  console.log(membersData.members);
 
-
-
-  const onSubmitEdit = async(text) => {
+  const onSubmitEdit = async({ editMessage }) => {
     resetField('editMessage');
-    await editMessage(messageUid, text.editMessage, chatRoomData.chatID, db);
+    await editMessage(messageUid, editMessage, currChat.chatData.chatID, db);
     await changeEditState(messageUid, false);
   }
-  
 
-  const handleContextMenu = (e, id, text, sender) => {
+
+  const handleContextMenu = (e, messageUid, messageData) => {
     e.preventDefault();
     setClicked(true);
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({ id, text, sender });
+    setContextMenuData({ messageUid, text: messageData.text, sender: messageData.sender });
   }
 
   return (
@@ -45,7 +39,7 @@ const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState 
       <div onContextMenu={(e) => handleContextMenu(e, messageUid, messageData)} className="hover:bg-gray-600">
         {(messageData.renderTimeAndSender || isFirst) && (
           <div className="flex">
-            
+
             {memberObjOfSender && memberObjOfSender.isBlocked ? (
               <div>Blocked User</div>
             ) : (

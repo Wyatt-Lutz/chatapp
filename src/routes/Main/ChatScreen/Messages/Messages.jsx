@@ -5,28 +5,27 @@ import { ChatContext } from "../../../../providers/ChatContext";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
 import { fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
-import { MessagesContext } from "../../../../providers/MessagesContext";
 import Message from "./Message"
 import Input from "./Input";
 
 
 const Messages = () => {
-  const { chatRoomData } = useContext(ChatContext);
-  const { messagesData } = useContext(MessagesContext);
+  const { currChat, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
-  const { dispatch } = useContext(MessagesContext);
+  const chatID = currChat.chatData.chatID;
+  const numUnread = currChat.messageData.numUnread;
+  const isAtBottom = currChat.messageData.isAtBottom;
 
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
-  
+
 
 
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
 
-  
 
-
+  //Intersection Observer configurations
   const [containerRef, isVisible] = useElementOnScreen({
     root: null,
     rootMargin: "0px",
@@ -35,30 +34,29 @@ const Messages = () => {
 
 
   useEffect(() => {
-    if (!chatRoomData.chatID) {
+    if (!chatID) {
       console.info("chatID undefined");
       return;
     }
 
     const handleUserOffline = () => {
-      updateUserOnlineStatus(false, db, chatRoomData.chatID, currUser.uid);
+      updateUserOnlineStatus(false, db, chatID, currUser.uid);
     };
 
     const handleScroll = () => {
-      const atBottom = messagesData.atBottom
       const scrollTop = messagesContainerRef.current.scrollTop;
       setScrolled(true);
-  
-      if (scrollTop !== 0 && (atBottom)) {
+
+      if (scrollTop !== 0 && (isAtBottom)) {
         dispatch({type: "UPDATE_AT_BOTTOM", payload: false});
-      } else if (scrollTop === 0 && (!atBottom)) {
+      } else if (scrollTop === 0 && (!isAtBottom)) {
         dispatch({type: "UPDATE_AT_BOTTOM", payload: true});
         dispatch({type: "UPDATE_UNREAD", payload: 0});
       }
-  
+
     };
 
-    updateUserOnlineStatus(true, db, chatRoomData.chatID, currUser.uid);
+    updateUserOnlineStatus(true, db, chatID, currUser.uid);
 
 
     const container = messagesContainerRef.current;
@@ -69,7 +67,7 @@ const Messages = () => {
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
     }
-  }, [chatRoomData.chatID, currUser.uid, dispatch, messagesData.atBottom]);
+  }, [chatID, currUser.uid, dispatch, isAtBottom]);
 
 
 
@@ -79,21 +77,21 @@ const Messages = () => {
     }
 
     const handleFetchMore = debounce(async() => {
-      const messageData = await fetchChats(messagesData.endTimestamp, db, chatRoomData.chatID);
-  
+      const messageData = await fetchChats(currChat.messageData.endTimestamp, db, chatID);
+
       if (messageData && messageData.size > 0) {
         dispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
         dispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
       }
     }, 300);
-  }, [isVisible, scrolled, dispatch, chatRoomData.chatID]);
+  }, [isVisible, scrolled, dispatch, chatID, currChat.messageData.endTimestamp]);
 
 
   useEffect(() => {
-    if(lastMessageRef.current && messagesData.atBottom) {
+    if(lastMessageRef.current && isAtBottom) {
       lastMessageRef.current.scrollIntoView({behavior: 'smooth'});
     }
-  }, [messagesData.atBottom]);
+  }, [isAtBottom]);
 
 
 
@@ -112,13 +110,13 @@ const Messages = () => {
 
               <div>
 
-                {Array.from(messagesData.messages.entries()).map(([messageUid, messageData], index) => {
+                {[...currChat.messageData.messages].map(([messageUid, messageData], index) => {
                   return (
                     <div key={messageUid}>
                       <Message messageUid={messageUid} messageData={messageData} isFirst={index === 0} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
 
-                    
-                  
+
+
                       {index === messageData.size - 1 && (
                         <div ref = {lastMessageRef} />
                       )}
@@ -134,8 +132,8 @@ const Messages = () => {
         <div className="flex border min-h-10" ref={containerRef}></div>
       </div>
 
-      {messagesData.numUnread > 0 && (
-        <div>{messagesData.numUnread} new messages</div>
+      {numUnread > 0 && (
+        <div>{numUnread} new messages</div>
       )}
 
 

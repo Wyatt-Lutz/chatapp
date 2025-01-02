@@ -60,13 +60,12 @@ const updateUnreadCount = async(db, chatID) => {
 }
 
 /**
- * Determines whether to show the timestamp and the sender of each message. 
- * Does not render them if the last message was sent by the client user and the last message was less than 5 minutes ago. 
- * @param {*} lastMessage 
- * @param {*} currUser 
- * @returns 
+ * Determines whether to show the timestamp and the sender of each message.
+ * Does not render them if the last message was sent by the client user and the last message was less than 5 minutes ago.
+ * @param {*} lastMessage
+ * @param {*} currUser
+ * @returns
  */
-
 export const calculateRenderTimeAndSender = (lastMessage, currUserDisplayName) => {
   if (lastMessage && lastMessage.sender === currUserDisplayName && (Date.now() - lastMessage.timestamp < 180000)) {
     return false;
