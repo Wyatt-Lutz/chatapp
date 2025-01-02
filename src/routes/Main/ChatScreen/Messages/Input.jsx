@@ -4,22 +4,23 @@ import { AuthContext } from "../../../../providers/AuthProvider";
 import { ChatContext } from "../../../../providers/ChatContext";
 import { MessagesContext } from "../../../../providers/MessagesContext";
 import { db } from "../../../../../firebase";
-import { addMessage } from "../../../../services/messageDataService";
+import { addMessage, calculateRenderTimeAndSender } from "../../../../services/messageDataService";
 
 
-const Input = ({calculateRenderTimeAndSender}) => {
+const Input = () => {
   const { register, handleSubmit, resetField } = useForm();
   const { currUser } = useContext(AuthContext);
-  const { data } = useContext(ChatContext);
+  const { chatRoomData } = useContext(ChatContext);
   const { messagesData } = useContext(MessagesContext);
 
   console.log('input run');
   const handleAddMessage = async(text) => {
     resetField('text');
-
-    const lastMessage = messagesData[messagesData.length - 1];
-    const willRenderTimeAndSender = await calculateRenderTimeAndSender(lastMessage);
-    await addMessage(text.text, data.chatID, currUser.uid, db, willRenderTimeAndSender);
+    
+    const lastMessage = [...messagesData.messages.entries()].pop() || {};
+    console.log(lastMessage);
+    const willRenderTimeAndSender = await calculateRenderTimeAndSender(lastMessage, currUser.displayName);
+    await addMessage(text.text, chatRoomData.chatID, currUser.uid, db, willRenderTimeAndSender);
 
 
   };

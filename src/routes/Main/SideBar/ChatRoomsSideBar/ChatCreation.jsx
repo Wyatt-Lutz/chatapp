@@ -91,7 +91,6 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     console.log(newChatID);
     //setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);
-    const ownerUid = currUser.uid;
     //dispatch({ type: "CHANGE_CHAT", payload: { newChatID, title, ownerUid }});
   }
 

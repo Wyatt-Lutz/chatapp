@@ -6,19 +6,21 @@ import { queryMessages } from "../../../services/searchDataService";
 import { calcTime } from "../../../services/messageDataService";
 import { MembersContext } from "../../../providers/MembersContext";
 import { ChatContext } from "../../../providers/ChatContext";
+import Message from "./Messages/Message";
 
 const Search = () => {
   const { register, watch } = useForm();
   const searchQuery = watch('searchQuery', '');
   const { chatRoomData } = useContext(ChatContext);
-  const {membersData} = useContext(MembersContext);
+  const { membersData } = useContext(MembersContext);
   const [searchedMessages, setSearchedMessages] = useState([]);
 
   useEffect(() => {
+
     if (!searchQuery) {
       return;
     }
-    const fetchMessagesWithQuery = async() => {
+    const fetchMessagess = async() => {
       const messagesObject = await queryMessages(db, chatRoomData.chatID, searchQuery);
       console.log("uisng object.keys: " + messagesObject);
       const messagesArray = Object.keys(messagesObject).map(key => ({
@@ -27,13 +29,9 @@ const Search = () => {
       }));
       setSearchedMessages(messagesArray);
     }
-    fetchMessagesWithQuery();
-  }, [searchQuery, chatRoomData.chatID]);
+    fetchMessagess();
 
-  const fetchUsername = (message) => {
-    const memberObjOfSender = membersData.members[message.sender];
-    return memberObjOfSender.username;
-  }
+  }, [searchQuery, chatRoomData.chatID]);
 
   return (
     <>
@@ -41,19 +39,9 @@ const Search = () => {
       {searchQuery && (
         <div>
           {searchedMessages?.map((message, index) => (
-            <>
-              <div className="flex">
-                <img src="" alt="helllo"/>
-                <div>{fetchUsername(message)}</div>
-                <div>{calcTime(message.timestamp)}</div>
-              </div>
-              <div className="text-wrap">
-                <div className="text-xl font-bold py-2 w-max">{message.text}</div>
-                {message.hasBeenEdited && (
-                  <div>Edited</div>
-                )}
-              </div>
-            </>
+            <div className="flex">
+              <Message />
+            </div>
           ))}
         </div>
       )}

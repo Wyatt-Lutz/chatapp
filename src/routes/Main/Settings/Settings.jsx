@@ -8,6 +8,7 @@ import ConfirmPassModal from "./ConfirmPassModal";
 import EmailNotVerified from "../../../utils/EmailNotVerified";
 import UsernameAvaliability from "../../../utils/UsernameAvaliability";
 import BlockedUsersModel from "./BlockedUsersModel";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
   const { currUser } = useContext(AuthContext);
@@ -135,8 +136,6 @@ const Settings = () => {
               <button onClick={editEmail}>Save Email</button>
             )}
           </div>
-
-
 
 
 

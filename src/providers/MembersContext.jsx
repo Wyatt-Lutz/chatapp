@@ -43,14 +43,12 @@ export const MembersContextProvider = ({ children }) => {
   const { currUser } = useContext(AuthContext);
 
   useEffect(() => {
-    console.log(chatRoomData.chatID);
     if (!chatRoomData.chatID) return;
     
-
     const membersRef = ref(db, `members/${chatRoomData.chatID}`);
 
     const handleMemberAdded = async(snap) => {
-      console.log("handleMemberAdded: " + snap.val());
+      console.log("handleMemberAdded: " + snap.val().username);
       const userBlockData = await getBlockData(db, currUser.uid);
       console.log(userBlockData);
       const memberObj = {...snap.val(), isBlocked: userBlockData[snap.key]};
@@ -66,7 +64,7 @@ export const MembersContextProvider = ({ children }) => {
       const member = state.members.get(snap.key);
       if (!member) return;
       for (const prop in snap.val()) {
-        if (snap.val().hasOwnProperty(prop)) {
+        if (Object.prototype.hasOwnProperty.call(snap.val(), prop)) {
           member[prop] = snap.val()[prop];
         }
       }
@@ -86,7 +84,7 @@ export const MembersContextProvider = ({ children }) => {
       memberRemovedListener();
       memberUpdatedListener();
     }
-  }, [chatRoomData.chatID]);
+  }, [chatRoomData.chatID, currUser.uid, state.members]);
 
 
   return(

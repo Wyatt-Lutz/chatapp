@@ -7,7 +7,7 @@ import { ChatContext } from "./ChatContext";
 export const MessagesContext = createContext();
 
 const initialState = {
-  messages: [],
+  messages: new Map(),
   endTimestamp: 0,
   numUnread: 0,
   isAtBottom: true,
@@ -18,22 +18,22 @@ const messagesReducer = (state, action) => {
     case "ADD_MESSAGE":
       return {
         ...state,
-        messages: [...state.messages, action.payload],
+        messages: state.messages.set(action.payload.key, action.payload.data)
       };
     case "ADD_OLDER_MESSAGES":
       return {
         ...state,
-        messages: [...action.payload, ...state.messages],
+        messages: new Map([...state.messages, ...action.payload]),
       }
     case "EDIT_MESSAGE":
       return {
         ...state,
-        messages: [...state.messages, action.payload],
+        messages: state.messages.set(action.payload.key, action.payload.data),
       };
     case "REMOVE_MESSAGE":
       return {
         ...state,
-        messages: delete state.messages.action.payload,
+        messages: state.messages.delete(action.payload),
       };
     case "UPDATE_END_TIMESTAMP":
       return {
@@ -66,11 +66,11 @@ export const MessagesContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(messagesReducer, initialState);
 
   useEffect(() => {
-    if (!chatRoomData) return;
+    if (!chatRoomData.chatID) return;
     const handleMessageAdded = (snap) => {
       console.log("key:" + snap.key);
       console.log("data:" + snap.val());
-      if (state.messages.length === 0) {
+      if (state.messages.size === 0) {
         dispatch({type: "UPDATE_END_TIMESTAMP", payload: snap.val().timestamp});
       }
   
@@ -78,11 +78,18 @@ export const MessagesContextProvider = ({ children }) => {
         dispatch({type: "UPDATE_UNREAD", payload: (state.numUnread + 1)});
       }
   
-      dispatch({type: "ADD_MESSAGE", payload: {[snap.key]: snap.val()}});
+      dispatch({type: "ADD_MESSAGE", payload: {key: snap.key, data: snap.val()}});
     }
   
     const handleMessageEdited = (snap) => {
-      dispatch({type: "EDIT_MESSAGE", payload: {[snap.key]: snap.val()}});
+      const message = state.messages.get(snap.key);
+      if (!message) return;
+      for (const prop in snap.val()) {
+        if (Object.prototype.hasOwnProperty.call(snap.val(), prop)) {
+          message[prop] = snap.val()[prop];
+        }
+      }
+      dispatch({type: "EDIT_MESSAGE", payload: {key: snap.key, data: message}});
     }
   
     const handleMessageDeleted = (snap) => {
@@ -104,10 +111,10 @@ export const MessagesContextProvider = ({ children }) => {
       chatChangedListener();
       chatRemovedListener();
     };
-  },[chatRoomData, state.endTimestamp, state.isAtBottom, state.messages.length, state.numUnread])
+  },[chatRoomData.chatID, state.endTimestamp, state.numUnread, state.isAtBottom, state.messages])
 
   return (
-    <MessagesContext.Provider value={{ messageData: state, dispatch }}>
+    <MessagesContext.Provider value={{ messagesData: state, dispatch }}>
       { children }
     </MessagesContext.Provider>
   )

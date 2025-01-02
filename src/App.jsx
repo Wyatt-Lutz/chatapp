@@ -21,7 +21,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div>Loading App...</div>}>
         <Routes>
           <Route path="/">
             <Route index element={<AuthProtected><Main /></AuthProtected>}></Route>

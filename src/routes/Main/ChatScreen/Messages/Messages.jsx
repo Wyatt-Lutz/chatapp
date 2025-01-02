@@ -4,28 +4,27 @@ import { debounce } from 'lodash';
 import { ChatContext } from "../../../../providers/ChatContext";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
-import { calculateRenderTimeAndSender, fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
-import { useContextMenu } from "../../../../hooks/useContextMenu";
+import { fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
 import { MessagesContext } from "../../../../providers/MessagesContext";
 import Message from "./Message"
 import Input from "./Input";
-import MessagesContextMenu from "./MessagesContextMenu";
+
 
 const Messages = () => {
   const { chatRoomData } = useContext(ChatContext);
-  const { messageData } = useContext(MessagesContext);
+  const { messagesData } = useContext(MessagesContext);
   const { currUser } = useContext(AuthContext);
   const { dispatch } = useContext(MessagesContext);
 
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
-  const [contextMenuData, setContextMenuData] = useState({});
+  
 
 
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
 
-  const { clicked, setClicked, points, setPoints } = useContextMenu();
+  
 
 
   const [containerRef, isVisible] = useElementOnScreen({
@@ -46,7 +45,7 @@ const Messages = () => {
     };
 
     const handleScroll = () => {
-      const atBottom = messageData.atBottom
+      const atBottom = messagesData.atBottom
       const scrollTop = messagesContainerRef.current.scrollTop;
       setScrolled(true);
   
@@ -70,23 +69,7 @@ const Messages = () => {
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
     }
-  }, [chatRoomData.chatID, currUser.uid, dispatch, messageData.atBottom]);
-
-
-
-
-
-
-
-
-  const handleContextMenu = (e, id, text, sender) => {
-    e.preventDefault();
-    setClicked(true);
-    setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({ id, text, sender });
-  }
-
-
+  }, [chatRoomData.chatID, currUser.uid, dispatch, messagesData.atBottom]);
 
 
 
@@ -96,9 +79,9 @@ const Messages = () => {
     }
 
     const handleFetchMore = debounce(async() => {
-      const messageData = await fetchChats(messageData.endTimestamp, db, chatRoomData.chatID);
+      const messageData = await fetchChats(messagesData.endTimestamp, db, chatRoomData.chatID);
   
-      if (messageData && messageData.length > 0 && messageData[0]) {
+      if (messageData && messageData.size > 0) {
         dispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
         dispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
       }
@@ -107,10 +90,10 @@ const Messages = () => {
 
 
   useEffect(() => {
-    if(lastMessageRef.current && messageData.atBottom) {
+    if(lastMessageRef.current && messagesData.atBottom) {
       lastMessageRef.current.scrollIntoView({behavior: 'smooth'});
     }
-  }, [messageData.atBottom]);
+  }, [messagesData.atBottom]);
 
 
 
@@ -129,34 +112,30 @@ const Messages = () => {
 
               <div>
 
-                {messageData?.messages.map((chat, index) => {
-                  const {id, message} = chat;
+                {Array.from(messagesData.messages.entries()).map(([messageUid, messageData], index) => {
                   return (
-                    <div key={id}>
+                    <div key={messageUid}>
+                      <Message messageUid={messageUid} messageData={messageData} isFirst={index === 0} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
 
-                    <div onContextMenu={(e) => handleContextMenu(e, id, message.text, message.sender)} className="hover:bg-gray-600">
-                      <Message chat={chat} isFirst={index === 0} isEditing={editState[id]} changeEditState={changeEditState}/>
+                    
+                  
+                      {index === messageData.size - 1 && (
+                        <div ref = {lastMessageRef} />
+                      )}
+
                     </div>
-
-                    {index === messageData.length - 1 && (
-                      <div ref = {lastMessageRef} />
-                    )}
-
-                  </div>
                   )
                 })}
               </div>
 
-            <Input calculateRenderTimeAndSender={calculateRenderTimeAndSender} />
+            <Input />
         </div>
 
         <div className="flex border min-h-10" ref={containerRef}></div>
       </div>
-      {(clicked && contextMenuData.sender === currUser.displayName) && (
-        <MessagesContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
-      )}
-      {messageData.numUnread > 0 && (
-        <div>{messageData.numUnread} new messages</div>
+
+      {messagesData.numUnread > 0 && (
+        <div>{messagesData.numUnread} new messages</div>
       )}
 
 
@@ -166,4 +145,4 @@ const Messages = () => {
   )
 }
 
-export default memo(Messages);
+export default Messages;

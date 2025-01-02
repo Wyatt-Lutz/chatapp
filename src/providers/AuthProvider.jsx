@@ -19,7 +19,7 @@ export const AuthContextProvider = ({ children }) => {
   }, []);
 
   if (loading) {
-    return <div>...</div>
+    return <div>Authenticating...</div>
   }
 
   return(

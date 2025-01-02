@@ -1,7 +1,6 @@
 import { onChildChanged, ref } from "firebase/database";
-import { createContext, useContext, useEffect, useReducer } from "react";
+import { createContext, useEffect, useReducer } from "react";
 import { db } from "../../firebase";
-import { ChatroomsContext } from "./ChatroomsContext";
 
 
 export const ChatContext = createContext();

@@ -67,9 +67,8 @@ const updateUnreadCount = async(db, chatID) => {
  * @returns 
  */
 
-export const calculateRenderTimeAndSender = (lastMessage, currUser) => {
-
-  if (lastMessage && lastMessage.sender === currUser.displayName && (Date.now() - lastMessage.timestamp < 180000)) {
+export const calculateRenderTimeAndSender = (lastMessage, currUserDisplayName) => {
+  if (lastMessage && lastMessage.sender === currUserDisplayName && (Date.now() - lastMessage.timestamp < 180000)) {
     return false;
   }
   return true;
@@ -100,16 +99,16 @@ export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, uid) =>
 
 
 
-export const editMessage = async(id, text, chatID, db) => {
-  const chatRef = ref(db, "messages/" + chatID + "/" + id);
+export const editMessage = async(messageUid, text, chatID, db) => {
+  const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
   await update(chatRef, {
     text: text,
     hasBeenEdited: true
   });
 }
 
-export const deleteMessage = async(id, db, chatID) => {
-  const chatRef = ref(db, "messages/" + chatID + "/" + id);
+export const deleteMessage = async(messageUid, db, chatID) => {
+  const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
   await remove(chatRef);
 }
 
