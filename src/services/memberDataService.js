@@ -16,7 +16,7 @@ export const updateBlockedStatus = async(db, clientUserUid, uidToBlock, newBlock
 }
 
 
-export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid) => {
+export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, memberDispatch) => {
   console.log('removeUserFromChat run');
 
 
@@ -35,6 +35,7 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   const membersListSnap = await get(membersRef);
   console.log(membersListSnap.val());
   if (Object.keys(membersListSnap.val()).length < 3) {
+    memberDispatch({type: "RESET"});
     await Promise.all([
       remove(membersRef),
       remove(currUserChatsInRef),

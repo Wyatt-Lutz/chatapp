@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { changeUsername, deleteAccount, changeEmail } from "../../../services/settingsDataService";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../providers/AuthProvider";
-import { db, actionCodeSettings } from "../../../../firebase";
+import { db } from "../../../../firebase";
 import { updateEmail, sendEmailVerification, updatePassword } from "firebase/auth";
 import ConfirmPassModal from "./ConfirmPassModal";
 import EmailNotVerified from "../../../utils/EmailNotVerified";
@@ -77,7 +77,7 @@ const Settings = () => {
     await displayPassModal(passwordModalHeader, passwordModalText);
 
     await updateEmail(currUser, newEmail);
-    await sendEmailVerification(currUser, actionCodeSettings);
+    await sendEmailVerification(currUser);
     setModalDisplayment(
       <EmailNotVerified
         email={currUser.email}

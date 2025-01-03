@@ -6,16 +6,15 @@ import { ChatContext } from "../../../../providers/ChatContext";
 const ChatRoomContextMenu = ({chatRoomID, points}) => {
   console.log('chatroom context menu')
   const { currUser } = useContext(AuthContext);
-  const { dispatch } = useContext(ChatContext);
+  const { memberDispatch } = useContext(ChatContext);
 
   const onRemoveUserFromChat = async() => {
     try {
-      await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid);
+      await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid, memberDispatch);
     } catch (err) {
       console.error(err);
       return;
     }
-    dispatch({type: "RESET"});
 
   }
 

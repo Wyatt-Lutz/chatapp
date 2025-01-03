@@ -8,11 +8,11 @@ import Search from './Search';
 import { ChatContext } from '../../../providers/ChatContext';
 
 const ChatScreen = () => {
-  const { currChat } = useContext(ChatContext);
-  const chatID = currChat.chatData.chatID
+  console.log('chatScreen run');
+  const { chatState } = useContext(ChatContext);
   return(
     <section>
-      {!chatID ? (
+      {!chatState.chatID ? (
         <div>Chat Requests</div>
       ) : (
         <>
@@ -25,7 +25,7 @@ const ChatScreen = () => {
 
 
           </div>
-          <Search />
+
         </>
 
       )}

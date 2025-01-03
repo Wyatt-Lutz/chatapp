@@ -6,30 +6,40 @@ import { ChatContext } from "../../../providers/ChatContext";
 import Message from "./Messages/Message";
 
 const Search = () => {
+  console.log('search run');
   const { register, watch } = useForm();
   const searchQuery = watch('searchQuery', '');
-  const { currChat } = useContext(ChatContext);
-  const chatID = currChat.chatData.chatID;
-  const [searchedMessages, setSearchedMessages] = useState([]);
-
+  const { chatState } = useContext(ChatContext);
+  const chatID = chatState.chatID;
+  const searchedMessages = new Map();
+/*
   useEffect(() => {
 
     if (!searchQuery) {
       return;
     }
+
     const fetchMessages = async() => {
       const messagesObject = await queryMessages(db, chatID, searchQuery);
-      console.log("using object.keys: " + messagesObject);
+      console.log("using object.keys: " + Object.values(messagesObject));
+      messages
+      searchedMessages.set(messagesObject.key)
+
+      const messageData = []
+      snap.forEach((child) => {
+        messageData.push(child.val());
+      })
+
       const messagesArray = Object.keys(messagesObject).map(key => ({
-        id: key,
-        ...messagesObject[key],
+
       }));
-      setSearchedMessages(messagesArray);
+
+
     }
     fetchMessages();
 
   }, [searchQuery, chatID]);
-
+*/
   return (
     <>
       <input type="text" placeholder="Search messages..." {...register('searchQuery')}/>

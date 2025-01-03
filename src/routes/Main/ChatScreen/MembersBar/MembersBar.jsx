@@ -4,8 +4,9 @@ import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
 import { ChatContext } from "../../../../providers/ChatContext";
 const MembersBar = () => {
-  const { currChat } = useContext(ChatContext);
-  const members = currChat.memberData.members;
+  console.log('memberBar run');
+  const { memberState } = useContext(ChatContext);
+  const members = memberState.members;
 
   const { clicked, setClicked, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
@@ -19,13 +20,22 @@ const MembersBar = () => {
   return (
     <div>
       <div>Members:</div>
-      {[...members].map(([memberUid, memberData]) => (
-        <div key={memberUid}>
-          <div onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
-            <Member memberUid={memberUid} memberData={memberData} />
-          </div>
-        </div>
-      ))}
+      <>
+        {!members ? (
+          <div>Loading members...</div>
+        ) : (
+          <>
+            {[...members].map(([memberUid, memberData]) => (
+              <div key={memberUid}>
+                <div onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
+                  <Member memberUid={memberUid} memberData={memberData} />
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+      </>
+
 
 
       {clicked && (

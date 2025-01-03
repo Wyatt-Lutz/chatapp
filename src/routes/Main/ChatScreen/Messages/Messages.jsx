@@ -10,11 +10,14 @@ import Input from "./Input";
 
 
 const Messages = () => {
-  const { currChat, dispatch } = useContext(ChatContext);
+  console.log('messagessss run');
+  const { chatState, messageState, messageDispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
-  const chatID = currChat.chatData.chatID;
-  const numUnread = currChat.messageData.numUnread;
-  const isAtBottom = currChat.messageData.isAtBottom;
+  const chatID = chatState.chatID;
+  const numUnread = messageState.numUnread;
+  const isAtBottom = messageState.isAtBottom;
+  const endTimestamp = messageState.endTimestamp;
+  const messages = messageState.messages
 
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
@@ -48,10 +51,10 @@ const Messages = () => {
       setScrolled(true);
 
       if (scrollTop !== 0 && (isAtBottom)) {
-        dispatch({type: "UPDATE_AT_BOTTOM", payload: false});
+        messageDispatch({type: "UPDATE_AT_BOTTOM", payload: false});
       } else if (scrollTop === 0 && (!isAtBottom)) {
-        dispatch({type: "UPDATE_AT_BOTTOM", payload: true});
-        dispatch({type: "UPDATE_UNREAD", payload: 0});
+        messageDispatch({type: "UPDATE_AT_BOTTOM", payload: true});
+        messageDispatch({type: "UPDATE_UNREAD", payload: 0});
       }
 
     };
@@ -67,24 +70,27 @@ const Messages = () => {
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
     }
-  }, [chatID, currUser.uid, dispatch, isAtBottom]);
+  }, [chatID, currUser.uid, messageDispatch, isAtBottom]);
 
 
 
   useEffect(() => {
+
+
+    const handleFetchMore = debounce(async() => {
+      const messageData = await fetchChats(endTimestamp, db, chatID);
+
+      if (messageData && messageData.size > 0) {
+        messageDispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
+        messageDispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
+      }
+    }, 300);
+
+
     if (isVisible && scrolled) {
       handleFetchMore();
     }
-
-    const handleFetchMore = debounce(async() => {
-      const messageData = await fetchChats(currChat.messageData.endTimestamp, db, chatID);
-
-      if (messageData && messageData.size > 0) {
-        dispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
-        dispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
-      }
-    }, 300);
-  }, [isVisible, scrolled, dispatch, chatID, currChat.messageData.endTimestamp]);
+  }, [isVisible, scrolled, messageDispatch, chatID, endTimestamp]);
 
 
   useEffect(() => {
@@ -109,21 +115,28 @@ const Messages = () => {
           <div className="flex-grow">
 
               <div>
+                {!messages ? (
+                  <div>Loading...</div>
+                ) : (
+                  <>
+                    {[...messages].map(([messageUid, messageData], index) => {
+                      return (
+                        <div key={messageUid}>
+                          <Message messageUid={messageUid} messageData={messageData} isFirst={index === 0} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
 
-                {[...currChat.messageData.messages].map(([messageUid, messageData], index) => {
-                  return (
-                    <div key={messageUid}>
-                      <Message messageUid={messageUid} messageData={messageData} isFirst={index === 0} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
 
 
+                          {index === messageData.size - 1 && (
+                            <div ref = {lastMessageRef} />
+                          )}
 
-                      {index === messageData.size - 1 && (
-                        <div ref = {lastMessageRef} />
-                      )}
+                        </div>
+                      )
+                    })}
+                  </>
+                )}
 
-                    </div>
-                  )
-                })}
+
               </div>
 
             <Input />

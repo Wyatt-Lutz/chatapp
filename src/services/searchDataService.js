@@ -5,6 +5,6 @@ export const queryMessages = async(db, chatID, searchQuery) => {
   const messagesQuery = query(messagesRef, orderByChild('text'), startAt(searchQuery), endAt(searchQuery + "\uf8ff"));
   const messagesSnap = await get(messagesQuery);
   console.log("queryMessageKey: " + messagesSnap.key);
-  console.log("queryMessageVal: " + messagesSnap.val());
+  console.log("queryMessageVal: " + Object.values(messagesSnap.val()));
   return messagesSnap;
 }

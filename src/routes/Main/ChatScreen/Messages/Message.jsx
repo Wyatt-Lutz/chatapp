@@ -1,28 +1,29 @@
 import { memo, useContext, useState } from "react"
-import { calcTime, editMessage } from "../../../../services/messageDataService";
+import { calcTime } from "../../../../services/messageDataService";
 import { useForm } from "react-hook-form";
 import { ChatContext } from "../../../../providers/ChatContext";
 import { db } from "../../../../../firebase";
-import { MembersContext } from "../../../../providers/MembersContext";
 import MessagesContextMenu from "./MessagesContextMenu";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import { AuthContext } from "../../../../providers/AuthProvider";
 
 
 const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState }) => {
+  console.log('message run');
   const { register, handleSubmit, resetField } = useForm();
-  const { currChat } = useContext(ChatContext);
+  const { chatState, memberState } = useContext(ChatContext);
 
   const { currUser } = useContext(AuthContext);
   const { clicked, setClicked, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
+  const memberDataOfSender = memberState.members.get(messageData.sender);
 
 
 
   const onSubmitEdit = async({ editMessage }) => {
     resetField('editMessage');
-    await editMessage(messageUid, editMessage, currChat.chatData.chatID, db);
+    await editMessage(messageUid, editMessage, chatState.chatID, db);
     await changeEditState(messageUid, false);
   }
 
@@ -40,10 +41,10 @@ const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState 
         {(messageData.renderTimeAndSender || isFirst) && (
           <div className="flex">
 
-            {memberObjOfSender && memberObjOfSender.isBlocked ? (
+            {memberDataOfSender && memberDataOfSender.isBlocked ? (
               <div>Blocked User</div>
             ) : (
-              <div>{memberObjOfSender && memberObjOfSender.username}</div>
+              <div>{memberDataOfSender && memberDataOfSender.username}</div>
             )}
 
             <div>{calcTime(messageData.timestamp)}</div>
@@ -57,8 +58,8 @@ const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState 
             </form>
           ) : (
             <>
-              {memberObjOfSender && memberObjOfSender.isBlocked ? (
-                <div></div>
+              {memberDataOfSender && memberDataOfSender.isBlocked ? (
+                <div>Blocked User</div>
               ) : (
                 <div className="text-wrap">
                 <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
@@ -80,4 +81,4 @@ const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState 
     </>
   )
 }
-export default Message;
+export default memo(Message);

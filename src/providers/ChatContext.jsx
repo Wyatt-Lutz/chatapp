@@ -7,28 +7,26 @@ import { db } from "../../firebase";
 
 export const ChatContext = createContext();
 
-const initialState = {
-  chatData: {
-    chatID: null,
-    title: '',
-    tempTitle: '',
-    owner: '',
-  },
-  memberData: new Map(),
-  messagesData: {
-    messages: new Map(),
-    endTimestamp: 0,
-    numUnread: 0,
-    isAtBottom: true,
-  }
-
+const initialChatState = {
+  chatID: null,
+  title: '',
+  tempTitle: '',
+  owner: '',
 };
+const initialMemberState = {members: new Map()};
+const initialMessageState = {
+  messages: new Map(),
+  endTimestamp: 0,
+  numUnread: 0,
+  isAtBottom: true,
+}
 
 
 const chatReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE_CHAT":
       //dispatch({type: "UPDATE_CHATROOM", payload: state});
+      console.log('changed');
       return {
         ...state,
         chatID: action.payload.chatID,
@@ -42,6 +40,8 @@ const chatReducer = (state, action) => {
       return { ...state, tempTitle: action.payload };
     case "UPDATE_OWNER":
       return {...state, owner: action.payload };
+    case "UPDATE_MEMBER_UIDS":
+      return {...state};
     case "RESET":
       return initialState;
     default:
@@ -51,10 +51,11 @@ const chatReducer = (state, action) => {
 
 
 const membersReducer = (state, action) => {
-  let newMembers = new Map(state.members);
+  let newMembers = new Map(state?.members);
   switch(action.type) {
     case "ADD_MEMBER":
     case "UPDATE_MEMBER_DATA":
+      console.log('add/update member');
       newMembers.set(action.payload.key, action.payload.data);
       return { ...state, members: newMembers };
     case "REMOVE_MEMBER":
@@ -67,10 +68,11 @@ const membersReducer = (state, action) => {
 
 
 const messagesReducer = (state, action) => {
-  let newMessages = new Map(state.members);
+  let newMessages = new Map(state?.messages);
   switch (action.type) {
     case "ADD_MESSAGE":
     case "EDIT_MESSAGE":
+      console.log('add message or edit message');
       newMessages.set(action.payload.key, action.payload.data);
       return { ...state, messages: newMessages };
 
@@ -99,32 +101,40 @@ const messagesReducer = (state, action) => {
   }
 }
 
-const rootReducer = (state, action) => ({
-  chat: chatReducer(state.chat, action),
-  members: membersReducer(state.members, action),
-  messages: messagesReducer(state.messages, action),
-});
-
 export const ChatContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(rootReducer, initialState);
+  const [chatState, chatDispatch] = useReducer(chatReducer, initialChatState);
+  const [memberState, memberDispatch] = useReducer(membersReducer, initialMemberState);
+  const [messageState, messageDispatch] = useReducer(messagesReducer, initialMessageState);
+
   const { currUser } = useContext(AuthContext);
+  const currUserUid = currUser?.uid;
 
 
-  const chatID = state.chatData.chatID;
-  const members = state.memberData.members;
-  const messages = state.messagesData.messages;
-  const endTimestamp = state.messagesData.endTimestamp;
-  const numUnread = state.messagesData.numUnread;
-  const isAtBottom = state.messagesData.isAtBottom;
+  const chatID = chatState.chatID;
+  const members = memberState.members;
+  const messages = messageState.messages;
+  const endTimestamp = messageState.endTimestamp;
+  const numUnread = messageState.numUnread;
+  const isAtBottom = messageState.isAtBottom;
 
 
 
   //Chatroom metadata Listeners useEffect
   useEffect(() => {
     if (!chatID) return;
+
     const onChatroomEdited = (snap) => {
-      console.log("key" + snap.key);
-      console.log("val" + snap.val());
+      const prop = snap.key; //property name
+
+      prop === 'title'
+      ? chatDispatch({ type: "UPDATE_TITLE", payload: snap.val() })
+      : prop === 'owner'
+      ? chatDispatch({ type: "UPDATE_OWNER", payload: snap.val() })
+      : prop === 'tempTitle'
+      ? chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: snap.val() })
+      : prop === 'memberUids'
+      ? chatDispatch({ type: "UPDATE_MEMBER_UIDS", payload: snap.val() })
+      : null;
     }
 
     const chatroomRef = ref(db, `chats/${chatID}`);
@@ -145,18 +155,17 @@ export const ChatContextProvider = ({ children }) => {
 
     const handleMemberAdded = async(snap) => {
       console.log("handleMemberAdded: " + snap.val().username);
-      const userBlockData = await getBlockData(db, currUser.uid);
-      console.log(userBlockData);
+      const userBlockData = await getBlockData(db, currUserUid);
       const memberObj = {...snap.val(), isBlocked: userBlockData[snap.key]};
-      dispatch({type:"ADD_MEMBER", payload: {key: snap.key, data: memberObj }});
+      memberDispatch({type:"ADD_MEMBER", payload: {key: snap.key, data: memberObj }});
     }
 
     const handleMemberRemoved = (snap) => {
-      dispatch({type: "REMOVE_MEMBER", payload: snap.key});
+      memberDispatch({type: "REMOVE_MEMBER", payload: snap.key});
     }
 
     const handleUpdateMember = (snap) => {
-
+      if (!members) return;
       const member = members.get(snap.key);
       if (!member) return;
       const data = snap.val();
@@ -165,7 +174,7 @@ export const ChatContextProvider = ({ children }) => {
         member[property] = data[property];
       }
 
-      dispatch({type: "UPDATE_MEMBER_DATA", payload: {key: snap.key, data: member}});
+      memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: snap.key, data: member}});
     }
 
 
@@ -180,7 +189,7 @@ export const ChatContextProvider = ({ children }) => {
       memberRemovedListener();
       memberUpdatedListener();
     }
-  }, [chatID, currUser.uid, members]);
+  }, [chatID, currUserUid]);
 
 
 
@@ -190,17 +199,15 @@ export const ChatContextProvider = ({ children }) => {
     if (!chatID) return;
 
     const handleMessageAdded = (snap) => {
-      console.log("key:" + snap.key);
-      console.log("data:" + snap.val());
       if (messages.size === 0) {
-        dispatch({type: "UPDATE_END_TIMESTAMP", payload: snap.val().timestamp});
+        messageDispatch({type: "UPDATE_END_TIMESTAMP", payload: snap.val().timestamp});
       }
 
       if (!isAtBottom) {
-        dispatch({type: "UPDATE_UNREAD", payload: (numUnread + 1)});
+        messageDispatch({type: "UPDATE_UNREAD", payload: (numUnread + 1)});
       }
 
-      dispatch({type: "ADD_MESSAGE", payload: {key: snap.key, data: snap.val()}});
+      messageDispatch({type: "ADD_MESSAGE", payload: {key: snap.key, data: snap.val()}});
     }
 
     const handleMessageEdited = (snap) => {
@@ -212,15 +219,14 @@ export const ChatContextProvider = ({ children }) => {
         message[property] = data[property];
       }
 
-      dispatch({type: "EDIT_MESSAGE", payload: {key: snap.key, data: message}});
+      messageDispatch({type: "EDIT_MESSAGE", payload: {key: snap.key, data: message}});
     }
 
     const handleMessageDeleted = (snap) => {
-      dispatch({type: "REMOVE_MESSAGE", payload: snap.key});
+      messageDispatch({type: "REMOVE_MESSAGE", payload: snap.key});
     }
 
     const chatsRef = ref(db, `messages/${chatID}/`);
-    const endTimestamp = endTimestamp;
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp), limitToLast(10));
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp));
 
@@ -234,19 +240,11 @@ export const ChatContextProvider = ({ children }) => {
       chatChangedListener();
       chatRemovedListener();
     };
-  }, [chatID, endTimestamp, numUnread, isAtBottom, messages]);
-
-
-
-
-
-
-
-
+  }, [chatID, endTimestamp, numUnread, isAtBottom]);
 
 
   return (
-    <ChatContext.Provider value={{ currChat: state, dispatch }}>
+    <ChatContext.Provider value={{ chatState, memberState, messageState, chatDispatch, memberDispatch, messageDispatch }}>
       {children}
     </ChatContext.Provider>
   );

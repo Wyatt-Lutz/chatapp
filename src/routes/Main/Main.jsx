@@ -1,9 +1,8 @@
 import { AuthContext } from '../../providers/AuthProvider';
 import ChatScreen from './ChatScreen/ChatScreen';
-
 import { sendEmailVerification, signOut } from 'firebase/auth';
 import { lazy, Suspense, useContext, useEffect, useState } from 'react';
-import { actionCodeSettings, auth } from '../../../firebase';
+import { auth } from '../../../firebase';
 import Settings from './Settings/Settings';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 const EmailNotVerified = lazy(() => import('../../utils/EmailNotVerified'));
@@ -24,7 +23,7 @@ const Main = () => {
         setEmailVerificationModal(true);
 
         if (!alreadySentVerification) {
-          await sendEmailVerification(currUser, actionCodeSettings);
+          await sendEmailVerification(currUser);
           localStorage.setItem('alreadySentVerification', true);
           console.info("Email Verification sent");
         }

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { db, auth } from "../../../firebase";
 import { createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
 import { ref, set } from 'firebase/database'
-import UsernameAvaliability from "../../utils/UsernameAvaliability.jsx";
+import UsernameAvaliability from "../../utils/UsernameAvailability.jsx";
 import { useState } from "react";
 
 

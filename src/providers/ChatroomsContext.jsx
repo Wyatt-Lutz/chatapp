@@ -18,7 +18,7 @@ const chatroomReducer = (state, action) => {
         ...state,
         chatrooms: [...state.chatrooms, action.payload],
       };
-    case "UPDATE_CHATROOM": 
+    case "UPDATE_CHATROOM":
       return {
         ...state,
         chatrooms: state.chatrooms.map((chatroom) => {
@@ -43,10 +43,10 @@ const chatroomReducer = (state, action) => {
 export const ChatroomsContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(chatroomReducer, initialState);
   const { currUser } = useContext(AuthContext);
-  
+
 
   useEffect(() => {
-    if (!currUser) return null;
+    if (!currUser) return;
     const chatsInRef = ref(db, `users/${currUser.uid}/chatsIn`);
 
     const handleChatroomAdded = async(snap) => {
@@ -54,11 +54,11 @@ export const ChatroomsContextProvider = ({ children }) => {
       const newChatRef = ref(db, `chats/${newChatID}`);
       const newChatSnap = await get(newChatRef);
       const newChatData = newChatSnap.val();
-      
+
       console.log("newChatDataVal:" + newChatData.memberUids);
-      
-  
-  
+
+
+
       newChatData.chatID = newChatID;
       console.log(newChatData.chatID);
 
@@ -66,14 +66,14 @@ export const ChatroomsContextProvider = ({ children }) => {
         dispatch({type: "ADD_CHATROOM", payload: newChatData}),
         dispatch({type: "UPDATE_UNREAD_COUNT", payload: {[newChatID]: snap.val()}}),
       ]);
-  
+
 
     }
-  
+
     const handleChatroomRemoved = (snap) => {
       dispatch({type: "REMOVE_CHATROOM", payload: snap.key });
     }
-  
+
     const handleUpdateUnread = (snap) => {
       dispatch({type: "UPDATE_UNREAD_COUNT", payload: {[snap.key]: snap.val()}});
     }

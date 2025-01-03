@@ -7,8 +7,8 @@ import { db } from "../../../../../firebase";
 
 
 const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
-  const { currChat, dispatch } = useContext(ChatContext);
-  const chatData = currChat.chatData;
+  console.log('membercontextMenu run');
+  const { chatState, chatDispatch, memberDispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
   console.log('membercontextmenu run');
 
@@ -16,17 +16,17 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
   const onChangeBlockStatus = async(newBlockStatus) => {
     await updateBlockedStatus(db, currUser.uid, memberUid, newBlockStatus);
     const newMemberObj = {[memberUid]: {...memberData, isBlocked: newBlockStatus}}
-    dispatch({type: "UPDATE_MEMBER_DATA", payload: newMemberObj});
+    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: newMemberObj});
   }
 
   const onRemoveMemberFromChat = async() => {
-    await removeUserFromChat(db, chatData.chatID, memberUid, memberData.username, currUser.uid, dispatch);
+    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, memberDispatch);
   }
 
 
   const onTransferOwnership = async() => {
-    await transferOwnership(db, chatData.chatID, memberUid);
-    dispatch({type: "UPDATE_OWNER", payload: memberUid});
+    await transferOwnership(db, chatState.chatID, memberUid);
+    chatDispatch({type: "UPDATE_OWNER", payload: memberUid});
   }
 
   return (
@@ -39,7 +39,7 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
             <button onClick={() => onChangeBlockStatus(true)}>Block User</button>
           )}
 
-          {currUser.uid === chatData.owner && (
+          {currUser.uid === chatState.owner && (
             <>
               <button onClick={onRemoveMemberFromChat}>Remove User</button>
               <button onClick={onTransferOwnership}>Transfer Ownership</button>
