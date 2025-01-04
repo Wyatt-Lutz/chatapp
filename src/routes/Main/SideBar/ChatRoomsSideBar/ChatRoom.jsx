@@ -1,20 +1,27 @@
 import { memo, useContext } from "react"
-import { ChatContext } from "../../../../ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 
-const ChatRoom = ({chat, numUnread}) => {
-  console.log('chat room')
-  const { data, dispatch } = useContext(ChatContext);
-
-  const handleChangeChat = (chatID, title, owner) => {
-    console.log(chatID);
-    dispatch({ type: "CHANGE_CHAT", payload: { chatID, title, owner }});
+const ChatRoom = ({chatroom, numUnread}) => {
+  console.log('chatRoom run');
+  const { chatState, chatDispatch } = useContext(ChatContext);
+  const handleChangeChat = () => {
+    chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: chatroom.chatID, title: chatroom.title, tempTitle: chatroom.tempTitle, owner: chatroom.owner }});
   };
 
   return (
 
     <div className="flex">
-      <button className="ring m-2" onClick={() => handleChangeChat(chat.id, chat.title, chat.owner)}>
-        {(data.chatID === chat.id && data.title) ? data.title : chat.title}
+      <button className="ring m-2" onClick={handleChangeChat}>
+        {chatState.chatID === chatroom.chatID ? (
+          <>
+            {chatState.title || chatState.tempTitle}
+          </>
+
+        ) : (
+          <>
+            {chatroom.title || chatroom.tempTitle}
+          </>
+        )}
       </button>
       <div>{numUnread}</div>
 
@@ -23,4 +30,4 @@ const ChatRoom = ({chat, numUnread}) => {
   )
 }
 
-export default memo(ChatRoom);
+export default ChatRoom;

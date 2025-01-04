@@ -1,43 +1,50 @@
-import { useContext, memo } from "react";
-import { ChatContext } from "../../../../ChatProvider";
-import { AuthContext } from "../../../../AuthProvider";
+import { useContext } from "react";
+import { ChatContext } from "../../../../providers/ChatContext";
+import { AuthContext } from "../../../../providers/AuthProvider";
 import { removeUserFromChat, transferOwnership, updateBlockedStatus } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 
 
 
-const MemberContextMenu = ({contextMenuData, points, clientUserIsOwner}) => {
-  const { data, dispatch } = useContext(ChatContext);
+const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
+  console.log('membercontextMenu run');
+  const { chatState, chatDispatch, memberDispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
-  console.log('membercontextmenu run');
-  const member = contextMenuData.member;
+
 
   const onChangeBlockStatus = async(newBlockStatus) => {
-    await updateBlockedStatus(db, currUser.uid, member.uid, newBlockStatus);
-    dispatch({type: "CHANGE_MEMBER", payload: { uid: member.uid, isOnline: member.isOnline, isBlocked: newBlockStatus, hasBeenRemoved: member.hasBeenRemoved, username: member.username }});
+    await updateBlockedStatus(db, currUser.uid, memberUid, newBlockStatus);
+    const newMemberObj = {...memberData, isBlocked: newBlockStatus}
+    console.log(newMemberObj);
+    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: memberUid, data: newMemberObj}});
+  }
+
+  const onRemoveMemberFromChat = async() => {
+    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, memberDispatch);
+  }
+
+
+  const onTransferOwnership = async() => {
+    await transferOwnership(db, chatState.chatID, memberUid);
+    chatDispatch({type: "UPDATE_OWNER", payload: memberUid});
   }
 
   return (
     <>
-      {member.uid !== currUser.uid && (
-        <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points?.y, left: points?.x}}>
-          {member.isBlocked ? (
+      {memberUid !== currUser.uid && (
+        <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
+          {memberData.isBlocked ? (
             <button onClick={() => onChangeBlockStatus(false)}>Unblock User</button>
           ) : (
             <button onClick={() => onChangeBlockStatus(true)}>Block User</button>
           )}
 
-          {currUser.uid === data.owner && (
+          {currUser.uid === chatState.owner && (
             <>
-              <button onClick={() => removeUserFromChat(db, data.chatID, member.uid, member.username, currUser.uid, dispatch)}>Remove User</button>
-              <button onClick={() => {
-                transferOwnership(db, data.chatID, member.uid);
-                dispatch({type: "UPDATE_OWNER", payload: member.uid});
-              }}>Transfer Ownership</button>
+              <button onClick={onRemoveMemberFromChat}>Remove User</button>
+              <button onClick={onTransferOwnership}>Transfer Ownership</button>
             </>
-
           )}
-
         </div>
       )}
     </>
@@ -45,4 +52,4 @@ const MemberContextMenu = ({contextMenuData, points, clientUserIsOwner}) => {
 
   )
 }
-export default memo(MemberContextMenu);
+export default MemberContextMenu;

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { db, auth } from "../../../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 
-import { ref, query, set, get, orderByChild, equalTo, onValue } from 'firebase/database'
+import { ref, query, get, orderByChild, equalTo } from 'firebase/database'
 
 
 const PasswordReset = ({passChange}) => {

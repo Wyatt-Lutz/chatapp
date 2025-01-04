@@ -1,9 +1,9 @@
 
-import { useContext, useState, useEffect, useRef, memo, Fragment, useCallback } from "react";
+import { useContext, useState, memo } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../../AuthProvider";
+import { AuthContext } from "../../../../providers/AuthProvider";
 import { db } from "../../../../../firebase";
-import { ChatContext } from "../../../../ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { checkIfDuplicateChat, createChat } from "../../../../services/chatBarDataService";
 import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../styling-components/Close";
@@ -12,7 +12,6 @@ import { getBlockData } from "../../../../services/memberDataService";
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
   console.log('chat creation')
-  const { data, dispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
   const [usersAdded, setUsersAdded] = useState([{uid: currUser.uid, username: currUser.displayName}]);
   const [isUserBlockedWarning, setIsUserBlockedWarning] = useState(null);
@@ -20,31 +19,28 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
 
   const addUser = async ({newUser}) => {
-    try {
-      resetField('newUser');
-      if (usersAdded.some(user => user.username === newUser)) {
-        console.info('user already added') //toast
-        return;
-      }
-      const userData = await checkIfUserExists(db, newUser);
-      if (!userData) {
-        console.log('user doenst exist');
-        return;
-      }
-
-      const user = {
-        uid: Object.keys(userData)[0],
-        username: Object.values(userData)[0].username,
-      }
-      console.log(user);
-
-
-      await checkUsersBlockedStatus(currUser.uid, user);
-      console.info('added user to chatbar');
-
-    } catch (error) {
-      console.error(error);
+    resetField('newUser');
+    if (usersAdded.some(user => user.username === newUser)) {
+      console.info('user already added') //toast
+      return;
     }
+    const userData = await checkIfUserExists(db, newUser);
+    if (!userData) {
+      console.log("user doesn't exist");
+      return;
+    }
+
+    const user = {
+      uid: Object.keys(userData)[0],
+      username: Object.values(userData)[0].username,
+    }
+    console.log(user);
+
+
+    await checkUsersBlockedStatus(currUser.uid, user);
+    console.info('added user to chatbar');
+
+
   }
 
   const checkUsersBlockedStatus = async(currUserUid, addedUser) => {
@@ -67,6 +63,8 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
     const uids = [...usersAdded.map(user => user.uid)];
     const memberUids = uids.sort().join("");
+    let title, tempTitle;
+    title = tempTitle = "";
 
     const isDuplicate = await checkIfDuplicateChat(db, currUser.uid, memberUids);
     if (isDuplicate) {
@@ -74,20 +72,25 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
       return;
     }
 
-    const title = chatName && chatName.length > 0 ? chatName : "";
-
     const membersList = usersAdded.reduce((members, member) => {
-      members[member.uid] = {isOnline: false, username: member.username};
+      members[member.uid] = {isOnline: false, username: member.username, hasBeenRemoved: false };
       return members
     }, {});
+    console.log(membersList);
 
+    //if the user entered a title, use it, if not, take the members list and map them out to use as the title
+    //const title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).map(member => member.username).join(', ');
+    if (chatName && chatName.length > 0) {
+      title = chatName;
+    } else {
+      tempTitle = Object.values(membersList).map(member => member.username).join(', ');
+    }
 
-    const newChatID = await createChat(db, memberUids, title, membersList, uids, currUser.uid);
+    const newChatID = await createChat(db, memberUids, title, tempTitle, membersList, uids, currUser.uid);
     console.log(newChatID);
-    setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
+    //setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);
-    const ownerUid = currUser.uid;
-    dispatch({ type: "CHANGE_CHAT", payload: { newChatID, title, ownerUid }});
+    //dispatch({ type: "CHANGE_CHAT", payload: { newChatID, title, ownerUid }});
   }
 
 
@@ -152,4 +155,4 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
   )
 }
-export default memo(ChatCreation);
+export default ChatCreation;

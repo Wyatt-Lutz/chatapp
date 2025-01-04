@@ -1,26 +1,23 @@
-import { memo, useCallback, useContext } from "react";
+import { memo, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../../AuthProvider";
-import { ChatContext } from "../../../../ChatProvider";
+import { AuthContext } from "../../../../providers/AuthProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { db } from "../../../../../firebase";
-import { addMessage } from "../../../../services/messageDataService";
+import { addMessage, calculateRenderTimeAndSender } from "../../../../services/messageDataService";
 
 
-const Input = ({calculateRenderTimeAndSender}) => {
+const Input = () => {
   const { register, handleSubmit, resetField } = useForm();
   const { currUser } = useContext(AuthContext);
-  const { data } = useContext(ChatContext);
+  const { chatState, messageState } = useContext(ChatContext);
 
   console.log('input run');
-  const handleAddMessage = useCallback(async(text) => {
+  const handleAddMessage = async({ text }) => {
     resetField('text');
-    const renderTimeAndSender = await calculateRenderTimeAndSender();
-    const timeData = await addMessage(text.text, data.chatID, currUser.uid, db, renderTimeAndSender);
-    if (timeData.renderState) {
-      localStorage.setItem('timestamp', timeData.time);
-    }
-  }, [data.chatID]);
-
+    const lastMessage = [...messageState.messages].pop() || {};
+    const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.displayName);
+    await addMessage(text, chatState.chatID, currUser.uid, db, willRenderTimeAndSender);
+  };
 
   return (
     <>

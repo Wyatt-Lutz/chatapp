@@ -1,7 +1,7 @@
-import { push, ref, set, update, get, query, orderByChild, equalTo } from "firebase/database";
+import { push, ref, set, update, get  } from "firebase/database";
 
 
-export const createChat = async(db, memberUids, title, membersList, uids, currUserUid) => {
+export const createChat = async(db, memberUids, title, tempTitle, membersList, uids, currUserUid) => {
   try {
     const chatsRef = ref(db, "chats/");
     const newChatRef = push(chatsRef);
@@ -10,6 +10,7 @@ export const createChat = async(db, memberUids, title, membersList, uids, currUs
 
     const newChatData = {
       title: title,
+      tempTitle: tempTitle,
       owner: currUserUid,
       memberUids: memberUids,
     }
@@ -17,16 +18,14 @@ export const createChat = async(db, memberUids, title, membersList, uids, currUs
     await Promise.all([
       set(newChatRef, newChatData),
       set(membersRef, membersList),
-    ]);
 
-    await Promise.all(
-      uids.map(uid => {
+
+      ...uids.map(uid => {
         const userChatDataRef = ref(db, "users/" + uid + "/chatsIn");
         const chatData = {[chatID]: 0};
         update(userChatDataRef, chatData)
       }),
-    );
-
+    ]);
 
 
     console.info('created chat');

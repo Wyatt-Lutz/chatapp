@@ -1,12 +1,11 @@
-import { useEffect } from "react";
 import { sendEmailVerification } from "firebase/auth";
-import { actionCodeSettings, auth } from "../../firebase";
+import { auth } from "../../firebase";
 
 const EmailNotVerified = ({ email }) => {
   const currUser = auth.currentUser;
   const resendEmail = async () => {
     try {
-      await sendEmailVerification(currUser, actionCodeSettings);
+      await sendEmailVerification(currUser);
       console.info("Email Verification resent");
     } catch (error) {
       console.error(error);

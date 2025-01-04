@@ -1,17 +1,21 @@
-import { AuthContext } from '../../AuthProvider';
+import { AuthContext } from '../../providers/AuthProvider';
 import ChatScreen from './ChatScreen/ChatScreen';
-
 import { sendEmailVerification, signOut } from 'firebase/auth';
 import { lazy, Suspense, useContext, useEffect, useState } from 'react';
-import { actionCodeSettings, auth } from '../../../firebase';
+import { auth } from '../../../firebase';
 import Settings from './Settings/Settings';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
+import { ChatContext } from '../../providers/ChatContext';
+import { ChatroomsContext } from '../../providers/ChatroomsContext';
+import { useNavigate } from 'react-router-dom';
 const EmailNotVerified = lazy(() => import('../../utils/EmailNotVerified'));
 const Main = () => {
   const [emailVerificationModal, setEmailVerificationModal] = useState(false);
   const { currUser } = useContext(AuthContext);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const {chatDispatch, memberDispatch, messageDispatch} = useContext(ChatContext);
+  const {dispatch} = useContext(ChatroomsContext);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -24,7 +28,7 @@ const Main = () => {
         setEmailVerificationModal(true);
 
         if (!alreadySentVerification) {
-          await sendEmailVerification(currUser, actionCodeSettings);
+          await sendEmailVerification(currUser);
           localStorage.setItem('alreadySentVerification', true);
           console.info("Email Verification sent");
         }
@@ -42,6 +46,13 @@ const Main = () => {
 
 
   const signCurrUserOut = () => {
+    //Reset the context data
+    chatDispatch({type: "RESET"});
+    memberDispatch({type: "RESET"});
+    messageDispatch({type: "RESET"});
+    dispatch({type: "RESET"});
+
+    //Firebase sign out
     signOut(auth).then(() => {
       console.info("Sign out successful")
     }).catch((error) => {
@@ -59,8 +70,6 @@ const Main = () => {
           <EmailNotVerified email={currUser.email} />
         </Suspense>
 
-      ) : isSettingsOpen ? (
-        <Settings />
       ) : loading ? (
         <div>Loading...</div>
       ) : (
@@ -68,7 +77,7 @@ const Main = () => {
           <div className='flex ring flex-col'>
             <ChatRoomsSideBar />
             <div className='flex'>
-              <button onClick={() => setIsSettingsOpen(true)} className="ring p-2">Settings</button>
+              <button onClick={() => navigate("/settings")} className="ring p-2">Settings</button>
               <button onClick={signCurrUserOut}>Log Out</button>
             </div>
           </div>

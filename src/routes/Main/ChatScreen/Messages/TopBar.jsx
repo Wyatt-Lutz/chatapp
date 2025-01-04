@@ -1,51 +1,40 @@
 import { memo, useContext, useState, useEffect } from "react"
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../../ChatProvider";
 import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../AuthProvider";
+import { AuthContext } from "../../../../providers/AuthProvider";
 import { editTitle } from "../../../../services/messageDataService";
-import { onChildChanged, ref } from 'firebase/database';
+import { ChatContext } from "../../../../providers/ChatContext";
 const TopBar = () => {
+  console.log('topBar run');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
-  const { data, dispatch } = useContext(ChatContext);
+  const { chatState } = useContext(ChatContext);
+  const chatID = chatState.chatID;
+  const title = chatState.title;
+  const tempTitle = chatState.tempTitle;
   const { currUser } = useContext(AuthContext);
 
-  console.log('topbar run')
 
-  const onFinishEditTitle = async(text) => {
+  const onFinishEditTitle = async({ title }) => {
     resetField('title');
     setIsEditingTitle(false);
-    if (text.title === "") {
+    if (title === "") {
       return;
     }
-    await editTitle(text.title, data.chatID, db, currUser.displayName);
+    await editTitle(title, chatID , db, currUser.displayName);
   }
 
-  useEffect(() => {
-    const titleRef = ref(db, "chats/" + data.chatID + "/title");
-
-    const chatsChangeListener = onChildChanged(titleRef, (snap) => {
-      console.log(snap.val());
-      dispatch({type: "UPDATE_TITLE", payload: snap.val()});
-    });
-
-    return () => {
-      chatsChangeListener();
-    }
-
-  }, [data.chatID]);
 
   return (
     <div className="ring" onMouseOver={() => setIsEditingTitle(true)} onMouseLeave={() => setIsEditingTitle(false)}>
 
       {isEditingTitle ? (
         <form onSubmit={handleSubmit(onFinishEditTitle)}>
-          <input {...register('title', {required: false})} placeholder={data.title} onBlur={handleSubmit(onFinishEditTitle)}></input>
+          <input {...register('title', {required: false})} placeholder={title || tempTitle} onBlur={handleSubmit(onFinishEditTitle)}></input>
         </form>
 
       ) : (
-        <div>{data.title}</div>
+        <div>{title || tempTitle}</div>
       )}
 
     </div>
