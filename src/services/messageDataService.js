@@ -6,7 +6,7 @@ const NUM_CHATS_PER_PAGE = 10;
 
 export const fetchChats = async(time, db, chatID) => {
   console.info('fetchChats run');
-  const chatsRef = ref(db, "messages/" + chatID + "/");
+  const chatsRef = ref(db, `messages/${chatID}/`);
   const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(time), limitToLast(NUM_CHATS_PER_PAGE));
   const snap = await get(messageQuery);
 
@@ -22,8 +22,10 @@ export const fetchChats = async(time, db, chatID) => {
 
 
 
+
+
 export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) => {
-  const chatRef = ref(db, "messages/" + chatID + "/");
+  const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
   const newMessage = {
@@ -57,6 +59,20 @@ const updateUnreadCount = async(db, chatID) => {
   }
 }
 
+/**
+ * Determines whether to show the timestamp and the sender of each message.
+ * Does not render them if the last message was sent by the client user and the last message was less than 5 minutes ago.
+ * @param {*} lastMessage
+ * @param {*} currUser
+ * @returns
+ */
+export const calculateRenderTimeAndSender = (lastMessage, currUserDisplayName) => {
+  if (lastMessage && lastMessage.sender === currUserDisplayName && (Date.now() - lastMessage.timestamp < 180000)) {
+    return false;
+  }
+  return true;
+}
+
 
 
 export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, uid) => {
@@ -82,16 +98,16 @@ export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, uid) =>
 
 
 
-export const editMessage = async(id, text, chatID, db) => {
-  const chatRef = ref(db, "messages/" + chatID + "/" + id);
+export const editMessage = async(messageUid, text, chatID, db) => {
+  const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
   await update(chatRef, {
     text: text,
     hasBeenEdited: true
   });
 }
 
-export const deleteMessage = async(id, db, chatID) => {
-  const chatRef = ref(db, "messages/" + chatID + "/" + id);
+export const deleteMessage = async(messageUid, db, chatID) => {
+  const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
   await remove(chatRef);
 }
 

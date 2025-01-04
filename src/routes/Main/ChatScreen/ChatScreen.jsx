@@ -1,33 +1,32 @@
 import { useContext } from 'react';
-import { ChatContext } from '../../../ChatProvider';
 
 
 import MembersBar from './MembersBar/MembersBar';
 import TopBar from './Messages/TopBar';
 import Messages from './Messages/Messages';
 import Search from './Search';
+import { ChatContext } from '../../../providers/ChatContext';
 
 const ChatScreen = () => {
-  const { data } = useContext(ChatContext);
-
+  console.log('chatScreen run');
+  const { chatState } = useContext(ChatContext);
   return(
     <section>
-      {!data.chatID ? (
+      {!chatState.chatID ? (
         <div>Chat Requests</div>
       ) : (
-        <div key={data.chatID}>
+        <>
           <TopBar />
           <div className='flex'>
             <Messages />
-            <div>
-              <div>Members:</div>
+            <>
               <MembersBar/>
-            </div>
+            </>
 
 
           </div>
-          <Search />
-        </div>
+
+        </>
 
       )}
     </section>

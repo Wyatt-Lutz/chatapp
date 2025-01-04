@@ -3,7 +3,7 @@
 
 import Close from "../../../styling-components/Close";
 import { useContext } from "react";
-import { AuthContext } from "../../../AuthProvider";
+import { AuthContext } from "../../../providers/AuthProvider";
 import { useForm } from "react-hook-form";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";

@@ -2,13 +2,15 @@ import { memo, useContext, useEffect, useState } from "react"
 import Close from "../../../styling-components/Close";
 import { getBlockData, getUsernameFromUid, updateBlockedStatus } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";
-import { AuthContext } from "../../../AuthProvider";
+import { AuthContext } from "../../../providers/AuthProvider";
 import Minus from "../../../styling-components/Minus";
 
-const BlockedUsersModel = ({changeDisplayment}) => {
+const BlockedUsersModal = ({changeDisplayment}) => {
   const { currUser } = useContext(AuthContext);
   const [blockedUsers, setBlockedUsers] = useState({});
   const [usernames, setUsernames] = useState({});
+
+
   useEffect(() => {
     const fetchBlockedUsers = async() => {
       const blockedUsers = await getBlockData(db, currUser.uid);
@@ -24,7 +26,7 @@ const BlockedUsersModel = ({changeDisplayment}) => {
       setUsernames(usernameData);
     }
     fetchBlockedUsers();
-  }, []);
+  }, [currUser.uid]);
 
   const fetchUsername = async(uid) => {
     const username = await getUsernameFromUid(db, uid);
@@ -66,4 +68,4 @@ const BlockedUsersModel = ({changeDisplayment}) => {
 
 }
 
-export default memo(BlockedUsersModel);
+export default BlockedUsersModal;

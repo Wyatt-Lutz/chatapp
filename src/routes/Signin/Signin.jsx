@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useState, useRef, useEffect} from "react"
+import { useState, useRef } from "react"
 import { auth } from "../../../firebase";
-import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signInWithCustomToken, browserSessionPersistence } from "firebase/auth";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import PasswordReset from "./PasswordReset";
 
@@ -27,8 +27,6 @@ const Signin = () => {
 
     navigate("/");
   }
-
-
 
   return(
     <section>

@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchUsernameData } from "../services/globalDatService";
 import { db } from "../../firebase";
 
 
-const UsernameAvaliability = ({newUsername, setIsButtonDisabled}) => {
-  const [isUsernameAvaliable, setIsUsernameAvaliable] = useState(null);
+const UsernameAvailability = ({newUsername, setIsButtonDisabled}) => {
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
   const usernames = useRef([]);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const UsernameAvaliability = ({newUsername, setIsButtonDisabled}) => {
 
   useEffect(() => {
     if (!newUsername) {
-      setIsUsernameAvaliable(null);
+      setIsUsernameAvailable(null);
       setIsButtonDisabled(true);
       return;
     }
@@ -25,24 +25,24 @@ const UsernameAvaliability = ({newUsername, setIsButtonDisabled}) => {
     const timeout = setTimeout(() => {
       console.log('recheck')
       const isUsernameTaken = usernames.current.includes(newUsername);
-      setIsUsernameAvaliable(!isUsernameTaken);
+      setIsUsernameAvailable(!isUsernameTaken);
       setIsButtonDisabled(isUsernameTaken);
     }, 500);
 
 
     return () => clearTimeout(timeout);
-  }, [newUsername]);
+  }, [newUsername, setIsButtonDisabled]);
 
 
   return (
     <>
-      {isUsernameAvaliable === true && (
-        <div className="text-green-500">Username is Avaliable</div>
+      {isUsernameAvailable === true && (
+        <div className="text-green-500">Username is Available</div>
       )}
-      {isUsernameAvaliable === false && (
-        <div className="text-red-400">Username is not avaliable. Consider adding numbers and special characters.</div>
+      {isUsernameAvailable === false && (
+        <div className="text-red-400">Username is not available. Consider adding numbers and special characters.</div>
       )}
     </>
   )
 }
-export default UsernameAvaliability;
+export default UsernameAvailability;

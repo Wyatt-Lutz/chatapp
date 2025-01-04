@@ -1,5 +1,5 @@
 
-import { deleteUser, updateEmail, updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
+import { deleteUser, updateProfile } from "firebase/auth";
 
 import { get, update, ref} from "firebase/database";
 import { checkIfUserExists } from "./globalDatService";
@@ -11,18 +11,18 @@ export const changeUsername = async(db, newUsername, currUser) => {
     return false;
   }
 
-  const currUserDataRef = ref(db, "users/" + currUser.uid);
+  const currUserDataRef = ref(db, `users/${currUser.uid}`);
   await update(currUserDataRef, {
     username: newUsername,
   });
 
-  const chatsInRef = ref(db, "users/" + currUser.uid + '/chatsIn');
+  const chatsInRef = ref(db, `users/${currUser.uid}/chatsIn`);
   const chatsInSnap = await get(chatsInRef);
   const chatroomIds = Object.keys(chatsInSnap.val());
   await Promise.all(
     chatroomIds.map((chatroomID) => {
-      const chatroomRef = ref(db, "members/" + chatroomID + "/" + currUser.uid);
-      update(chatroomRef, {
+      const chatroomMemberRef = ref(db, `members/${chatroomID}/${currUser.uid}`);
+      update(chatroomMemberRef, {
         username: newUsername,
       });
     })
@@ -39,7 +39,7 @@ export const changeUsername = async(db, newUsername, currUser) => {
 
 
 export const changeEmail = async(db, currUser, newEmail) => {
-  const userDataRef = ref(db, "users/" + currUser.uid);
+  const userDataRef = ref(db, `users/${currUser.uid}`);
   await update(userDataRef, {
     email: newEmail,
   });
@@ -47,9 +47,9 @@ export const changeEmail = async(db, currUser, newEmail) => {
 
 
 export const deleteAccount = async(db, currUser) => {
-  
-  
-  
+
+
+
   await deleteUser(currUser);
 
 

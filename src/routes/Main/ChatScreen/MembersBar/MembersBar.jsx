@@ -1,83 +1,47 @@
-import { memo, useContext, useEffect, useRef, useState } from "react"
+import { memo, useContext, useState } from "react"
 import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
-import { ChatContext } from "../../../../ChatProvider";
-import { AuthContext } from "../../../../AuthProvider";
-import { onChildAdded, onChildChanged, ref } from "firebase/database";
-import { db } from "../../../../../firebase";
-import { getBlockData } from "../../../../services/memberDataService";
+import { ChatContext } from "../../../../providers/ChatContext";
 const MembersBar = () => {
-  console.log('membersBar run')
+  console.log('memberBar run');
+  const { memberState } = useContext(ChatContext);
+  const members = memberState.members;
 
-  const { data, dispatch } = useContext(ChatContext);
-  console.log(data.members);
-  const { currUser } = useContext(AuthContext);
-  const { clicked, setClicked, points, setPoints } = useContextMenu();
+  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
-  const handleContextMenu = (e, member) => {
+  const handleContextMenu = (e, memberUid, memberData) => {
     e.preventDefault();
-    setClicked(true);
+    setContextMenu({'member': true});
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({member: member});
+    setContextMenuData({memberUid: memberUid, memberData: memberData});
   }
-
-
-
-
-  useEffect(() => {
-    let memberAddedListener, memberChangedListener;
-    const getBlockedData = async() => {
-      const data = await getBlockData(db, currUser.uid);
-      return data;
-    }
-
-    const setMemberData = async() => {
-      const blockData = await getBlockedData();
-      console.log(blockData);
-      const memberRef = ref(db, "members/" + data.chatID);
-      memberAddedListener = onChildAdded(memberRef, (snap) => {
-        dispatch({type: "ADD_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, isBlocked: blockData[snap.key] || false, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-      });
-
-      memberChangedListener = onChildChanged(memberRef, (snap) => {
-        dispatch({type: "CHANGE_MEMBER", payload: { uid: snap.key, isOnline: snap.val().isOnline, isBlocked: blockData[snap.key] || false, hasBeenRemoved: snap.val().hasBeenRemoved || false, username: snap.val().username }});
-      });
-    }
-    setMemberData();
-    return () => {
-      if(memberAddedListener) {
-        console.log('hello')
-        memberAddedListener();
-      }
-      if (memberChangedListener) {
-        memberChangedListener();
-      }
-    }
-
-
-  }, [data.chatID]);
   return (
     <div>
+      <div>Members:</div>
+      <>
+        {!members ? (
+          <div>Loading members...</div>
+        ) : (
+          <>
+            {[...members].map(([memberUid, memberData]) => (
+              <div key={memberUid} onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
+                <Member memberUid={memberUid} memberData={memberData} />
+              </div>
+            ))}
+          </>
+        )}
+      </>
 
 
-      {data.members?.map(member => (
-        <div key={member.uid}>
-          {!member.hasBeenRemoved && (
-            <div onContextMenu={(e) => handleContextMenu(e, member)} className="hover:bg-gray-600">
-              <Member member={member} />
-            </div>
-          )}
-        </div>
-      ))}
 
-      {clicked && (
-        <MemberContextMenu contextMenuData={contextMenuData} clientUserIsOwner={data.owner === currUser.uid ? true : false} points={points} />
+      {contextMenu.member && (
+        <MemberContextMenu contextMenuData={contextMenuData} points={points} />
       )}
 
 
     </div>
   )
 }
-export default memo(MembersBar);
+export default MembersBar;

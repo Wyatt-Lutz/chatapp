@@ -1,23 +1,25 @@
 import { memo, useContext } from "react"
-import { ChatContext } from "../../../../ChatProvider"
+import { ChatContext } from "../../../../providers/ChatContext";
 
-const Member = ({ member }) => {
-  console.log('member run')
-  const { data } = useContext(ChatContext);
+const Member = ({ memberUid, memberData }) => {
+  console.log('member run');
+  const { chatState } = useContext(ChatContext);
 
+  /*
   const fetchProfilePicture = () => {
 
   }
-  
+  */
+
   return (
     <div className="flex">
-      <div>{member.username}</div>
+      <div>{memberData?.username}</div>
 
-      {data.owner === member.uid && (
+      {chatState.owner === memberUid && (
         <div>Owner</div>
       )}
     </div>
 
   )
 }
-export default memo(Member);
+export default Member;

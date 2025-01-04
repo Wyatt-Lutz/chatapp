@@ -1,53 +1,40 @@
-import { Fragment, memo, useCallback, useContext } from "react"
-import { calcTime, editMessage } from "../../../../services/messageDataService";
+import { memo, useContext } from "react"
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../../ChatProvider";
+import { ChatContext } from "../../../../providers/ChatContext";
 import { db } from "../../../../../firebase";
+import { editMessage } from "../../../../services/messageDataService";
 
 
-const Message = ({ chat, isFirst, isEditing, changeEditState }) => {
-  console.log('chat run');
+const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {
+  console.log('message run');
   const { register, handleSubmit, resetField } = useForm();
-  const { data } = useContext(ChatContext);
+  const { chatState } = useContext(ChatContext);
 
-  const onSubmitEdit = async(text) => {
+
+
+  const onSubmitEdit = async({ editMessageText }) => {
     resetField('editMessage');
-    editMessage(chat.id, text.editMessage, data.chatID, db);
-    changeEditState(chat.id, false);
+    await editMessage(messageUid, editMessageText, chatState.chatID, db);
+    await changeEditState(messageUid, false);
   }
-  const memberObjOfSender = data.members.find(member => member.uid === chat.sender);
-
 
 
   return (
     <>
-      {(chat.renderTimeAndSender || isFirst) && (
-        <div className="flex">
-          <img src="" alt="helllo"/>
-          {memberObjOfSender && memberObjOfSender.isBlocked ? (
-            <div>Blocked User</div>
-          ) : (
-            <div>{memberObjOfSender && memberObjOfSender.username}</div>
-          )}
-
-          <div>{calcTime(chat.timestamp)}</div>
-        </div>
-      )}
-
-      <div>
+      <div className="hover:bg-gray-600">
         {isEditing ? (
           <form onSubmit={handleSubmit(onSubmitEdit)}>
-            <input placeholder={chat.text} {...register('editMessage', { required: false, maxLength: 200 })} />
+            <input placeholder={messageData.text} {...register('editMessageText', { required: false, maxLength: 200 })} />
           </form>
         ) : (
           <>
-            {memberObjOfSender && memberObjOfSender.isBlocked ? (
-              <div></div>
+            {memberDataOfSender && memberDataOfSender.isBlocked ? (
+              <div>Blocked User</div>
             ) : (
               <div className="text-wrap">
-              <div className="text-xl font-bold py-2 w-max">{chat.text}</div>
+              <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
 
-              {chat.hasBeenEdited && (
+              {messageData.hasBeenEdited && (
                 <div>Edited</div>
               )}
               </div>
@@ -57,7 +44,6 @@ const Message = ({ chat, isFirst, isEditing, changeEditState }) => {
 
         )}
       </div>
-
     </>
   )
 }
