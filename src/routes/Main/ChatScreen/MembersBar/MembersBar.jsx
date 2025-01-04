@@ -8,12 +8,12 @@ const MembersBar = () => {
   const { memberState } = useContext(ChatContext);
   const members = memberState.members;
 
-  const { clicked, setClicked, points, setPoints } = useContextMenu();
+  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
   const handleContextMenu = (e, memberUid, memberData) => {
     e.preventDefault();
-    setClicked(true);
+    setContextMenu({'member': true});
     setPoints({x: e.pageX, y: e.pageY});
     setContextMenuData({memberUid: memberUid, memberData: memberData});
   }
@@ -26,10 +26,8 @@ const MembersBar = () => {
         ) : (
           <>
             {[...members].map(([memberUid, memberData]) => (
-              <div key={memberUid}>
-                <div onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
-                  <Member memberUid={memberUid} memberData={memberData} />
-                </div>
+              <div key={memberUid} onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
+                <Member memberUid={memberUid} memberData={memberData} />
               </div>
             ))}
           </>
@@ -38,7 +36,7 @@ const MembersBar = () => {
 
 
 
-      {clicked && (
+      {contextMenu.member && (
         <MemberContextMenu contextMenuData={contextMenuData} points={points} />
       )}
 

@@ -1,81 +1,47 @@
-import { memo, useContext, useState } from "react"
-import { calcTime } from "../../../../services/messageDataService";
+import { memo, useContext } from "react"
 import { useForm } from "react-hook-form";
 import { ChatContext } from "../../../../providers/ChatContext";
 import { db } from "../../../../../firebase";
-import MessagesContextMenu from "./MessagesContextMenu";
-import { useContextMenu } from "../../../../hooks/useContextMenu";
-import { AuthContext } from "../../../../providers/AuthProvider";
+import { editMessage } from "../../../../services/messageDataService";
 
 
-const Message = ({ messageUid, messageData, isFirst, isEditing, changeEditState }) => {
+const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {
   console.log('message run');
   const { register, handleSubmit, resetField } = useForm();
-  const { chatState, memberState } = useContext(ChatContext);
-
-  const { currUser } = useContext(AuthContext);
-  const { clicked, setClicked, points, setPoints } = useContextMenu();
-  const [contextMenuData, setContextMenuData] = useState({});
-
-  const memberDataOfSender = memberState.members.get(messageData.sender);
+  const { chatState } = useContext(ChatContext);
 
 
 
-  const onSubmitEdit = async({ editMessage }) => {
+  const onSubmitEdit = async({ editMessageText }) => {
     resetField('editMessage');
-    await editMessage(messageUid, editMessage, chatState.chatID, db);
+    await editMessage(messageUid, editMessageText, chatState.chatID, db);
     await changeEditState(messageUid, false);
   }
 
 
-  const handleContextMenu = (e, messageUid, messageData) => {
-    e.preventDefault();
-    setClicked(true);
-    setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({ messageUid, text: messageData.text, sender: messageData.sender });
-  }
-
   return (
     <>
-      <div onContextMenu={(e) => handleContextMenu(e, messageUid, messageData)} className="hover:bg-gray-600">
-        {(messageData.renderTimeAndSender || isFirst) && (
-          <div className="flex">
-
+      <div className="hover:bg-gray-600">
+        {isEditing ? (
+          <form onSubmit={handleSubmit(onSubmitEdit)}>
+            <input placeholder={messageData.text} {...register('editMessageText', { required: false, maxLength: 200 })} />
+          </form>
+        ) : (
+          <>
             {memberDataOfSender && memberDataOfSender.isBlocked ? (
               <div>Blocked User</div>
             ) : (
-              <div>{memberDataOfSender && memberDataOfSender.username}</div>
-            )}
+              <div className="text-wrap">
+              <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
 
-            <div>{calcTime(messageData.timestamp)}</div>
-          </div>
-        )}
-
-        <div>
-          {isEditing ? (
-            <form onSubmit={handleSubmit(onSubmitEdit)}>
-              <input placeholder={messageData.text} {...register('editMessage', { required: false, maxLength: 200 })} />
-            </form>
-          ) : (
-            <>
-              {memberDataOfSender && memberDataOfSender.isBlocked ? (
-                <div>Blocked User</div>
-              ) : (
-                <div className="text-wrap">
-                <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
-
-                {messageData.hasBeenEdited && (
-                  <div>Edited</div>
-                )}
-                </div>
+              {messageData.hasBeenEdited && (
+                <div>Edited</div>
               )}
-            </>
+              </div>
+            )}
+          </>
 
 
-          )}
-        </div>
-        {(clicked && contextMenuData.sender === currUser.displayName) && (
-          <MessagesContextMenu changeEditState={changeEditState} contextMenuData={contextMenuData} points={points} />
         )}
       </div>
     </>

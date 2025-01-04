@@ -26,7 +26,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     }
     const userData = await checkIfUserExists(db, newUser);
     if (!userData) {
-      console.log('user doenst exist');
+      console.log("user doesn't exist");
       return;
     }
 

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 export const useContextMenu = () => {
-  const [clicked, setClicked] = useState(false);
+  const [contextMenu, setContextMenu] = useState({});
   const [points, setPoints] = useState({x: 0, y: 0});
 
   useEffect(() => {
     const handleClick = () => {
-      setClicked(false);
+      setContextMenu({});
     }
 
     document.addEventListener("click", handleClick);
@@ -15,5 +15,5 @@ export const useContextMenu = () => {
     }
   }, []);
 
-  return {clicked, setClicked, points, setPoints };
+  return {contextMenu, setContextMenu, points, setPoints };
 }

@@ -11,6 +11,7 @@ import BlockedUsersModal from "./BlockedUsersModal";
 import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
+  console.log('settings run')
   const { currUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const {register, watch, resetField} = useForm({
@@ -158,7 +159,7 @@ const Settings = () => {
 
 
           <button onClick={handleDeleteAccount} className="bg-red-500">Delete Account</button>
-          <button onClick={navigate("/")}>Go Home</button>
+          <button onClick={() => navigate("/")}>Go Home</button>
 
 
           {modalDisplayment}

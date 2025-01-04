@@ -10,13 +10,13 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
   console.log('membercontextMenu run');
   const { chatState, chatDispatch, memberDispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
-  console.log('membercontextmenu run');
 
 
   const onChangeBlockStatus = async(newBlockStatus) => {
     await updateBlockedStatus(db, currUser.uid, memberUid, newBlockStatus);
-    const newMemberObj = {[memberUid]: {...memberData, isBlocked: newBlockStatus}}
-    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: newMemberObj});
+    const newMemberObj = {...memberData, isBlocked: newBlockStatus}
+    console.log(newMemberObj);
+    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: memberUid, data: newMemberObj}});
   }
 
   const onRemoveMemberFromChat = async() => {

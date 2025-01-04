@@ -4,14 +4,17 @@ import { debounce } from 'lodash';
 import { ChatContext } from "../../../../providers/ChatContext";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
-import { fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
+import { calcTime, fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
+import { useContextMenu } from "../../../../hooks/useContextMenu";
 import Message from "./Message"
 import Input from "./Input";
+import MessagesContextMenu from "./MessagesContextMenu";
+import MemberContextMenu from "../MembersBar/MemberContextMenu";
 
 
 const Messages = () => {
   console.log('messagessss run');
-  const { chatState, messageState, messageDispatch } = useContext(ChatContext);
+  const { chatState, memberState, messageState, messageDispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
   const chatID = chatState.chatID;
   const numUnread = messageState.numUnread;
@@ -22,7 +25,9 @@ const Messages = () => {
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
 
-
+  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
+  const [messageContextMenuData, setMessageContextMenuData] = useState({});
+  const [usernameContextMenuData, setUsernameContextMenuData] = useState({});
 
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
@@ -108,6 +113,21 @@ const Messages = () => {
   };
 
 
+  const handleMessageContextMenu = (e, messageUid, messageData) => {
+    e.preventDefault();
+    setContextMenu(prev => ({...prev, 'messages': true}));
+    setPoints(prev => ({...prev, 'messages': {x: e.pageX, y: e.pageY}}));
+    setMessageContextMenuData({ messageUid, text: messageData.text, sender: messageData.sender });
+  }
+
+  const handleUsernameContextMenu = (e, memberUid, memberData) => {
+    e.preventDefault();
+    setContextMenu(prev => ({...prev, 'username': true}));
+    setPoints(prev => ({...prev, 'username': {x: e.pageX, y: e.pageY}}));
+    setUsernameContextMenuData({memberUid, memberData})
+  }
+
+
   return(
     <section className="w-full">
 
@@ -120,17 +140,43 @@ const Messages = () => {
                 ) : (
                   <>
                     {[...messages].map(([messageUid, messageData], index) => {
+                      const memberDataOfSender = memberState.members.get(messageData.sender);
                       return (
-                        <div key={messageUid}>
-                          <Message messageUid={messageUid} messageData={messageData} isFirst={index === 0} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
+                        <div>
+
+                          {(messageData.renderTimeAndSender || index === 0) && (
+                            <>
+                              {messageData.sender !== 'server' && (
+                                <div className="flex" onContextMenu={(e) => handleUsernameContextMenu(e, messageData.sender, memberDataOfSender)}>
+
+                                  {memberDataOfSender && memberDataOfSender.isBlocked ? (
+                                    <div>Blocked User</div>
+                                  ) : (
+                                    <div>{memberDataOfSender && memberDataOfSender.username}</div>
+                                  )}
+                                </div>
+                              )}
 
 
+                              <div>{calcTime(messageData.timestamp)}</div>
+                            </>
 
-                          {index === messageData.size - 1 && (
-                            <div ref = {lastMessageRef} />
                           )}
 
+
+
+                          <div key={messageUid} onContextMenu={(e) => handleMessageContextMenu(e, messageUid, messageData)}>
+                            <Message messageUid={messageUid} memberDataOfSender={memberDataOfSender} messageData={messageData} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
+
+
+                            {index === messageData.size - 1 && (
+                              <div ref = {lastMessageRef} />
+                            )}
+
+                          </div>
+
                         </div>
+
                       )
                     })}
                   </>
@@ -147,6 +193,12 @@ const Messages = () => {
 
       {numUnread > 0 && (
         <div>{numUnread} new messages</div>
+      )}
+      {(contextMenu.messages && messageContextMenuData.sender !== 'server' && (messageContextMenuData.sender === currUser.uid || currUser.uid === chatState.owner)) && (
+        <MessagesContextMenu changeEditState={changeEditState} contextMenuData={messageContextMenuData} points={points.messages} />
+      )}
+      {(contextMenu.username && usernameContextMenuData.memberUid !== currUser.uid) && (
+        <MemberContextMenu contextMenuData={usernameContextMenuData} points={points.username} />
       )}
 
 

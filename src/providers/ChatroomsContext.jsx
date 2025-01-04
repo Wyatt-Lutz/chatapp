@@ -35,6 +35,8 @@ const chatroomReducer = (state, action) => {
         ...state,
         unreadCount: [...state.unreadCount, action.payload],
       };
+    case "RESET":
+      return initialState;
     default:
       return state;
   }

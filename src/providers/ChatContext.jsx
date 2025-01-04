@@ -43,7 +43,7 @@ const chatReducer = (state, action) => {
     case "UPDATE_MEMBER_UIDS":
       return {...state};
     case "RESET":
-      return initialState;
+      return initialChatState;
     default:
       return state;
   }
@@ -56,11 +56,16 @@ const membersReducer = (state, action) => {
     case "ADD_MEMBER":
     case "UPDATE_MEMBER_DATA":
       console.log('add/update member');
+      console.log(action.payload.key);
+      console.log(action.payload.data);
+      console.log(newMembers);
       newMembers.set(action.payload.key, action.payload.data);
       return { ...state, members: newMembers };
     case "REMOVE_MEMBER":
       newMembers.delete(action.payload);
       return { ...state, members: newMembers };
+    case "RESET":
+      return initialMemberState;
     default:
       return state;
   }
@@ -94,7 +99,8 @@ const messagesReducer = (state, action) => {
 
     case "UPDATE_UNREAD":
       return {  ...state, numUnread: action.payload };
-
+    case "RESET":
+      return initialMessageState;
     default:
       return state;
 
@@ -170,8 +176,15 @@ export const ChatContextProvider = ({ children }) => {
       if (!member) return;
       const data = snap.val();
 
-      for (const property in data) {
-        member[property] = data[property];
+      if ((member.username !== data.username) && (chatState.title === "")) {
+        const tempTitle = [...memberState].map(member => member.username).join(', ');
+        console.log(tempTitle);
+        console.log(chatState.tempTitle);
+        member.tempTitle = tempTitle;
+      } else if (member.isOnline !== data.isOnline) {
+        member.isOnline = data.isOnline;
+      } else if (member.hasBeenRemoved !== data.hasBeenRemoved) {
+        member.hasBeenRemoved = data.hasBeenRemoved;
       }
 
       memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: snap.key, data: member}});
