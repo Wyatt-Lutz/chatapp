@@ -1,30 +1,21 @@
 import dayjs from "dayjs";
-import { ref, query, set, get, update, endBefore, runTransaction, limitToLast, push, orderByChild, remove, serverTimestamp } from 'firebase/database';
+import { ref, query, set, get, update, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst } from 'firebase/database';
 import { fetchOnlineUsersForChat } from "./memberDataService";
-const NUM_CHATS_PER_PAGE = 10;
 
 
-export const fetchChats = async(time, db, chatID) => {
+export const fetchOlderChats = async(endTimestamp, db, chatID) => {
   console.info('fetchChats run');
   const chatsRef = ref(db, `messages/${chatID}/`);
-  const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(time), limitToLast(NUM_CHATS_PER_PAGE));
-  const snap = await get(messageQuery);
-
-  if (!snap.exists()) {
-    return [];
-  }
-  const messageData = []
-  snap.forEach((child) => {
-    messageData.push(child.val());
-  })
-  return messageData;
+  const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(endTimestamp), limitToFirst(10));
+  const messageSnap = await get(messageQuery);
+  return messageSnap.val();
 }
 
 
 
 
 
-export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) => {
+export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID) => {
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
@@ -36,12 +27,30 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender) 
     hasBeenEdited: false,
   }
   await set(newMessageRef, newMessage);
-  await fetchOnlineUsersForChat(db, chatID);
+
   await updateUnreadCount(db, chatID);
-  return {renderState: renderTimeAndSender, time: Date.now()};
+
+
+  //If there isn't a first message already, set this to be the first using runTransaction for atomicity
+  if (!firstMessageID) {
+    const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
+    await runTransaction(firstMessageIdRef, (currID) => {
+      if (currID === null) {
+        return newMessageRef.key; //the message ID
+      }
+      return currID;
+    });
+  }
 
 };
 
+
+/**
+ * Updates the number of unread messages for each offline user in a chatroom.
+ * Uses runTransaction to ensure atomicity
+ * @param {Database} db - Firebase Realtime Database Reference
+ * @param {String} chatID - ID of the chatroom
+ */
 const updateUnreadCount = async(db, chatID) => {
   const offlineMembers = await fetchOnlineUsersForChat(db, chatID, false);
   for (const userUid of offlineMembers) {
@@ -53,18 +62,18 @@ const updateUnreadCount = async(db, chatID) => {
         return currData + 1;
       }
     }
-    runTransaction(userDataRef, transactionUpdate).catch((error) => {
+    await runTransaction(userDataRef, transactionUpdate).catch((error) => {
       console.error('update unreadcount transaction failed:' + error);
     });
   }
 }
 
 /**
- * Determines whether to show the timestamp and the sender of each message.
- * Does not render them if the last message was sent by the client user and the last message was less than 5 minutes ago.
+ * Determines whether to show the timestamp and the username of user for a message.
+ * Will not render them if the last message was sent by the client user and the last message was less than 5 minutes ago.
  * @param {*} lastMessage
  * @param {*} currUser
- * @returns
+ * @returns {Boolean}
  */
 export const calculateRenderTimeAndSender = (lastMessage, currUserDisplayName) => {
   if (lastMessage && lastMessage.sender === currUserDisplayName && (Date.now() - lastMessage.timestamp < 180000)) {

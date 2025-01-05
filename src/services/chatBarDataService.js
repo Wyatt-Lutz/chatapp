@@ -13,6 +13,7 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
       tempTitle: tempTitle,
       owner: currUserUid,
       memberUids: memberUids,
+      firstMessageID: null,
     }
 
     await Promise.all([

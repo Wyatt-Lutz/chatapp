@@ -12,6 +12,7 @@ const initialChatState = {
   title: '',
   tempTitle: '',
   owner: '',
+  firstMessageID: null,
 };
 const initialMemberState = {members: new Map()};
 const initialMessageState = {
@@ -19,20 +20,24 @@ const initialMessageState = {
   endTimestamp: 0,
   numUnread: 0,
   isAtBottom: true,
+  isFirstMessageRendered: false,
 }
 
 
 const chatReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE_CHAT":
+
       //dispatch({type: "UPDATE_CHATROOM", payload: state});
       console.log('changed');
+      const { chatID, title, tempTitle, owner, firstMessageID } = action.payload;
       return {
         ...state,
-        chatID: action.payload.chatID,
-        title: action.payload.title,
-        owner: action.payload.owner,
-        tempTitle: action.payload.tempTitle,
+        chatID,
+        title,
+        owner,
+        tempTitle,
+        firstMessageID,
       };
     case "UPDATE_TITLE":
       return { ...state, title: action.payload };
@@ -82,12 +87,14 @@ const messagesReducer = (state, action) => {
       return { ...state, messages: newMessages };
 
     case "ADD_OLDER_MESSAGES":
+      const combinedMessages = new Map([...action.payload, ...state.messages]);
+      console.log(combinedMessages);
       return {
         ...state,
-        messages: new Map([...state.messages, ...action.payload]),
+        messages: combinedMessages,
       }
 
-    case "REMOVE_MESSAGE":
+    case "REMOVE_MESSAGES":
       newMessages.delete(action.payload);
       return { ...state, messages: newMessages };
 
@@ -99,8 +106,13 @@ const messagesReducer = (state, action) => {
 
     case "UPDATE_UNREAD":
       return {  ...state, numUnread: action.payload };
+
+    case "IS_FIRST_MESSAGE_RENDERED":
+      return { ...state, isFirstMessageRendered: action.payload};
+
     case "RESET":
       return initialMessageState;
+
     default:
       return state;
 
@@ -214,6 +226,10 @@ export const ChatContextProvider = ({ children }) => {
     const handleMessageAdded = (snap) => {
       if (messages.size === 0) {
         messageDispatch({type: "UPDATE_END_TIMESTAMP", payload: snap.val().timestamp});
+
+        if (snap.key == chatState.firstMessageID) {
+          messageDispatch({type: "UPDATE_IS_FIRST_MESSAGE_RENDERED", payload: true});
+        }
       }
 
       if (!isAtBottom) {

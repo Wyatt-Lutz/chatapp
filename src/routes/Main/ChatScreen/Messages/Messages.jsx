@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 import { ChatContext } from "../../../../providers/ChatContext";
 import { AuthContext } from "../../../../providers/AuthProvider";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
-import { calcTime, fetchChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
+import { calcTime, fetchOlderChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import Message from "./Message"
 import Input from "./Input";
@@ -16,11 +16,10 @@ const Messages = () => {
   console.log('messagessss run');
   const { chatState, memberState, messageState, messageDispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
-  const chatID = chatState.chatID;
-  const numUnread = messageState.numUnread;
-  const isAtBottom = messageState.isAtBottom;
-  const endTimestamp = messageState.endTimestamp;
-  const messages = messageState.messages
+
+  const {chatID, title, tempTitle} = chatState;
+  const { numUnread, isAtBottom, endTimestamp, messages, isFirstMessageRendered }  = messageState;
+
 
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
@@ -75,7 +74,7 @@ const Messages = () => {
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleUserOffline);
     }
-  }, [chatID, currUser.uid, messageDispatch, isAtBottom]);
+  }, [chatID, currUser.uid, messageDispatch, isAtBottom, isFirstMessageRendered]);
 
 
 
@@ -83,19 +82,22 @@ const Messages = () => {
 
 
     const handleFetchMore = debounce(async() => {
-      const messageData = await fetchChats(endTimestamp, db, chatID);
+      const messageData = await fetchOlderChats(endTimestamp, db, chatID);
+      const keysOfMessages = Object.keys(messageData);
+      if (messageData && keysOfMessages.length > 0) {
+        const timestampOfOldestMessage = messageData[keysOfMessages[0].timestamp];
+        messageDispatch({type:"UPDATE_END_TIMESTAMP", payload: timestampOfOldestMessage});
 
-      if (messageData && messageData.size > 0) {
-        messageDispatch({type:"UPDATE_END_TIMESTAMP", payload: messageData[0].timestamp});
-        messageDispatch({type:"ADD_OLDER_MESSAGES", payload: messageData});
+        const newMessageMap = new Map(Object.entries(messageData));
+        messageDispatch({type: "ADD_OLDER_MESSAGES", payload: newMessageMap});
       }
     }, 300);
 
 
-    if (isVisible && scrolled) {
+    if (!isFirstMessageRendered && isVisible && scrolled) {
       handleFetchMore();
     }
-  }, [isVisible, scrolled, messageDispatch, chatID, endTimestamp]);
+  }, [isVisible, scrolled, messageDispatch, chatID, endTimestamp, isFirstMessageRendered]);
 
 
   useEffect(() => {
@@ -139,6 +141,9 @@ const Messages = () => {
                   <div>Loading...</div>
                 ) : (
                   <>
+                    {isFirstMessageRendered && (
+                      <div>This is the start of {title || tempTitle}</div>
+                    )}
                     {[...messages].map(([messageUid, messageData], index) => {
                       const memberDataOfSender = memberState.members.get(messageData.sender);
                       return (

@@ -3,8 +3,11 @@ import { ChatContext } from "../../../../providers/ChatContext";
 
 const ChatRoom = ({chatroom, numUnread}) => {
   console.log('chatRoom run');
-  const { chatState, chatDispatch } = useContext(ChatContext);
+  const { chatState, chatDispatch, memberDispatch, messageDispatch } = useContext(ChatContext);
   const handleChangeChat = () => {
+    chatDispatch({type: "RESET"});
+    memberDispatch({type: "RESET"});
+    messageDispatch({type: "RESET"});
     chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: chatroom.chatID, title: chatroom.title, tempTitle: chatroom.tempTitle, owner: chatroom.owner }});
   };
 

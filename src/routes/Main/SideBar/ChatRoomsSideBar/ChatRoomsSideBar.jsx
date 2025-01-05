@@ -9,7 +9,7 @@ const ChatRoomsSideBar = () => {
   console.log('chatroomsidebar run');
   const { chatRoomsData } = useContext(ChatroomsContext);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
-  const { clicked, setClicked, points, setPoints } = useContextMenu();
+  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
 
@@ -19,7 +19,7 @@ const ChatRoomsSideBar = () => {
 
   const handleContextMenu = (e, chatroom) => {
     e.preventDefault();
-    setClicked(true);
+    setContextMenu({'chatroom': true});
     setPoints({x: e.pageX, y: e.pageY});
     console.log(chatroom);
     setContextMenuData(chatroom.chatID);
@@ -47,7 +47,7 @@ const ChatRoomsSideBar = () => {
         )}
       </div>
 
-      {clicked && (
+      {contextMenu.chatroom && (
         <ChatRoomContextMenu contextMenuData={contextMenuData} points={points}/>
       )}
 
