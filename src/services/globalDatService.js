@@ -2,7 +2,6 @@ import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 
 
 export const fetchUsernameData = async(db) => {
-  console.log('yooo')
   const usersQuery = query(ref(db, "users"), orderByChild('username'));
   const usersQuerySnap = await get(usersQuery);
   return usersQuerySnap.val();

@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import Signin from "./routes/Signin/Signin";
+import Signin from "./pages/Signin/Signin";
 import { Navigate } from "react-router-dom";
 import { Suspense, lazy, useContext } from "react";
-import { AuthContext } from "./providers/AuthProvider";
+import { AuthContext } from "./context/AuthContext";
 
-const Signup = lazy(() => import('./routes/Signup/Signup'));
-const Main = lazy(() => import('./routes/Main/Main'));
-const Settings = lazy(() => import('./routes/Main/Settings/Settings'));
+const Signup = lazy(() => import('./pages/Signup/Signup'));
+const Main = lazy(() => import('./pages/Main/Main'));
+const Settings = lazy(() => import('./pages/Settings/Settings'));
 
 function App() {
   const { currUser } = useContext(AuthContext);

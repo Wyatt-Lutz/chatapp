@@ -1,11 +1,11 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
-import './index.css';
+import './assets/index.css';
 
-import { AuthContextProvider } from './providers/AuthProvider.jsx';
-import { ChatContextProvider } from './providers/ChatContext.jsx';
-import { ChatroomsContextProvider } from './providers/ChatroomsContext.jsx';
+import { AuthContextProvider } from './context/AuthContext.jsx';
+import { ChatContextProvider } from './context/ChatContext.jsx';
+import { ChatroomsContextProvider } from './context/ChatroomsContext.jsx';
 
 const Providers = ({ children }) => (
   <AuthContextProvider>

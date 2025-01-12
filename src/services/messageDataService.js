@@ -16,6 +16,7 @@ export const fetchOlderChats = async(endTimestamp, db, chatID) => {
 
 
 export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID) => {
+  console.log(firstMessageID);
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
@@ -28,19 +29,22 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
   }
   await set(newMessageRef, newMessage);
 
-  await updateUnreadCount(db, chatID);
-
-
-  //If there isn't a first message already, set this to be the first using runTransaction for atomicity
+   //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
   if (!firstMessageID) {
     const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
     await runTransaction(firstMessageIdRef, (currID) => {
-      if (currID === null) {
+      if (!currID) {
         return newMessageRef.key; //the message ID
       }
       return currID;
     });
   }
+
+  await updateUnreadCount(db, chatID);
+
+
+
+
 
 };
 

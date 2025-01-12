@@ -13,7 +13,7 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
       tempTitle: tempTitle,
       owner: currUserUid,
       memberUids: memberUids,
-      firstMessageID: null,
+      firstMessageID: "",
     }
 
     await Promise.all([
@@ -61,5 +61,17 @@ export const checkIfDuplicateChat = async(db, currUserUid, newChatMemberUids) =>
   return false;
 }
 
+
+/**
+ * Fetches metadata for a specified chatroom.
+ * @param {*} db
+ * @param {*} chatID
+ * @returns
+ */
+export const fetchChatRoomData = async(db, chatID) => {
+  const chatroomRef = ref(db, `chats/${chatID}`);
+  const chatroomDataSnap = await get(chatroomRef);
+  return chatroomDataSnap.val();
+}
 
 
