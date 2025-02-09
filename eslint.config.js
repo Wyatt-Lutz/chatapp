@@ -4,6 +4,7 @@ import { FlatCompat } from "@eslint/eslintrc"
 import pluginReact from "eslint-plugin-react";
 import js from "@eslint/js";
 
+
 const compat = new FlatCompat({
   recommendedConfig: js.configs.recommended,
 });
