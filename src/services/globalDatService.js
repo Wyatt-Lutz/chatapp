@@ -1,4 +1,4 @@
-import { ref, get, query, orderByChild, equalTo } from "firebase/database";
+import { ref, get, query, orderByChild, equalTo, set } from "firebase/database";
 
 
 export const fetchUsernameData = async(db) => {
@@ -17,4 +17,15 @@ export const checkIfUserExists = async(db, newUser) => {
   console.log(usersQuerySnap.val());
   return usersQuerySnap.val();
 
+}
+
+
+export const createUserData = async(db, uid, trimmedUsername, email) => {
+  const userRef = ref(db, `users/${uid}`);
+  set((userRef), {
+    username: trimmedUsername,
+    email: email,
+    blocked: [],
+    chatsIn: [],
+  });
 }

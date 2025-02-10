@@ -1,13 +1,13 @@
 import { useForm } from "react-hook-form";
-import { changeUsername, deleteAccount, changeEmail } from "../../../src/services/settingsDataService";
+import { changeUsername, deleteAccount, changeEmail } from "../services/settingsDataService";
 import { useContext, useState } from "react";
-import { AuthContext } from "../../../src/context/AuthContext";
-import { db } from "../../../firebase";
+import { AuthContext } from "../context/AuthContext";
+import { db } from "../../firebase";
 import { updateEmail, sendEmailVerification, updatePassword } from "firebase/auth";
-import ConfirmPassModal from "./ConfirmPassModal";
-import EmailNotVerified from "../../../src/components/EmailNotVerified";
-import UsernameAvailability from "../../../src/components/UsernameAvailability";
-import BlockedUsersModal from "./BlockedUsersModal";
+import ConfirmPassModal from "../components/ConfirmPassModal";
+import EmailNotVerified from "../components/EmailNotVerified";
+import UsernameAvailability from "../components/UsernameAvailability";
+import BlockedUsersModal from "../components/BlockedUsersModal";
 import { useNavigate } from "react-router-dom";
 
 const Settings = () => {

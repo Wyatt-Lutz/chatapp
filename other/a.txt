@@ -20,3 +20,11 @@ also figure out the useMemo stuff with each component and the useContext that I 
 Was working on messagesContext.jsx and problem was if I have the message logic there, then I will also need like the numUnread for the current chat
   and also like scroll position flags to know if to add to unread count, but thats just wierd, keeping the scroll position flag in the context
   So i could like find a way to efficiently have it see if messages updates without it being like a useEffect listener watsit
+
+
+
+account setup -> add profile picture, unless do a default image of something
+settings -> change profile picture and display it
+messages -> display profile picture and have ability to send pictures -> can send image and message at same, add a message property: imageURL and can display the image if it exists
+  - should be able to edit the message, not the image, even if there is no text originally
+emojis

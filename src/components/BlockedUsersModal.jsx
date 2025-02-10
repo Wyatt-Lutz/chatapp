@@ -1,9 +1,9 @@
 import { memo, useContext, useEffect, useState } from "react"
-import Close from "../../../src/components/ui/Close";
-import { getBlockData, getUsernameFromUid, updateBlockedStatus } from "../../../src/services/memberDataService";
-import { db } from "../../../firebase";
-import { AuthContext } from "../../../src/context/AuthContext";
-import Minus from "../../../src/components/ui/Minus";
+import Close from "./ui/Close";
+import { getBlockData, getUsernameFromUid, updateBlockedStatus } from "../services/memberDataService";
+import { db } from "../../firebase";
+import { AuthContext } from "../context/AuthContext";
+import Minus from "./ui/Minus";
 
 const BlockedUsersModal = ({changeDisplayment}) => {
   const { currUser } = useContext(AuthContext);
