@@ -18,7 +18,10 @@
   -if I sign in, go back to /signin, and then click signin even if the email/password fields aren't right, it signs me in, but gives me an invalid password console error anyway
 
 -Signup
-  - Optimize it
+  - improve the flow, like I should have the verification link go to the website or something
+  - could preload the default image in signupform 
+  - see if If there is a way to prevent the extremely rare case that two people sign up with the same username, but they both loaded available usernames at the same time, so only one should get it assuming I check usernames on signup again.
+  - when the user clicks next in signupform, add username check 
   - add a feature like with chanigng username where the username inputed is checked against the username data and if its avaliable tell under the input - make sure to only fetch userData once
   - Make the form errors toasts or something - well Idk, because its cool when they pop up immedietly like if username.length > 15
   - Do some research with the noValidate thing with the form, like is it safer to keep or do I have all the regex checks and stuff
@@ -58,6 +61,12 @@
   - Sort the chatbar for most recent chatted in on top, need to add a timestamp or something
 
 -app
+  - use react-hook-form useWatch instead of its watch 
+  - see if I can avoid reinitializing like currUser or DB and pass them to componenets in a lifecycle like in Settings
+  - make sure I dont set any jsx to like a useState, should only store data there
+  - set default values to function parameters that are optional, as it they may not be there
+  - make a progress bar hook if needed
+  - it says authenticaitng... on like signup and signin when not signed in, probably because auth wraps everything
   - fix our horrible folder system, and also some name things, like I have a main.jsx and Main.jsx
   - See if I dont have to pass the dispatch functions and db and whatnot to the service functions
   - Add destructuring everywhere where necessary

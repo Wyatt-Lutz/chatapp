@@ -1,9 +1,9 @@
 
 
 
-import Close from "./ui/Close";
+import Close from "../../../components/ui/Close";
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext";
 import { useForm } from "react-hook-form";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";

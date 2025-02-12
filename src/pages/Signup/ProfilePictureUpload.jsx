@@ -4,16 +4,22 @@ import { storage } from "../../../firebase";
 import { useEffect, useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { readAndCompressImage } from 'browser-image-resizer';
 
 
 const ProfilePictureUpload = ({user}) => {
-  console.log(user);
-  console.log(user.userCredential.uid);
 
   const navigate = useNavigate();
 
   const {register, handleSubmit} = useForm();
   const [profilePicture, setProfilePicture] = useState(null);
+  const [progress, setProgress] = useState(0);
+
+  const imageCompressionConfig = {
+    quality: 3.0,
+    maxWidth: 512,
+    maxHeight: 512,
+  };
 
   useEffect(() => {
     const fetchDefaultImage = async() => {
@@ -28,14 +34,21 @@ const ProfilePictureUpload = ({user}) => {
   }, []);
 
 
-  const onSubmit = async({file}) => {
+  const onSubmit = async({image}) => {
+    console.log(image[0]);
+    const metadata = {
+      contentType: image[0].type,
+    };
 
-    const pictureRef = ref(storage, `users/${user.userCredential.uid}`);
-    const uploadTask = uploadBytesResumable(pictureRef, file);
+    const resizedImage = await readAndCompressImage(image[0], imageCompressionConfig);
+
+    //const compressedImage = await imageCompression(image[0], imageCompressionConfig);
+    const pictureRef = ref(storage, `users/${user.userCredential.user.uid}`);
+    const uploadTask = uploadBytesResumable(pictureRef, resizedImage, metadata);
 
     uploadTask.on('state_changed', (snap) => {
       const progress = (snap.bytesTransferred / snap.totalBytes) * 100;
-      console.log(progress);
+      setProgress(progress);
       switch (snap.state) {
         case 'paused':
           console.error("upload is paused");
@@ -57,7 +70,7 @@ const ProfilePictureUpload = ({user}) => {
           break;
       }
     }, async() => {
-      const imageURL = await getDownloadURL(uploadTask.snap.ref);
+      const imageURL = await getDownloadURL(uploadTask.snapshot.ref);
       setProfilePicture(imageURL);
     });
   }
@@ -65,7 +78,13 @@ const ProfilePictureUpload = ({user}) => {
 
 
   const onFinish = async() => {
-    await updateProfile(user.userCredential, {displayName: user.displayName, photoURL: profilePicture});
+
+    try {
+      await updateProfile(user.userCredential.user, {displayName: user.displayName, photoURL: profilePicture});
+    } catch (err) {
+      console.error(err);
+    }
+    
     navigate("/")
   }
 
@@ -78,6 +97,7 @@ const ProfilePictureUpload = ({user}) => {
         <input type="file" {...register('image')}/>
         <button type="submit">Choose</button>
       </form>
+      <progress max={100} value={progress}></progress>
 
       <button onClick={onFinish}>Complete</button>
     </>

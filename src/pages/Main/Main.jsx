@@ -7,7 +7,8 @@ import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 import { ChatContext } from '../../context/ChatContext';
 import { ChatroomsContext } from '../../context/ChatroomsContext';
 import { useNavigate } from 'react-router-dom';
-import { getDownloadURL, ref } from 'firebase/storage';
+
+
 const EmailNotVerified = lazy(() => import('../../components/EmailNotVerified'));
 const Main = () => {
   const [emailVerificationModal, setEmailVerificationModal] = useState(false);
@@ -22,19 +23,19 @@ const Main = () => {
   useEffect(() => {
 
     const checkIfUserVerified = async() => {
-
-      const alreadySentVerification = localStorage.getItem('alreadySentVerification');
+      const verificationCookieId = `verification-${currUser.uid}`
+      const alreadySentVerification = localStorage.getItem(verificationCookieId);
 
       if (!auth.currentUser.emailVerified) {
         setEmailVerificationModal(true);
 
         if (!alreadySentVerification) {
           await sendEmailVerification(currUser);
-          localStorage.setItem('alreadySentVerification', true);
+          localStorage.setItem(verificationCookieId, true);
           console.info("Email Verification sent");
         }
       } else if (alreadySentVerification) {
-        localStorage.removeItem('alreadySentVerification');
+        localStorage.removeItem(verificationCookieId);
       }
 
       setLoading(false);
