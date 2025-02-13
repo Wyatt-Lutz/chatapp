@@ -1,9 +1,12 @@
 
+-UsernameAvalaibility
+  - With slow internet, I think it says username is available for a second before chaning to not availiable (if the username isnt availbiable)
 
 -PasswordReset
   - Optimize it and make it better wiuth change Password, like add
 
 -Settings
+  - the modal popups have a black background
   - Test Delete Account
   - Have all the change components dispaly toasts on success
   - In the delete account popup, there is the done button and delete button
@@ -18,6 +21,7 @@
   -if I sign in, go back to /signin, and then click signin even if the email/password fields aren't right, it signs me in, but gives me an invalid password console error anyway
 
 -Signup
+  - recieved 2 emails with different bodys to verify account on signup, could be because i clicked complete twice, but either way should only send one
   - improve the flow, like I should have the verification link go to the website or something
   - could preload the default image in signupform 
   - see if If there is a way to prevent the extremely rare case that two people sign up with the same username, but they both loaded available usernames at the same time, so only one should get it assuming I check usernames on signup again.

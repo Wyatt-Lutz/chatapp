@@ -9,6 +9,7 @@ import DeleteAccount from "./Components/DeleteAccount";
 import ChangePassword from "./Components/ChangePassword";
 import ChangeEmail from "./Components/ChangeEmail";
 import ChangeUsername from "./Components/ChangeUsername";
+import ChangeProfilePicture from "./Components/ChangeProfilePicture";
 
 const Settings = () => {
   console.log('settings run')
@@ -62,7 +63,7 @@ const Settings = () => {
           <ChangeEmail db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
           <ChangePassword currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
           <DeleteAccount db={db} currUser={currUser} displayPassModal={displayPassModal} />
-          
+          <ChangeProfilePicture currUser={currUser} />
           
           <button onClick={() => setModal({ type: "BlockedUsersModal", props: {changeDisplayment: () => setModal({ type: null, props: {} }) }})} className="bg-gray-500">Blocked Users</button>
 
