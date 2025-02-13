@@ -7,7 +7,7 @@ import { AuthContext } from "./context/AuthContext";
 
 const Signup = lazy(() => import('./pages/Signup/Signup'));
 const Main = lazy(() => import('./pages/Main/Main'));
-const Settings = lazy(() => import('./pages/Settings'));
+const Settings = lazy(() => import('./pages/Settings/Settings'));
 
 function App() {
   const { currUser } = useContext(AuthContext);

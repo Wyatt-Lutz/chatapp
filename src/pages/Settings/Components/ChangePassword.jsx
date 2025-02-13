@@ -3,14 +3,14 @@ import { useForm, useWatch } from "react-hook-form";
 
 const ChangePassword = ({currUser, displayPassModal, passwordModalHeader, passwordModalText}) => {
 
-    const {register, resetField} = useForm({
+    const {register, resetField, control} = useForm({
         defaultValues: {
             newPassword: "",
             confirmNewPassword: "",
         }
     })
-    const newPassword = useWatch({ name: 'newPassword' });
-    const confirmNewPassword = useWatch({ name: 'confirmNewPassword' });
+    const newPassword = useWatch({ name: 'newPassword', control });
+    const confirmNewPassword = useWatch({ name: 'confirmNewPassword', control });
 
 
     const editPassword = async() => {
