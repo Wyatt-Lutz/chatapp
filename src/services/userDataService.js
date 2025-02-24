@@ -3,33 +3,35 @@ import { storage } from "../../firebase";
 import { readAndCompressImage } from "browser-image-resizer";
 
 export const fetchProfilePicture = async(userUid) => {
-    const pictureRef = ref(storage, `users/${userUid}`);
-    const pictureUrl = await getDownloadURL(pictureRef);
-    return pictureUrl;
+  const pictureRef = ref(storage, `users/${userUid}`);
+  const pictureUrl = await getDownloadURL(pictureRef);
+  return pictureUrl;
 }
 
 
 export const compressImage = async(originalImage) => {
-    const imageCompressionConfig = {
-        quality: 3.0,
-        maxWidth: 512,
-        maxHeight: 512,
-    };
-  
-    const resizedImage = await readAndCompressImage(originalImage, imageCompressionConfig);
-    return resizedImage;
+  const imageCompressionConfig = {
+      quality: 3.0,
+      maxWidth: 512,
+      maxHeight: 512,
+  };
+
+  const resizedImage = await readAndCompressImage(originalImage, imageCompressionConfig);
+  return resizedImage;
 }
 
 
 export const uploadPicture = async(image, storageLocation) => {
-    const metadata = {
+  return new Promise((resolve) => {
+      const metadata = {
         contentType: image.type,
     };
 
     const pictureRef = ref(storage, storageLocation);
     const uploadTask = uploadBytesResumable(pictureRef, image, metadata);
-  
-      uploadTask.on('state_changed', (snap) => {
+
+    uploadTask.on('state_changed',
+      (snap) => {
         switch (snap.state) {
           case 'paused':
             console.error("upload is paused");
@@ -38,10 +40,11 @@ export const uploadPicture = async(image, storageLocation) => {
             console.log('uploading');
             break;
         }
-      }, (error) => {
+      },
+      (error) => {
         switch (error.code) {
           case 'storage/unauthorized':
-            console.error('user doesnt have permission to upload');
+            console.error('user doesn\'t have permission to upload');
             break;
           case 'storage/canceled':
             console.error('upload is canceled');
@@ -50,8 +53,11 @@ export const uploadPicture = async(image, storageLocation) => {
             console.error('unknown error');
             break;
         }
-      }, async() => {
+      },
+      async() => {
         const imageURL = await getDownloadURL(uploadTask.snapshot.ref);
-        return imageURL;
-      });
+        resolve(imageURL);
+      }
+    );
+  })
 }

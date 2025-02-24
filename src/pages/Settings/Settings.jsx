@@ -20,13 +20,8 @@ const Settings = () => {
   const [modal, setModal] = useState({ type: null, props: {} });
 
 
-
-
   const passwordModalHeader = "Confirm Current Password"
   const passwordModalText = "Please enter your current password to confirm these changes."
-
-
-
 
 
   const displayPassModal = (header, text, isDeleteAccount = false) => {
@@ -47,6 +42,9 @@ const Settings = () => {
 
   return (
         <>
+          {modal.type === "ConfirmPassModal" && (
+            <ConfirmPassModal {...modal.props} />
+          )}
           <h1>Settings</h1>
 
           <h2>My Account</h2>
@@ -57,18 +55,16 @@ const Settings = () => {
           </div>
 
 
-
-
-          <ChangeUsername db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} /> 
+          <ChangeUsername db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
           <ChangeEmail db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
           <ChangePassword currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
           <DeleteAccount db={db} currUser={currUser} displayPassModal={displayPassModal} />
           <ChangeProfilePicture currUser={currUser} />
-          
+
           <button onClick={() => setModal({ type: "BlockedUsersModal", props: {changeDisplayment: () => setModal({ type: null, props: {} }) }})} className="bg-gray-500">Blocked Users</button>
 
 
-          
+
           <button onClick={() => navigate("/")}>Go Home</button>
 
 

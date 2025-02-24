@@ -8,6 +8,7 @@ import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
 import { ChatContext } from "../../../../context/ChatContext";
+import { fetchProfilePicture } from "../../../../services/userDataService";
 
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
@@ -75,11 +76,13 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
       console.log("chat with those members already exists");
       return;
     }
+    const membersList = {};
 
-    const membersList = usersAdded.reduce((members, member) => {
-      members[member.uid] = {isOnline: false, username: member.username, hasBeenRemoved: false };
-      return members
-    }, {});
+    for (const member of usersAdded) {
+      const profilePicture = await fetchProfilePicture(member.uid);
+      membersList[member.uid] = { isOnline: false, username: member.username, hasBeenRemoved: false, profilePictureURL: profilePicture };
+    }
+
     console.log(membersList);
 
     //if the user entered a title, use it, if not, take the members list and map them out to use as the title
@@ -100,7 +103,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
   return (
     <>
-        <div className="z-100 fixed inset-0 flex items-center justify-center p-6 bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
           <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
             <button onClick={() => changeChatRoomCreationState(false)} className="absolute top-4 right-4"><Close /></button>
             {isUserBlockedWarning ? (
@@ -121,7 +124,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
                       <div className="px-2" key={user.uid}>{user.username}</div>
                     ))}
                   </div>
-                  <button className="ring "type="submit">Find User</button>
+                  <button className="ring"type="submit">Find User</button>
                 </form>
 
                 <form onSubmit={handleSubmit((data) => handleCreateChat(data))}>

@@ -1,10 +1,7 @@
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useForm } from "react-hook-form";
-import { storage } from "../../../firebase";
 import { useEffect, useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { readAndCompressImage } from 'browser-image-resizer';
 import { compressImage, fetchProfilePicture, uploadPicture } from "../../services/userDataService";
 
 
@@ -36,16 +33,16 @@ const ProfilePictureUpload = ({user}) => {
     const photoStorageLocation = `users/${user.userCredential.user.uid}`;
     try {
       const photoUrl = await uploadPicture(profilePicture, photoStorageLocation);
-      console.log('hotourl' + photoUrl);
+      console.log('photo url: ' + photoUrl);
       await updateProfile(user.userCredential.user, {
-        displayName: user.displayName, 
+        displayName: user.displayName,
         photoURL: photoUrl
       });
 
     } catch (err) {
       console.error(err);
     }
-    
+
     navigate("/");
   }
 

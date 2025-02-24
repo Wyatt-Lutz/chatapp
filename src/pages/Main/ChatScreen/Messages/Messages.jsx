@@ -153,12 +153,18 @@ const Messages = () => {
                             <>
                               {messageData.sender !== 'server' && (
                                 <div className="flex" onContextMenu={(e) => handleUsernameContextMenu(e, messageData.sender, memberDataOfSender)}>
+                                  {memberDataOfSender && (
+                                    <div>
+                                      <img src={memberDataOfSender.profilePictureURL} alt="profile picture"/>
+                                      {memberDataOfSender.isBlocked ? (
+                                        <div>Blocked User</div>
+                                      ) : (
+                                        <div>{memberDataOfSender && memberDataOfSender.username}</div>
+                                      )}
+                                    </div>
 
-                                  {memberDataOfSender && memberDataOfSender.isBlocked ? (
-                                    <div>Blocked User</div>
-                                  ) : (
-                                    <div>{memberDataOfSender && memberDataOfSender.username}</div>
                                   )}
+
                                 </div>
                               )}
 

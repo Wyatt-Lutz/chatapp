@@ -5,8 +5,6 @@ import { useState } from "react";
 
 
 
-
-
 const Signup = () => {
   const navigate = useNavigate();
   const [userData, setUserdata] = useState(null);
