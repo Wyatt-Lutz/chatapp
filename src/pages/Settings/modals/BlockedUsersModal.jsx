@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import Close from "../../../components/ui/Close";
 import { getBlockData, getUsernameFromUid, updateBlockedStatus } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";

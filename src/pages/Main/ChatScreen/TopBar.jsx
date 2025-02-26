@@ -1,4 +1,4 @@
-import { memo, useContext, useState, useEffect } from "react"
+import { useContext, useState } from "react"
 import { useForm } from "react-hook-form";
 import { db } from "../../../../firebase";
 import { AuthContext } from "../../../../src/context/AuthContext";
@@ -43,4 +43,4 @@ const TopBar = () => {
   )
 }
 
-export default memo(TopBar);
+export default TopBar;

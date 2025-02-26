@@ -1,4 +1,4 @@
-import { useContext, useState, memo, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
 import { ChatContext } from "../../../../context/ChatContext";

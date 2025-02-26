@@ -1,4 +1,4 @@
-import { memo, useContext } from "react"
+import { useContext } from "react"
 import { removeUserFromChat } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 import { AuthContext } from "../../../../context/AuthContext";

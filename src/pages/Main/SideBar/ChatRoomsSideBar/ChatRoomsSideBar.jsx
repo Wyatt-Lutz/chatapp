@@ -1,4 +1,4 @@
-import { useContext, useState, memo } from "react";
+import { useContext, useState } from "react";
 import Plus from "../../../../components/ui/Plus";
 import ChatRoom from "./ChatRoom";
 import { useContextMenu } from "../../../../hooks/useContextMenu";

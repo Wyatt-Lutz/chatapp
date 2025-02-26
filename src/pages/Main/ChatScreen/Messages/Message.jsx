@@ -1,4 +1,4 @@
-import { memo, useContext } from "react"
+import { useContext } from "react"
 import { useForm } from "react-hook-form";
 import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
@@ -47,4 +47,4 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
     </>
   )
 }
-export default memo(Message);
+export default Message;

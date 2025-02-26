@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
-import { limitToLast, orderByChild, query, startAt, ref, onChildAdded, onChildChanged, onChildRemoved, get } from "firebase/database";
+import { limitToLast, orderByChild, query, startAt, ref, onChildAdded, onChildChanged, onChildRemoved } from "firebase/database";
 import { getBlockData } from "../services/memberDataService";
 import { AuthContext } from "./AuthContext";
 import { db } from "../../firebase";

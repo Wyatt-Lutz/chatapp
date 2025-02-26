@@ -1,4 +1,4 @@
-import { useContext, memo } from "react";
+import { useContext } from "react";
 import { db } from "../../../../../firebase";
 import { ChatContext } from "../../../../context/ChatContext";
 import { deleteMessage } from "../../../../services/messageDataService";

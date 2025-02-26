@@ -3,6 +3,7 @@ import pluginJs from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc"
 import pluginReact from "eslint-plugin-react";
 import js from "@eslint/js";
+import reactCompiler from 'eslint-plugin-react-compiler'
 
 
 const compat = new FlatCompat({
@@ -34,9 +35,13 @@ export default [
   pluginReact.configs.flat.recommended,
   {
     rules: {
+      'react-compiler/react-comipler': 'error',
       "react/react-in-jsx-scope": "off",
       "react/jsx-uses-react": "off",
       "react/prop-types": "off",
+    },
+    plugins: {
+      'react-compiler': reactCompiler,
     },
   },
 ];

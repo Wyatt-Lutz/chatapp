@@ -14,12 +14,12 @@ const ChangeUsername = ({db, currUser, displayPassModal, passwordModalHeader, pa
 
     const editUsername = async() => {
         await displayPassModal(passwordModalHeader, passwordModalText);
-    
+
         const isChanged = await changeUsername(db, newUsername, currUser);
         if (isChanged) {
           console.log("username changed");
         }
-    
+
       }
     return (
         <>

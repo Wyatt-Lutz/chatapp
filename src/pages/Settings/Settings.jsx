@@ -42,9 +42,6 @@ const Settings = () => {
 
   return (
         <>
-          {modal.type === "ConfirmPassModal" && (
-            <ConfirmPassModal {...modal.props} />
-          )}
           <h1>Settings</h1>
 
           <h2>My Account</h2>

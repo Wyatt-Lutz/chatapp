@@ -1,4 +1,4 @@
-import { memo, useContext } from "react"
+import { useContext } from "react"
 import { ChatContext } from "../../../../context/ChatContext";
 
 const Member = ({ memberUid, memberData }) => {

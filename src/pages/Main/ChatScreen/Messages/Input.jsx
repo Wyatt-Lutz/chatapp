@@ -1,4 +1,4 @@
-import { memo, useContext, useState } from "react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../context/AuthContext";
 import { ChatContext } from "../../../../context/ChatContext";
@@ -30,8 +30,8 @@ const Input = () => {
     <>
 
       <form onSubmit={handleSubmit(handleAddMessage)}>
-        <input onChange={(e) => setInput(e.target.value)} placeholder="Type here..." {...register('text', { required: false, maxLength: 200})} value={input} />
-        <button onClick={(e) => {e.preventDefault(); setShowEmojiPicker(prev => !prev);}}><Smile /></button>
+        <input placeholder="Type here..." {...register('text', { required: false, maxLength: 200})} />
+        <button><Smile /></button>
       </form>
 
 
@@ -39,4 +39,4 @@ const Input = () => {
     </>
   )
 }
-export default memo(Input);
+export default Input;

@@ -1,5 +1,5 @@
 
-import { useContext, useState, memo } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../context/AuthContext";
 import { db } from "../../../../../firebase";
