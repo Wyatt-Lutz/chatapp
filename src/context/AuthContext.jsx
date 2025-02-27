@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { auth } from "../../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, sendEmailVerification } from "firebase/auth";
 
 
 export const AuthContext = createContext();
@@ -9,10 +9,12 @@ export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const authState = onAuthStateChanged(auth, (user) => {
+    const authState = onAuthStateChanged(auth, async(user) => {
       setCurrUser(user);
       setLoading(false);
     });
+
+
     return () => {
       authState();
     };

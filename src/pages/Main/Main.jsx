@@ -2,7 +2,7 @@ import { AuthContext } from '../../context/AuthContext';
 import ChatScreen from './ChatScreen/ChatScreen';
 import { sendEmailVerification, signOut } from 'firebase/auth';
 import { lazy, Suspense, useContext, useEffect, useRef, useState } from 'react';
-import { auth, storage } from '../../../firebase';
+import { auth } from '../../../firebase';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 import { ChatContext } from '../../context/ChatContext';
 import { ChatroomsContext } from '../../context/ChatroomsContext';

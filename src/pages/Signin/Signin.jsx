@@ -18,14 +18,20 @@ const Signin = () => {
 
 
   const signUserIn = async({email, password}) => {
-    await setPersistence(auth, checkboxRef.current.checked ? browserLocalPersistence : browserSessionPersistence)
-    await signInWithEmailAndPassword(auth, email, password).catch((error) => {
-      if (error.code === 'auth/invalid-credential') {
-        console.error('Your email and/or password are incorrect.');
-      }
-    });
+    try {
+      await setPersistence(auth, checkboxRef.current.checked ? browserLocalPersistence : browserSessionPersistence);
+      await signInWithEmailAndPassword(auth, email, password);
 
-    navigate("/");
+      navigate("/");
+    } catch (e) {
+      if (e.message === 'EMAIL_NOT_FOUND') {
+        console.error('The emailed entered does not have an associated account.');
+      } else if (e.message === 'INVALID_PASSWORD') {
+        console.error('The entered password is incorrect');
+      } else {
+        console.error('Error signing in');
+      }
+    }
   }
 
   return(

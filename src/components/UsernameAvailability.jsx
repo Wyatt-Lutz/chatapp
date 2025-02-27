@@ -11,7 +11,7 @@ const UsernameAvailability = ({newUsername, setIsButtonDisabled}) => {
     const fetchUsernames = async() => {
       console.log('fetched usernames');
       const usernameData = await fetchUsernameData(db);
-      setUsernames(Object.values(usernameData).map((user) => user.username));
+      setUsernames(usernameData);
     }
     fetchUsernames();
   }, []);

@@ -1,20 +1,24 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { db, auth } from "../../../firebase";
 import { createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
 import { useState } from "react";
-import { createUserData } from "../../services/globalDatService";
+import { createUserData, fetchUsernameData } from "../../services/globalDatService";
 
 
 const SignupForm = ({ onSubmitForm }) => {
-  const { register, formState: { errors }, handleSubmit, watch } = useForm();
-  const newUsername = watch('username');
+  const { register, formState: { errors }, handleSubmit, control } = useForm();
+  const newUsername = useWatch({ name: 'username', control });
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
 
 
   const onSubmit = async({email, password, username}) => {
     try {
+      const usernames = await fetchUsernameData(db);
+      if (usernames.includes(username)) {
+        throw new Error('username-already-in-use');
+      }
 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log(userCredential);
@@ -30,6 +34,9 @@ const SignupForm = ({ onSubmitForm }) => {
       onSubmitForm({displayName: trimmedUsername, userCredential: userCredential});
     } catch(error) {
       switch (error.code) {
+        case 'username-already-in-use':
+          console.log('Username is already taken');
+          break;
         case 'auth/email-already-in-use':
           console.log(`Email address ${email} already in use.`);
           break;

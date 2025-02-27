@@ -1,8 +1,10 @@
 import { sendEmailVerification } from "firebase/auth";
 import { auth } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 const EmailNotVerified = ({ email }) => {
   const currUser = auth.currentUser;
+  const navigate = useNavigate();
   const resendEmail = async () => {
     try {
       await sendEmailVerification(currUser);
@@ -22,7 +24,7 @@ const EmailNotVerified = ({ email }) => {
       >
         Resend Email
       </button>
-      <button className="border rounded-md bg-zinc-500 m-2 p-1">Change Email</button>
+      <button onClick={() => navigate("/settings")} className="border rounded-md bg-zinc-500 m-2 p-1">Change Email</button>
     </div>
   );
 };

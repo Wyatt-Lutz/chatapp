@@ -1,29 +1,31 @@
 import { sendEmailVerification, updateEmail } from "firebase/auth";
 import { useForm, useWatch } from "react-hook-form";
 import { changeEmail } from "../../../services/settingsDataService";
+import { useNavigate } from "react-router-dom";
+
 
 const ChangeEmail = ({db, currUser, displayPassModal, passwordModalHeader, passwordModalText}) => {
     const {register, control} = useForm({
-            defaultValues: {
-                newEmail: currUser.email,
-            }
-        })
+        defaultValues: {
+            newEmail: currUser.email,
+        }
+    });
+    const navigate = useNavigate();
     const newEmail = useWatch({ name: 'newEmail', control });
     const editEmail = async() => {
         await displayPassModal(passwordModalHeader, passwordModalText);
-    
+
         await updateEmail(currUser, newEmail);
         await sendEmailVerification(currUser);
-    
-        setModal({
-          type: "EmailNotVerified",
-          props: {
-            email: currUser.email,
-          }
-        });
-    
+
         await changeEmail(db, currUser, newEmail);
-      }
+
+        navigate("/");
+
+
+    }
+
+
     return (
         <>
             <div className="flex">

@@ -1,6 +1,4 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
--UsernameAvalaibility
-  - With slow internet, I think it says username is available for a second before chaning to not availiable (if the username isnt availbiable)
 
 -PasswordReset
   - Optimize it and make it better wiuth change Password, like add
@@ -9,26 +7,21 @@
   - Test Delete Account
   - Have all the change components dispaly toasts on success
   - For pfp Ill have a separate button near password like - change profile picture
-  - in email, should I have it so that the email isnt changed until the new one is verified
 
 -members
   - whenever you remove a user and theres only 2 users in the chat originally, so the entire chat is deleted, the chatrooms sidebar data like disappears or something
   - Make sure you can block members even if they have been removed or something, because its not like theyre accounts have been deleted
 
 -signin
-  -if I sign in, go back to /signin, and then click signin even if the email/password fields aren't right, it signs me in, but gives me an invalid password console error anyway
+  - sometimes there is a lot of lag between clicking signin and it going to home page. It can be seen on that react-scan
 
 -Signup
   - recieved 2 emails with different bodys to verify account on signup, could be because i clicked complete twice, but either way should only send one
   - improve the flow, like I should have the verification link go to the website or something
   - could preload the default image in signupform
-  - see if If there is a way to prevent the extremely rare case that two people sign up with the same username, but they both loaded available usernames at the same time, so only one should get it assuming I check usernames on signup again.
-  - when the user clicks next in signupform, add username check
-  - add a feature like with chanigng username where the username inputed is checked against the username data and if its avaliable tell under the input - make sure to only fetch userData once
   - Make the form errors toasts or something - well Idk, because its cool when they pop up immedietly like if username.length > 15
   - Do some research with the noValidate thing with the form, like is it safer to keep or do I have all the regex checks and stuff
-- useChatData
-  - See if I can optimize fetchMoreChats in useChatData - just really the end
+
 -messages
   - Fix the search messaghes thing
   - see if there is better ways to handle the unseen messages than all the scroll listeners and checks
@@ -42,12 +35,8 @@
   - Should add something to indicate the top of a chat
   - See if there is a more efficient method with handleClick in which I jsut reset to close the context menu
   - See if there is a more effeicient method to get the timestamp of the last message that had a timestamp, right now I have it stored in localstorage
-  - See if I can optimize the thing in which whenever set() runs when you add a message, it immediatly invokes onValue(), but then onValue() also sees that the database changes so theres a double invocation. Right now i have it so if the userSent a chat, it returns in the handleNewMessage
-  - Make sure that text box is not accessible if user hasnt clicked on chat - would be replaced by like friends list or whatever
-  - I should take out the naming the chat and instead just have it automatically name the chat as the name of the members. Then have a button next to the name of the chat after they created it to change the name - only if more than 2 people in chat
-  - Do testing with react query like what happens if I click off of the app, will data still be fetched from the listener and when I click back what happens because I turned that off
   - Test to see what happens if a user clicks on a chat as soon as a messaeg is added
-  - add optimistic updates
+  - add optimistic updates (its like so fast I dont even need it, unless I added it without knowing)
 
 
 
