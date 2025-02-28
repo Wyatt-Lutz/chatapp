@@ -20,11 +20,9 @@ const Providers = ({ children }) => (
 ReactDOM.createRoot(document.getElementById('root')).render(
 
   <StrictMode>
-    <ErrorBoundary>
-      <Providers>
-        <App />
-      </Providers>
-    </ErrorBoundary>
+    <Providers>
+      <App />
+    </Providers>
   </StrictMode>
 
 

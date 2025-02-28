@@ -23,6 +23,7 @@ const ChatScreen = () => {
               <MembersBar/>
             </>
 
+            <Search />
 
           </div>
 

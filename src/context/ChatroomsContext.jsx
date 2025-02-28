@@ -45,6 +45,8 @@ export const ChatroomsContextProvider = ({ children }) => {
 
       const {title, tempTitle} = await fetchChatRoomData(db, newChatID);
 
+      //const updatedTempTitle =
+
       const chatroomObj = {numUnread: snap.val(), title, tempTitle};
       dispatch({ type: "ADD_CHATROOM", payload: {key: newChatID, data: chatroomObj}});
     }

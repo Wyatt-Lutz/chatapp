@@ -28,6 +28,7 @@ const chatReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE_CHAT":
       const { chatID, firstMessageID, owner, tempTitle, title } = action.payload;
+
       return {
         ...state,
         chatID,

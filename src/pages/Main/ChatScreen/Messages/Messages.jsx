@@ -19,14 +19,14 @@ const Messages = () => {
 
   const {chatID, title, tempTitle} = chatState;
   const { numUnread, isAtBottom, endTimestamp, messages, isFirstMessageRendered }  = messageState;
-
+  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
 
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
 
-  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
+
   const [messageContextMenuData, setMessageContextMenuData] = useState({});
-  const [usernameContextMenuData, setUsernameContextMenuData] = useState({});
+
 
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
@@ -122,12 +122,7 @@ const Messages = () => {
     setMessageContextMenuData({ messageUid, text: messageData.text, sender: messageData.sender });
   }
 
-  const handleUsernameContextMenu = (e, memberUid, memberData) => {
-    e.preventDefault();
-    setContextMenu(prev => ({...prev, 'username': true}));
-    setPoints(prev => ({...prev, 'username': {x: e.pageX, y: e.pageY}}));
-    setUsernameContextMenuData({memberUid, memberData})
-  }
+
 
 
   return(
@@ -148,33 +143,6 @@ const Messages = () => {
                       const memberDataOfSender = memberState.members.get(messageData.sender);
                       return (
                         <div>
-
-                          {(messageData.renderTimeAndSender || index === 0) && (
-                            <>
-                              {messageData.sender !== 'server' && (
-                                <div className="flex" onContextMenu={(e) => handleUsernameContextMenu(e, messageData.sender, memberDataOfSender)}>
-                                  {memberDataOfSender && (
-                                    <div>
-                                      <img src={memberDataOfSender.profilePictureURL} alt="profile picture"/>
-                                      {memberDataOfSender.isBlocked ? (
-                                        <div>Blocked User</div>
-                                      ) : (
-                                        <div>{memberDataOfSender && memberDataOfSender.username}</div>
-                                      )}
-                                    </div>
-
-                                  )}
-
-                                </div>
-                              )}
-
-
-                              <div>{calcTime(messageData.timestamp)}</div>
-                            </>
-
-                          )}
-
-
 
                           <div key={messageUid} onContextMenu={(e) => handleMessageContextMenu(e, messageUid, messageData)}>
                             <Message messageUid={messageUid} memberDataOfSender={memberDataOfSender} messageData={messageData} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
@@ -208,9 +176,7 @@ const Messages = () => {
       {(contextMenu.messages && messageContextMenuData.sender !== 'server' && (messageContextMenuData.sender === currUser.uid || currUser.uid === chatState.owner)) && (
         <MessagesContextMenu changeEditState={changeEditState} contextMenuData={messageContextMenuData} points={points.messages} />
       )}
-      {(contextMenu.username && usernameContextMenuData.memberUid !== currUser.uid) && (
-        <MemberContextMenu contextMenuData={usernameContextMenuData} points={points.username} />
-      )}
+
 
 
 

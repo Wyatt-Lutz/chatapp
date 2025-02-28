@@ -86,7 +86,6 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     console.log(membersList);
 
     //if the user entered a title, use it, if not, take the members list and map them out to use as the title
-    //const title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).map(member => member.username).join(', ');
     if (chatName && chatName.length > 0) {
       title = chatName;
     } else {

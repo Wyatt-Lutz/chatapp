@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { db } from "../../../../firebase";
 import { queryMessages } from "../../../services/searchDataService";
 import { ChatContext } from "../../../context/ChatContext";
@@ -7,12 +7,12 @@ import Message from "./Messages/Message";
 
 const Search = () => {
   console.log('search run');
-  const { register, watch } = useForm();
-  const searchQuery = watch('searchQuery', '');
-  const { chatState } = useContext(ChatContext);
+  const { register, control } = useForm();
+  const searchQuery = useWatch({name: 'searchQuery', control});
+  const { chatState, memberState } = useContext(ChatContext);
   const chatID = chatState.chatID;
-  const searchedMessages = new Map();
-/*
+  const [searchedMessages, setSearchedMessages] = useState(new Map());
+
   useEffect(() => {
 
     if (!searchQuery) {
@@ -21,36 +21,39 @@ const Search = () => {
 
     const fetchMessages = async() => {
       const messagesObject = await queryMessages(db, chatID, searchQuery);
-      console.log("using object.keys: " + Object.values(messagesObject));
-      messages
-      searchedMessages.set(messagesObject.key)
+      if (!messagesObject) {
+        setSearchedMessages(new Map());
 
-      const messageData = []
-      snap.forEach((child) => {
-        messageData.push(child.val());
-      })
+        return;
+      }
 
-      const messagesArray = Object.keys(messagesObject).map(key => ({
-
-      }));
+      const messagesArray = Object.entries(messagesObject);
+      console.log(messagesArray);
+      setSearchedMessages(new Map(messagesArray));
 
 
+      searchedMessages.set(messagesObject.key, Object.values(messagesObject));
+      [...searchedMessages].map(([messageID, messageData]) => {
+        console.log(messageID);
+      });
     }
     fetchMessages();
 
   }, [searchQuery, chatID]);
-*/
+
   return (
     <>
       <input type="text" placeholder="Search messages..." {...register('searchQuery')}/>
-      {searchQuery && (
+      {(searchedMessages && searchedMessages.size > 0) ? (
         <div>
-          {searchedMessages?.map((message, index) => (
-            <div key={message.id} className="flex">
-              <Message messageUid={message.id} messageData={message} isFirst={index === 0} />
+          {[...searchedMessages].map(([messageID, messageData], index) => (
+            <div key={messageID} className="">
+              <Message messageUid={messageID} memberDataOfSender={memberState.members.get(messageData.sender)} messageData={messageData} isEditing={false} changeEditState={() => {}}/>
             </div>
           ))}
         </div>
+      ) : (
+        <div>No Results</div>
       )}
     </>
   )
