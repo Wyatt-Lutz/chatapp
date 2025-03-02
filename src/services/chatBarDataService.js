@@ -40,13 +40,16 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
 }
 
 /**
- * Removes the current user's username from tempTitle to display.
+ * Removes the current user's username from the tempTitle.
  * @param {*} tempTitle
  */
 export const reduceTempTitle = (tempTitle, username) => {
+  const newTempTitle = tempTitle.split(', ').filter((name) => name !== username);
+  return newTempTitle;
+
 }
 
-title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).map(member => member.username).join(', ');
+//title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).map(member => member.username).join(', ');
 
 export const checkIfDuplicateChat = async(db, currUserUid, newChatMemberUids) => {
   const chatsInRef = ref(db, "users/" + currUserUid + "/chatsIn");

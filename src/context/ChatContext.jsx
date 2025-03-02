@@ -3,6 +3,7 @@ import { limitToLast, orderByChild, query, startAt, ref, onChildAdded, onChildCh
 import { getBlockData } from "../services/memberDataService";
 import { AuthContext } from "./AuthContext";
 import { db } from "../../firebase";
+import { reduceTempTitle } from "../services/chatBarDataService";
 
 
 export const ChatContext = createContext();
@@ -144,7 +145,7 @@ export const ChatContextProvider = ({ children }) => {
 
     const onChatroomEdited = (snap) => {
       const prop = snap.key; //property name
-
+reduceTempTitle
       prop === 'title'
       ? chatDispatch({ type: "UPDATE_TITLE", payload: snap.val() })
       : prop === 'owner'
