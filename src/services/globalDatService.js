@@ -29,5 +29,6 @@ export const createUserData = async(db, uid, trimmedUsername, email) => {
     email: email,
     blocked: [],
     chatsIn: [],
+    lastUsernameChange: 0,
   });
 }

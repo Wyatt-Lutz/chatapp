@@ -4,12 +4,14 @@ import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
 import { calcTime, editMessage } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
+import { AuthContext } from "../../../../context/AuthContext";
 
 
 const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {
   console.log('message run');
   const { register, handleSubmit, resetField } = useForm();
   const { chatState } = useContext(ChatContext);
+  const {currUser} = useContext(AuthContext);
   const [usernameContextMenuData, setUsernameContextMenuData] = useState({});
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
 

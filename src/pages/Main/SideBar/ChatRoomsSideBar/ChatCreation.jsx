@@ -8,7 +8,8 @@ import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
 import { ChatContext } from "../../../../context/ChatContext";
-import { fetchProfilePicture } from "../../../../services/userDataService";
+import { fetchProfilePicture } from "../../../../services/storageDataService";
+
 
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
@@ -64,6 +65,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
 
 
   const handleCreateChat = async ({chatName}) => {
+    if (usersAdded.length < 2) return;
     resetField('chatName');
 
     const uids = [...usersAdded.map(user => user.uid)];
@@ -134,7 +136,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
                     </div>
                   )}
                   <div className="flex">
-                    <button type="submit" className="ring">Create Chat</button>
+                    <button type="submit" disabled={usersAdded.length < 2} className="ring">Create Chat</button>
                     <button className="ring" onClick={() => changeChatRoomCreationState(false)}>Cancel</button>
                   </div>
 

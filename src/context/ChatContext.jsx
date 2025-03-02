@@ -3,7 +3,6 @@ import { limitToLast, orderByChild, query, startAt, ref, onChildAdded, onChildCh
 import { getBlockData } from "../services/memberDataService";
 import { AuthContext } from "./AuthContext";
 import { db } from "../../firebase";
-import { reduceTempTitle } from "../services/chatBarDataService";
 
 
 export const ChatContext = createContext();
@@ -41,7 +40,7 @@ const chatReducer = (state, action) => {
     case "UPDATE_TITLE":
       return { ...state, title: action.payload };
     case "UPDATE_TEMP_TITLE":
-      return { ...state, tempTitle: action.payload };
+      return { ...state, tempTitle: updatedTempTitle};
     case "UPDATE_OWNER":
       return {...state, owner: action.payload };
     case "UPDATE_MEMBER_UIDS":
@@ -95,7 +94,7 @@ const messagesReducer = (state, action) => {
         messages: combinedMessages,
       }
 
-    case "REMOVE_MESSAGES":
+    case "REMOVE_MESSAGE":
       newMessages.delete(action.payload);
       return { ...state, messages: newMessages };
 
@@ -145,7 +144,6 @@ export const ChatContextProvider = ({ children }) => {
 
     const onChatroomEdited = (snap) => {
       const prop = snap.key; //property name
-reduceTempTitle
       prop === 'title'
       ? chatDispatch({ type: "UPDATE_TITLE", payload: snap.val() })
       : prop === 'owner'
@@ -191,12 +189,13 @@ reduceTempTitle
       const member = members.get(snap.key);
       if (!member) return;
       const data = snap.val();
+      console.log(data);
+      console.log(member);
 
-      if ((member.username !== data.username) && (chatState.title === "")) {
-        const tempTitle = [...memberState].map(member => member.username).join(', ');
-        console.log(tempTitle);
-        console.log(chatState.tempTitle);
-        member.tempTitle = tempTitle;
+      if ((member.username !== data.username) && (snap.key !== currUser.uid)) {
+        console.log('will update tmep title');
+        const tempTitle = chatState.tempTitle.split(', ').filter((name) => name !== member.username).concat(data.username);
+        chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: tempTitle});
       } else if (member.isOnline !== data.isOnline) {
         member.isOnline = data.isOnline;
       } else if (member.hasBeenRemoved !== data.hasBeenRemoved) {

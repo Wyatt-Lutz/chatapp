@@ -17,6 +17,8 @@ const ChangeEmail = ({db, currUser, displayPassModal, passwordModalHeader, passw
 
         await updateEmail(currUser, newEmail);
         await sendEmailVerification(currUser);
+        const verificationCookieId = `verification-${currUser.uid}`
+        localStorage.setItem(verificationCookieId, true);
 
         await changeEmail(db, currUser, newEmail);
 

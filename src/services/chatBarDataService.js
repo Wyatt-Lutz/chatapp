@@ -1,4 +1,4 @@
-import { push, ref, set, update, get  } from "firebase/database";
+import { push, ref, set, update, get } from "firebase/database";
 
 
 export const createChat = async(db, memberUids, title, tempTitle, membersList, uids, currUserUid) => {
@@ -44,9 +44,8 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
  * @param {*} tempTitle
  */
 export const reduceTempTitle = (tempTitle, username) => {
-  const newTempTitle = tempTitle.split(', ').filter((name) => name !== username);
+  const newTempTitle = tempTitle.split(', ').filter((name) => name !== username).join(', ');
   return newTempTitle;
-
 }
 
 //title = chatName && chatName.length > 0 ? chatName : Object.values(membersList).map(member => member.username).join(', ');

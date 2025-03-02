@@ -5,12 +5,6 @@ const Member = ({ memberUid, memberData }) => {
   console.log('member run');
   const { chatState } = useContext(ChatContext);
 
-  /*
-  const fetchProfilePicture = () => {
-
-  }
-  */
-
   return (
     <div className="flex">
       <div>{memberData?.username}</div>

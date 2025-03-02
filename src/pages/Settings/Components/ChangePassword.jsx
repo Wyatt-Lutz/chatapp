@@ -14,8 +14,10 @@ const ChangePassword = ({currUser, displayPassModal, passwordModalHeader, passwo
 
 
     const editPassword = async() => {
+        if (newPassword !== confirmNewPassword) return;
+
         await displayPassModal(passwordModalHeader, passwordModalText);
-    
+
         await updatePassword(currUser, newPassword);
         resetField("newPassword");
         resetField("confirmNewPassword");
@@ -27,7 +29,7 @@ const ChangePassword = ({currUser, displayPassModal, passwordModalHeader, passwo
                 <input type="password" placeholder="New password" {...register('newPassword')} />
                 <input type="password" placeholder="Confirm new password "{...register('confirmNewPassword')}/>
                 {(newPassword.length > 0 && confirmNewPassword.length > 0) && (
-                <button disabled={!(newPassword === confirmNewPassword)} onClick={editPassword}>Save Password</button>
+                <button disabled={(newPassword !== confirmNewPassword)} onClick={editPassword}>Save Password</button>
                 )}
             </div>
         </>
