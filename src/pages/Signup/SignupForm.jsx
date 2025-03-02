@@ -14,6 +14,7 @@ const SignupForm = ({ onSubmitForm }) => {
 
 
   const onSubmit = async({email, password, username}) => {
+    if (isButtonDisabled) return;
     try {
       const usernames = await fetchUsernameData(db);
       if (usernames.includes(username)) {

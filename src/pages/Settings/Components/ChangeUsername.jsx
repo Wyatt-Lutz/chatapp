@@ -2,6 +2,7 @@ import { useForm, useWatch } from "react-hook-form";
 import UsernameAvailability from "../../../components/UsernameAvailability";
 import { changeUsername } from "../../../services/settingsDataService";
 import { useState } from "react";
+import { fetchLastUsernameChangeTime } from "../../../services/userDataService";
 
 const ChangeUsername = ({db, currUser, displayPassModal, passwordModalHeader, passwordModalText}) => {
     const {register, control} = useForm({
@@ -13,6 +14,12 @@ const ChangeUsername = ({db, currUser, displayPassModal, passwordModalHeader, pa
     const newUsername = useWatch({ name: 'newUsername', control });
 
     const editUsername = async() => {
+        if (isEditUsernameDisabled) return;
+        const lastUsernameChange = await fetchLastUsernameChangeTime(db, currUser.uid);
+        if ((Date.now() - lastUsernameChange) < 864000000) { //10 days
+            return;
+        }
+
         await displayPassModal(passwordModalHeader, passwordModalText);
 
         const isChanged = await changeUsername(db, newUsername, currUser);
@@ -20,7 +27,7 @@ const ChangeUsername = ({db, currUser, displayPassModal, passwordModalHeader, pa
           console.log("username changed");
         }
 
-      }
+    }
     return (
         <>
             <div className="flex">

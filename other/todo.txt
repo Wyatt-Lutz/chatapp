@@ -3,24 +3,26 @@
 -PasswordReset
   - Optimize it and make it better wiuth change Password, like add
 
+-Chatrooms
+  - Consider adding chatroom title and tempTitle listeners
+
+
 -Settings
   - Test Delete Account
   - Have all the change components dispaly toasts on success
   - For pfp Ill have a separate button near password like - change profile picture
+  - Whenever a user changes thier username, tell them in ui that like you can only change it every 10 days, like during the success toast or screen or something
 
 -members
   - whenever you remove a user and theres only 2 users in the chat originally, so the entire chat is deleted, the chatrooms sidebar data like disappears or something
   - Make sure you can block members even if they have been removed or something, because its not like theyre accounts have been deleted
 
--signin
-  - sometimes there is a lot of lag between clicking signin and it going to home page. It can be seen on that react-scan
 
 -Signup
   - recieved 2 emails with different bodys to verify account on signup, could be because i clicked complete twice, but either way should only send one
   - improve the flow, like I should have the verification link go to the website or something
   - could preload the default image in signupform
   - Make the form errors toasts or something - well Idk, because its cool when they pop up immedietly like if username.length > 15
-  - Do some research with the noValidate thing with the form, like is it safer to keep or do I have all the regex checks and stuff
 
 -messages
   - see if there is better ways to handle the unseen messages than all the scroll listeners and checks

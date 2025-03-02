@@ -2,7 +2,8 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { compressImage, fetchProfilePicture, uploadPicture } from "../../services/userDataService";
+import { compressImage, fetchProfilePicture, uploadPicture } from "../../services/storageDataService";
+
 
 
 const ProfilePictureUpload = ({user}) => {
