@@ -2,9 +2,8 @@ import { get, ref } from "firebase/database"
 
 
 export const fetchLastUsernameChangeTime = async(db, userUid) => {
-  const userRef = ref(db, `users/${userUid}`);
-  const userDataSnap = await get(userRef);
+  const lastUsernameChangeRef = ref(db, `users/${userUid}/lastUsernameChange`);
+  const lastUserNameChangeSnap = await get(lastUsernameChangeRef);
 
-  const {lastUsernameChange} = userDataSnap.val();
-  return lastUsernameChange;
+  return lastUserNameChangeSnap.val();
 }

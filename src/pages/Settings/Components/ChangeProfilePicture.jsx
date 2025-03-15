@@ -3,7 +3,8 @@ import { updateProfile } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { deleteObject, ref } from "firebase/storage";
 import { storage } from "../../../../firebase";
-import { compressImage, uploadPicture } from "../../../services/storageDataService";
+import { uploadPicture } from "../../../services/storageDataService";
+import { compressImage } from "../../../utils/mediaUtils";
 
 const ChangeProfilePicture = ({currUser}) => {
     const {register, handleSubmit} = useForm();

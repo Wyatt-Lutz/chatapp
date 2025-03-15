@@ -25,6 +25,8 @@
   - Make the form errors toasts or something - well Idk, because its cool when they pop up immedietly like if username.length > 15
 
 -messages
+  - Make the delete group chat thing
+  - test t he firstmessageid and top of messages, it may be a little glitchy
   - see if there is better ways to handle the unseen messages than all the scroll listeners and checks
   - I think theres like an error if a user loaded a chatroom before midnight, the messages will say Today at 10PM right, but then if its open as the day changes, the old messages I think would still say Today and 10PM even though it was yesterday
   - If a user changes their name, does the title reflect that? - check
@@ -55,6 +57,7 @@
   - Sort the chatbar for most recent chatted in on top, need to add a timestamp or something
 
 -app
+  - the services are for all functions that access the database, so move any non-database get or set functions to some utils thing.
   - use react-hook-form useWatch instead of its watch
   - see if I can avoid reinitializing like currUser or DB and pass them to componenets in a lifecycle like in Settings
   - make sure I dont set any jsx to like a useState, should only store data there

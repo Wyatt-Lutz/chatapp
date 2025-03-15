@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 
 export const useElementOnScreen = (options) => {
   const containerRef = useRef(null);
-  const [isVisible, setIsVisible ] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const callbackFunction = (entries) => {
     const [entry] = entries;

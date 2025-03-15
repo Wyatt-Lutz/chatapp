@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { ref, query, set, get, update, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst } from 'firebase/database';
 import { fetchOnlineUsersForChat } from "./memberDataService";
 
@@ -72,36 +71,24 @@ const updateUnreadCount = async(db, chatID) => {
   }
 }
 
-/**
- * Determines whether to show the timestamp and the username of user for a message.
- * Will not render them if the last message was sent by the client user and the last message was less than 5 minutes ago.
- * @param {*} lastMessage
- * @param {*} currUser
- * @returns {Boolean}
- */
-export const calculateRenderTimeAndSender = (lastMessage, currUserDisplayName) => {
-  if (lastMessage && lastMessage.sender === currUserDisplayName && (Date.now() - lastMessage.timestamp < 180000)) {
-    return false;
-  }
-  return true;
-}
+
 
 
 
 export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, uid) => {
 
-  const memberSnap = await get(ref(db, "members/" + chatID));
+  const memberSnap = await get(ref(db, `members/${chatID}`));
   if (!memberSnap.exists()) {
     return;
   }
-  const dataRef = ref(db, "members/" + chatID + "/" + uid);
+  const dataRef = ref(db, `members/${chatID}/${uid}`);
 
   await update(dataRef, {
     "isOnline": newOnlineStatus,
   });
 
   if (newOnlineStatus) {
-    const userDataRef = ref(db, "users/" + uid + "/chatsIn");
+    const userDataRef = ref(db, `users/${uid}/chatsIn`);
     await update(userDataRef, {[chatID]: 0});
   }
 
@@ -126,26 +113,10 @@ export const deleteMessage = async(messageUid, db, chatID) => {
 
 
 export const editTitle = async(newTitle, chatID, db, displayName) => {
-
-  const titleRef = ref(db, "chats/" + chatID);
+  const titleRef = ref(db, `chats/${chatID}`);
   await update(titleRef, {
     title: newTitle,
   });
   const changedTitleText = displayName + " has changed the chat name to " + newTitle;
   await addMessage(changedTitleText, chatID, "server", db, true);
-}
-
-
-export const calcTime = (time) => {
-  const formattedTime = dayjs(time).format('h:mm A');
-  const today = new Date();
-  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const yesterdayMidnight = new Date(todayMidnight);
-  yesterdayMidnight.setDate(todayMidnight.getDate() - 1);
-  if (time - todayMidnight.getTime() > 0) {
-    return 'Today at ' + formattedTime;
-  } else if (time - yesterdayMidnight.getTime() > 0) {
-    return 'Yesterday at' + formattedTime;
-  }
-  return dayjs(time).format('MM/DD/YYYY h:m A');
 }

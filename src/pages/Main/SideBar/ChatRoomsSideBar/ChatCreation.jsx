@@ -9,6 +9,7 @@ import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
 import { ChatContext } from "../../../../context/ChatContext";
 import { fetchProfilePicture } from "../../../../services/storageDataService";
+import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 
 
 
@@ -97,7 +98,8 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     const newChatID = await createChat(db, memberUids, title, tempTitle, membersList, uids, currUser.uid);
     //setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);
-    chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: newChatID, title, owner: currUser.uid, tempTitle, firstMessageID: "" }});
+    const updatedTempTitle = reduceTempTitle(tempTitle, currUser.displayName);
+    chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: newChatID, title, owner: currUser.uid, tempTitle: updatedTempTitle, firstMessageID: "" }});
   }
 
 

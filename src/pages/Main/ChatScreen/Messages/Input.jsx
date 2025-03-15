@@ -3,9 +3,10 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../../context/AuthContext";
 import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
-import { addMessage, calculateRenderTimeAndSender } from "../../../../services/messageDataService";
+import { addMessage } from "../../../../services/messageDataService";
 
 import Smile from "../../../../components/ui/Smile";
+import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
 
 
 

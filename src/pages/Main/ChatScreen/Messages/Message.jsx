@@ -2,9 +2,10 @@ import { useContext, useState } from "react"
 import { useForm } from "react-hook-form";
 import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
-import { calcTime, editMessage } from "../../../../services/messageDataService";
+import { editMessage } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import { AuthContext } from "../../../../context/AuthContext";
+import { calcTime } from "../../../../utils/messageUtils";
 
 
 const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {

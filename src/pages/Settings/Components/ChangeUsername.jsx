@@ -22,10 +22,8 @@ const ChangeUsername = ({db, currUser, displayPassModal, passwordModalHeader, pa
 
         await displayPassModal(passwordModalHeader, passwordModalText);
 
-        const isChanged = await changeUsername(db, newUsername, currUser);
-        if (isChanged) {
-          console.log("username changed");
-        }
+        await changeUsername(db, newUsername, currUser);
+
 
     }
     return (

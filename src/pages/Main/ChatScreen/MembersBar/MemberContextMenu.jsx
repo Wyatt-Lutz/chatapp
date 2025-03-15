@@ -8,7 +8,7 @@ import { db } from "../../../../../firebase";
 
 const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
   console.log('membercontextMenu run');
-  const { chatState, memberDispatch } = useContext(ChatContext);
+  const { chatState, memberDispatch, chatDispatch} = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
 
 
@@ -20,13 +20,12 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
   }
 
   const onRemoveMemberFromChat = async() => {
-    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, memberDispatch);
+    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, memberDispatch, chatDispatch);
   }
 
 
   const onTransferOwnership = async() => {
-    await transferOwnership(db, chatState.chatID, memberUid);
-    chatDispatch({type: "UPDATE_OWNER", payload: memberUid});
+    await transferOwnership(db, chatState.chatID, memberUid, chatDispatch);
   }
 
   return (

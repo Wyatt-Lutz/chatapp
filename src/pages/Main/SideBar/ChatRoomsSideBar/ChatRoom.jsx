@@ -1,8 +1,9 @@
 import { useContext } from "react"
 import { ChatContext } from "../../../../context/ChatContext";
-import { fetchChatRoomData, reduceTempTitle } from "../../../../services/chatBarDataService";
+import { fetchChatRoomData } from "../../../../services/chatBarDataService";
 import { db } from "../../../../../firebase";
 import { AuthContext } from "../../../../context/AuthContext";
+import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 
 const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
   console.log('chatRoom run');
@@ -17,6 +18,7 @@ const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
 
     const {firstMessageID, owner, tempTitle, title} = await fetchChatRoomData(db, chatID);
     const updatedTempTitle = reduceTempTitle(tempTitle, currUser.displayName);
+    console.log(updatedTempTitle);
     chatDispatch({ type: "CHANGE_CHAT", payload: {chatID, firstMessageID, owner, tempTitle: updatedTempTitle, title}});
   };
 

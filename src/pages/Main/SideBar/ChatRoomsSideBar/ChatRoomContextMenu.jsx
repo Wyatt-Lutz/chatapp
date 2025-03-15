@@ -3,24 +3,26 @@ import { removeUserFromChat } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 import { AuthContext } from "../../../../context/AuthContext";
 import { ChatContext } from "../../../../context/ChatContext";
+import { deleteChat } from "../../../../services/chatBarDataService";
 const ChatRoomContextMenu = ({chatRoomID, points}) => {
   console.log('chatroom context menu')
   const { currUser } = useContext(AuthContext);
-  const { memberDispatch } = useContext(ChatContext);
+  const { chatState, memberDispatch, chatDispatch } = useContext(ChatContext);
 
   const onRemoveUserFromChat = async() => {
-    try {
-      await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid, memberDispatch);
-    } catch (err) {
-      console.error(err);
-      return;
-    }
+    await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid, memberDispatch, chatDispatch);
+  }
 
+  const onDeleteChat = async() => {
+    await deleteChat();
   }
 
   return (
     <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
       <button onClick={onRemoveUserFromChat}>Leave Group Chat</button>
+      {currUser.uid === chatState.owner && (
+        <button onClick={onDeleteChat}>Delete Group Chat</button>
+      )}
     </div>
   )
 }

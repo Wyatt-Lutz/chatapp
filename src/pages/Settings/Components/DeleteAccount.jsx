@@ -1,6 +1,14 @@
+import { useContext } from "react";
 import { deleteAccount } from "../../../services/settingsDataService";
+import { ChatContext } from "../../../context/ChatContext";
+import { ChatroomsContext } from "../../../context/ChatroomsContext";
+import { useNavigate } from "react-router-dom";
 
 const DeleteAccount = ({displayPassModal, db, currUser}) => {
+
+    const {chatDispatch, memberDispatch, messageDispatch} = useContext(ChatContext);
+    const {chatRoomsDispatch} = useContext(ChatroomsContext);
+    const navigate = useNavigate();
 
     const handleDeleteAccount = async() => {
 
@@ -9,7 +17,7 @@ const DeleteAccount = ({displayPassModal, db, currUser}) => {
 
         await displayPassModal(deleteAccountHeader, deleteAccountText, true);
 
-        await deleteAccount(db, currUser);
+        await deleteAccount(db, currUser, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch, navigate);
     }
     return (
         <>

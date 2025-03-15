@@ -4,12 +4,11 @@ import { debounce } from 'lodash';
 import { ChatContext } from "../../../../context/ChatContext";
 import { AuthContext } from "../../../../context/AuthContext";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
-import { calcTime, fetchOlderChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
+import { fetchOlderChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import Message from "./Message"
 import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
-import MemberContextMenu from "../MembersBar/MemberContextMenu";
 
 
 const Messages = () => {
@@ -18,7 +17,7 @@ const Messages = () => {
   const { currUser } = useContext(AuthContext);
 
   const {chatID, title, tempTitle} = chatState;
-  const { numUnread, isAtBottom, endTimestamp, messages, isFirstMessageRendered }  = messageState;
+  const { numUnread, isAtBottom, endTimestamp, messages, isFirstMessageRendered } = messageState;
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
 
   const [scrolled, setScrolled] = useState(false);
@@ -41,10 +40,16 @@ const Messages = () => {
 
 
   useEffect(() => {
+    const handleUpdateUserOnlineStatus = async() => {
+      await updateUserOnlineStatus(true, db, chatID, currUser.uid);
+    }
+
     if (!chatID) {
       console.info("chatID undefined");
       return;
     }
+
+    handleUpdateUserOnlineStatus();
 
     const handleUserOffline = () => {
       updateUserOnlineStatus(false, db, chatID, currUser.uid);
@@ -62,9 +67,6 @@ const Messages = () => {
       }
 
     };
-
-    updateUserOnlineStatus(true, db, chatID, currUser.uid);
-
 
     const container = messagesContainerRef.current;
 
@@ -128,7 +130,7 @@ const Messages = () => {
   return(
     <section className="w-full">
 
-      <div ref={messagesContainerRef} className="overflow-y-auto max-h-[400px] no-scrollbar w-full flex flex-col-reverse scroll-smooth">
+      <div ref={messagesContainerRef} className="overflow-y-auto max-h-[800px] no-scrollbar w-full flex flex-col-reverse scroll-smooth">
           <div className="flex-grow">
 
               <div>
@@ -167,7 +169,7 @@ const Messages = () => {
             <Input />
         </div>
 
-        <div className="flex border min-h-10" ref={containerRef}></div>
+        <div className="flex border" ref={containerRef}></div>
       </div>
 
       {numUnread > 0 && (

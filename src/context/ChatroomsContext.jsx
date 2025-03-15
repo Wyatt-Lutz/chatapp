@@ -2,7 +2,8 @@ import { onChildAdded, onChildChanged, onChildRemoved, ref } from "firebase/data
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { db } from "../../firebase";
 import { AuthContext } from "./AuthContext";
-import { fetchChatRoomData, reduceTempTitle } from "../services/chatBarDataService";
+import { fetchChatRoomData } from "../services/chatBarDataService";
+import { reduceTempTitle } from "../utils/chatroomUtils";
 
 
 export const ChatroomsContext = createContext();

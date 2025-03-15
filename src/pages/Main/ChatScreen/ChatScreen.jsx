@@ -13,7 +13,7 @@ const ChatScreen = () => {
   return(
     <section>
       {!chatState.chatID ? (
-        <div>Chat Requests</div>
+        <div>Hello</div>
       ) : (
         <>
           <TopBar />
