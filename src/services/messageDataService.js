@@ -1,5 +1,5 @@
 import { ref, query, set, get, update, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst } from 'firebase/database';
-import { fetchOnlineUsersForChat } from "./memberDataService";
+import { fetchChatUsersByStatus } from "./memberDataService";
 
 
 export const fetchOlderChats = async(endTimestamp, db, chatID) => {
@@ -14,7 +14,7 @@ export const fetchOlderChats = async(endTimestamp, db, chatID) => {
 
 
 
-export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID) => {
+export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID, chatDispatch) => {
   console.log(firstMessageID);
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
@@ -30,6 +30,7 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
 
    //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
   if (!firstMessageID) {
+
     const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
     await runTransaction(firstMessageIdRef, (currID) => {
       if (!currID) {
@@ -37,6 +38,7 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
       }
       return currID;
     });
+    chatDispatch({type: "UPDATE_FIRST_MESSAGE_ID", payload: newMessageRef.key});
   }
 
   await updateUnreadCount(db, chatID);
@@ -55,7 +57,7 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
  * @param {String} chatID - ID of the chatroom
  */
 const updateUnreadCount = async(db, chatID) => {
-  const offlineMembers = await fetchOnlineUsersForChat(db, chatID, false);
+  const offlineMembers = await fetchChatUsersByStatus(db, chatID, false);
   for (const userUid of offlineMembers) {
     const userDataRef = ref(db, `users/${userUid}/chatsIn/${chatID}`);
     const transactionUpdate = (currData) => {
@@ -112,11 +114,11 @@ export const deleteMessage = async(messageUid, db, chatID) => {
 }
 
 
-export const editTitle = async(newTitle, chatID, db, displayName) => {
+export const editTitle = async(newTitle, chatID, db, displayName, chatDispatch) => {
   const titleRef = ref(db, `chats/${chatID}`);
   await update(titleRef, {
     title: newTitle,
   });
   const changedTitleText = displayName + " has changed the chat name to " + newTitle;
-  await addMessage(changedTitleText, chatID, "server", db, true);
+  await addMessage(changedTitleText, chatID, "server", db, true, chatDispatch);
 }

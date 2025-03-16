@@ -21,7 +21,7 @@ const ChatRoomsSideBar = () => {
     e.preventDefault();
     setContextMenu({'chatroom': true});
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData(chatID);
+    setContextMenuData({chatID: chatID});
   }
 
 

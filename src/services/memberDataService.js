@@ -1,6 +1,7 @@
 import { get, ref, remove, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
 import { reduceTempTitle } from "../utils/chatroomUtils";
+import { fetchChatRoomData } from "./chatBarDataService";
 
 
 /**
@@ -16,19 +17,25 @@ export const updateBlockedStatus = async(db, clientUserUid, uidToBlock, newBlock
   await update(userBlockListRef, newBlockData);
 }
 
+export const fetchMembersFromChat = async(db, chatID) => {
+  const membersRef = ref(db, `members/${chatID}`);
+  return ((await get(membersRef)).val());
+}
 
-export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, memberDispatch, chatDispatch, memberOptions = {}) => {
+export const fetchChatsInData = async(db, userUid) => {
+  const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
+  return ((await get(chatsInRef)).val());
+}
+
+
+export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, chatDispatch, memberDispatch, messageDispatch, memberOptions = {}) => {
   console.log('removeUserFromChat run');
 
 
   const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
-  const membersRef = ref(db, `members/${chatID}`);
-  const userChatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
-  const currUserChatsInRef = ref(db, `users/${currUserUid}/chatsIn/${chatID}`);
+  const userChatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}/`);
   const chatDataRef = ref(db, `chats/${chatID}`);
 
-  const memberUidsRef = ref(db, `chats/${chatID}/memberUids`);
-  const tempTitleRef = ref(db, `chats/${chatID}/tempTitle`);
 
   const userRemovedServerMessage = uidToRemove === currUserUid
   ? `${usernameOfUserRemoved} has left the chat.`
@@ -36,18 +43,14 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
 
-  const membersListSnap = await get(membersRef);
-  const members = Object.keys(membersListSnap.val());
+  const members = Object.keys(await fetchMembersFromChat(db, chatID));
   if (members.length <= 2) {
     memberDispatch({type: "RESET"});
-    await Promise.all([
-      remove(currUserChatsInRef),
-      deleteChatRoom(db, chatID),
-    ]);
+    await deleteChatRoom(db, chatID, chatDispatch, memberDispatch, messageDispatch, members);
     return;
   }
 
-  const {tempTitle, ownerUid, memberUids} = (await get(chatDataRef)).val();
+  const {tempTitle, ownerUid, memberUids} = await fetchChatRoomData(db, chatID);
 
   const newMemberUids = memberUids.replace(uidToRemove, "");
   const newTempTitle = reduceTempTitle(tempTitle, usernameOfUserRemoved);
@@ -56,7 +59,7 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
     remove(userChatsInRef),
     update(memberToRemoveRef, {hasBeenRemoved: true, ...memberOptions}),
     update(chatDataRef, {memberUids: newMemberUids, tempTitle: newTempTitle}),
-    addMessage(userRemovedServerMessage, chatID, "server", db, true),
+    addMessage(userRemovedServerMessage, chatID, "server", db, true, chatDispatch),
   ]);
 
 
@@ -73,8 +76,21 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
 
-export const deleteChatRoom = async(db, chatID) => {
+export const deleteChatRoom = async(db, chatID, chatDispatch, memberDispatch, messageDispatch, memberData = null) => {
+  if (!memberData) {
+    memberData = Object.keys(await fetchMembersFromChat(db, chatID));
+  }
+
+  chatDispatch({type: "RESET"});
+  memberDispatch({type: "RESET"});
+  messageDispatch({type: "RESET"});
+
   const membersRef = ref(db, `members/${chatID}`);
+
+  for (const memberUid of memberData) {
+    const chatsInRef = ref(db, `users/${memberUid}/chatsIn/${chatID}`);
+    await remove(chatsInRef);
+  }
   await Promise.all([
     remove(membersRef),
     remove(ref(db, `messages/${chatID}`)),
@@ -126,10 +142,9 @@ export const getUsernameFromUid = async(db, userUid) => {
 }
 
 
-export const fetchOnlineUsersForChat = async(db, chatID, status) => {
-  const membersRef = ref(db, `members/${chatID}`);
-  const membersSnap = await get(membersRef);
-  const membersData = membersSnap.val();
+export const fetchChatUsersByStatus = async(db, chatID, status) => {
+
+  const membersData = await fetchMembersFromChat(db, chatID);
 
   const onlineMembers = [];
 

@@ -8,7 +8,7 @@ const TopBar = () => {
   console.log('topBar run');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
-  const { chatState } = useContext(ChatContext);
+  const { chatState, chatDispatch, memberState } = useContext(ChatContext);
   const chatID = chatState.chatID;
   const title = chatState.title;
   const tempTitle = chatState.tempTitle;
@@ -21,14 +21,14 @@ const TopBar = () => {
     if (title === "") {
       return;
     }
-    await editTitle(title, chatID , db, currUser.displayName);
+    await editTitle(title, chatID , db, currUser.displayName, chatDispatch);
   }
 
 
   return (
     <div className="ring" onMouseOver={() => setIsEditingTitle(true)} onMouseLeave={() => setIsEditingTitle(false)}>
 
-      {isEditingTitle ? (
+      {memberState.members.size > 2 && isEditingTitle ? (
         <form onSubmit={handleSubmit(onFinishEditTitle)}>
           <input {...register('title', {required: false})} placeholder={title || tempTitle} onBlur={handleSubmit(onFinishEditTitle)}></input>
         </form>

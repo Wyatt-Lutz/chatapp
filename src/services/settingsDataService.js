@@ -3,7 +3,7 @@ import { deleteUser, updateProfile } from "firebase/auth";
 
 import { get, update, ref, remove} from "firebase/database";
 import { checkIfUserExists } from "./globalDatService";
-import { removeUserFromChat } from "./memberDataService";
+import { fetchChatsInData, removeUserFromChat } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
 import { auth } from "../../firebase";
 
@@ -21,12 +21,10 @@ export const changeUsername = async(db, newUsername, currUser) => {
     lastUsernameChange: Date.now(),
   });
 
-  const chatsInRef = ref(db, `users/${currUser.uid}/chatsIn`);
-  const chatsInSnap = await get(chatsInRef);
-  const chatsIn = chatsInSnap.val();
+  const chatsInData = await fetchChatsInData(db, currUser.uid);
 
-  if (chatsIn) {
-    const updateChatroomsPromise = Object.keys(chatsIn).map(async (chatID) => {
+  if (chatsInData) {
+    const updateChatroomsPromise = Object.keys(chatsInData).map(async (chatID) => {
       const chatroomMemberRef = ref(db, `members/${chatID}/${currUser.uid}`);
       const chatRoomRef = ref(db, `chats/${chatID}`);
       const chatRoomDataSnap = await get(chatRoomRef);
@@ -69,11 +67,9 @@ export const deleteAccount = async(db, currUser, chatDispatch, memberDispatch, m
 
   navigate("/");
 
-  const chatsInRef = ref(db, `users/${currUser.uid}/chatsIn`);
   const userRef = ref(db, `users/${currUser.uid}`);
 
-  const chatsInSnap = await get(chatsInRef);
-  const chatsInData = chatsInSnap.val();
+  const chatsInData = await fetchChatsInData(db, currUser.uid);
 
   const memberOptions = {
     profilePictureURL: "",
@@ -81,7 +77,7 @@ export const deleteAccount = async(db, currUser, chatDispatch, memberDispatch, m
     isOnline: false,
   }
   for (const chatID in chatsInData) {
-    await removeUserFromChat(db, chatID, currUser.uid, currUser.displayName, currUser.uid, memberDispatch, chatDispatch, memberOptions);
+    await removeUserFromChat(db, chatID, currUser.uid, currUser.displayName, currUser.uid, chatDispatch, memberDispatch, messageDispatch, memberOptions);
   }
 
 

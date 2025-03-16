@@ -1,9 +1,4 @@
 import { signOut } from "firebase/auth";
-import { useContext } from "react";
-import { ChatContext } from "../context/ChatContext";
-import { ChatroomsContext } from "../context/ChatroomsContext";
-
-
 
 
 export const signUserOut = async(auth, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch) => {

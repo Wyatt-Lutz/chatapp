@@ -6,6 +6,7 @@ import { editMessage } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import { AuthContext } from "../../../../context/AuthContext";
 import { calcTime } from "../../../../utils/messageUtils";
+import MemberContextMenu from "../MembersBar/MemberContextMenu";
 
 
 const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {

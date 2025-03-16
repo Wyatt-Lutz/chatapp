@@ -13,7 +13,7 @@ import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
 const Input = () => {
   const { register, handleSubmit, resetField } = useForm();
   const { currUser } = useContext(AuthContext);
-  const { chatState, messageState } = useContext(ChatContext);
+  const { chatState, messageState, chatDispatch } = useContext(ChatContext);
 
 
 
@@ -22,7 +22,7 @@ const Input = () => {
     resetField('text');
     const lastMessage = [...messageState.messages].pop() || {};
     const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.displayName);
-    await addMessage(text, chatState.chatID, currUser.uid, db, willRenderTimeAndSender, chatState.firstMessageID);
+    await addMessage(text, chatState.chatID, currUser.uid, db, willRenderTimeAndSender, chatState.firstMessageID, chatDispatch);
   };
 
 

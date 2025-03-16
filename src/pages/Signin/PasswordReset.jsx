@@ -8,23 +8,18 @@ import { ref, query, get, orderByChild, equalTo } from 'firebase/database'
 const PasswordReset = ({passChange}) => {
   const { register, handleSubmit } = useForm();
   const onSubmit = async ({email}) => {
-    try {
-      const emailsRef = query(ref(db, "users"), orderByChild('email'), equalTo(email));
-      get(emailsRef).then((snap) => {
-        if (!snap.exists() || snap.val() == null) {
-          console.info('no account with that email') //toast
-          return;
-        }
-      })
 
-      await sendPasswordResetEmail(auth, email);
-      console.info('password reset email send') //toast
-      passChange(false);
-
-
-    } catch (error) {
-      console.error(error);
+    const emailsRef = query(ref(db, "users"), orderByChild('email'), equalTo(email));
+    const emailsDataSnap = await get(emailsRef);
+    if (!emailsDataSnap.exists()) return;
+    const emailsData = emailsDataSnap.val();
+    if (!emailsData) {
+      console.info('no account with that email');
+      return
     }
+    await sendPasswordResetEmail(auth, email);
+    console.info('password reset email send')
+    passChange(false);
 
   }
 

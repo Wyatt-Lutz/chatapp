@@ -131,7 +131,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
                 </form>
 
                 <form onSubmit={handleSubmit((data) => handleCreateChat(data))}>
-                  {usersAdded.length > 1 && (
+                  {usersAdded.length > 2 && (
                     <div>
                       <div>Create a name for your group (optional)</div>
                       <input {...register('chatName', { required: false, maxLength: 25})}></input>

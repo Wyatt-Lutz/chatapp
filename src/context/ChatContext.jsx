@@ -28,7 +28,6 @@ const chatReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE_CHAT":
       const { chatID, firstMessageID, owner, tempTitle, title } = action.payload;
-
       return {
         ...state,
         chatID,
@@ -157,11 +156,19 @@ export const ChatContextProvider = ({ children }) => {
       : null;
     }
 
+    const onChatroomRemoved = () => {
+      chatDispatch({type: "RESET"});
+      memberDispatch({type: "RESET"});
+      messageDispatch({type: "RESET"});
+    }
+
     const chatroomRef = ref(db, `chats/${chatID}`);
     const chatRoomEditedListener = onChildChanged(chatroomRef, onChatroomEdited);
+    const chatroomRemovedListener = onChildRemoved(chatroomRef, onChatroomRemoved);
 
     return () => {
       chatRoomEditedListener();
+      chatroomRemovedListener();
     }
   }, [chatID]);
 
@@ -181,10 +188,14 @@ export const ChatContextProvider = ({ children }) => {
     }
 
     const handleMemberRemoved = (snap) => {
+      console.log(snap.key);
+
+
       memberDispatch({type: "REMOVE_MEMBER", payload: snap.key});
     }
 
     const handleUpdateMember = (snap) => {
+      console.log(snap.key);
       if (!members) return;
       const member = members.get(snap.key);
       if (!member) return;
@@ -193,7 +204,7 @@ export const ChatContextProvider = ({ children }) => {
       console.log(member);
 
       if ((member.username !== data.username) && (snap.key !== currUser.uid)) {
-        console.log('will update tmep title');
+        console.log('will update temp title');
         const tempTitle = chatState.tempTitle.split(', ').filter((name) => name !== member.username).concat(data.username);
         chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: tempTitle});
       } else if (member.isOnline !== data.isOnline) {
