@@ -4,7 +4,6 @@ import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
 import { ChatContext } from "../../../../context/ChatContext";
 const MembersBar = () => {
-  console.log('memberBar run');
   const { memberState } = useContext(ChatContext);
   const members = memberState.members;
 

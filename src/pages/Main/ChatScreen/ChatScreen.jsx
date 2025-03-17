@@ -2,13 +2,12 @@ import { useContext } from 'react';
 
 
 import MembersBar from './MembersBar/MembersBar';
-import TopBar from './TopBar';
+import TopBar from './Ancillary/TopBar';
 import Messages from './Messages/Messages';
-import Search from './Search';
+import Search from './Ancillary/Search';
 import { ChatContext } from '../../../context/ChatContext';
 
 const ChatScreen = () => {
-  console.log('chatScreen run');
   const { chatState } = useContext(ChatContext);
   return(
     <section>

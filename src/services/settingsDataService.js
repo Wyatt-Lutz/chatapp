@@ -63,7 +63,7 @@ export const changeEmail = async(db, currUser, newEmail) => {
 }
 
 
-export const deleteAccount = async(db, currUser, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch, navigate) => {
+export const deleteAccount = async(db, currUser, numOfMembers, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch, navigate) => {
 
   navigate("/");
 
@@ -77,7 +77,7 @@ export const deleteAccount = async(db, currUser, chatDispatch, memberDispatch, m
     isOnline: false,
   }
   for (const chatID in chatsInData) {
-    await removeUserFromChat(db, chatID, currUser.uid, currUser.displayName, currUser.uid, chatDispatch, memberDispatch, messageDispatch, memberOptions);
+    await removeUserFromChat(db, chatID, currUser.uid, currUser.displayName, currUser.uid, numOfMembers, chatDispatch, memberDispatch, messageDispatch, memberOptions);
   }
 
 

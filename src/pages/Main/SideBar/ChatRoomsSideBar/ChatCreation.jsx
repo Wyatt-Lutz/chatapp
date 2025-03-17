@@ -14,7 +14,6 @@ import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
-  console.log('chat creation')
   const { currUser } = useContext(AuthContext);
   const { chatDispatch } = useContext(ChatContext);
   const [usersAdded, setUsersAdded] = useState([{uid: currUser.uid, username: currUser.displayName}]);
@@ -95,7 +94,8 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
       tempTitle = Object.values(membersList).map(member => member.username).join(', ');
     }
 
-    const newChatID = await createChat(db, memberUids, title, tempTitle, membersList, uids, currUser.uid);
+
+    const newChatID = await createChat(db, memberUids, title, tempTitle, membersList, uids, usersAdded.length, currUser.uid);
     //setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);
     const updatedTempTitle = reduceTempTitle(tempTitle, currUser.displayName);

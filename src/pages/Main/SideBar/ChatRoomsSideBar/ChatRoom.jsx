@@ -6,7 +6,6 @@ import { AuthContext } from "../../../../context/AuthContext";
 import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 
 const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
-  console.log('chatRoom run');
   const { chatState, chatDispatch, memberDispatch, messageDispatch } = useContext(ChatContext);
   const {currUser} = useContext(AuthContext);
   const handleChangeChat = async() => {

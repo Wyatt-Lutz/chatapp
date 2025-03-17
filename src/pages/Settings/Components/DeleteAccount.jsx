@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const DeleteAccount = ({displayPassModal, db, currUser}) => {
 
-    const {chatDispatch, memberDispatch, messageDispatch} = useContext(ChatContext);
+    const {chatState, chatDispatch, memberDispatch, messageDispatch} = useContext(ChatContext);
     const {chatRoomsDispatch} = useContext(ChatroomsContext);
     const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ const DeleteAccount = ({displayPassModal, db, currUser}) => {
 
         await displayPassModal(deleteAccountHeader, deleteAccountText, true);
 
-        await deleteAccount(db, currUser, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch, navigate);
+        await deleteAccount(db, currUser, chatState.numOfMembers, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch, navigate);
     }
     return (
         <>

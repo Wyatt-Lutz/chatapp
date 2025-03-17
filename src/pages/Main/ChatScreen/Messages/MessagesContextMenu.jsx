@@ -4,7 +4,6 @@ import { ChatContext } from "../../../../context/ChatContext";
 import { deleteMessage } from "../../../../services/messageDataService";
 import { AuthContext } from "../../../../context/AuthContext";
 const MessagesContextMenu = ({changeEditState, contextMenuData: {sender, messageUid}, points}) => {
-  console.log('messagesContextMenu run');
   const { chatState } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
   return (

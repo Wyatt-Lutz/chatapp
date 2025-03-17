@@ -7,7 +7,6 @@ import { db } from "../../../../../firebase";
 
 
 const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
-  console.log('membercontextMenu run');
   const { chatState, memberDispatch, chatDispatch, messageDispatch} = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
 
@@ -20,7 +19,7 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
   }
 
   const onRemoveMemberFromChat = async() => {
-    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, chatDispatch, memberDispatch, messageDispatch);
+    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, chatState.numOfMembers, chatDispatch, memberDispatch, messageDispatch);
   }
 
 

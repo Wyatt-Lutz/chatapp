@@ -12,7 +12,6 @@ import ChangeUsername from "./Components/ChangeUsername";
 import ChangeProfilePicture from "./Components/ChangeProfilePicture";
 
 const Settings = () => {
-  console.log('settings run')
   const { currUser } = useContext(AuthContext);
   const navigate = useNavigate();
 

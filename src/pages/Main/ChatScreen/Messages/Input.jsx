@@ -16,8 +16,6 @@ const Input = () => {
   const { chatState, messageState, chatDispatch } = useContext(ChatContext);
 
 
-
-  console.log('input run');
   const handleAddMessage = async({ text }) => {
     resetField('text');
     const lastMessage = [...messageState.messages].pop() || {};

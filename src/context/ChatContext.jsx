@@ -13,6 +13,7 @@ const initialChatState = {
   tempTitle: '',
   owner: '',
   firstMessageID: "",
+  numOfMembers: null,
 };
 const initialMemberState = {members: new Map()};
 const initialMessageState = {
@@ -27,7 +28,7 @@ const initialMessageState = {
 const chatReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE_CHAT":
-      const { chatID, firstMessageID, owner, tempTitle, title } = action.payload;
+      const { chatID, firstMessageID, owner, tempTitle, title, numOfMembers} = action.payload;
       return {
         ...state,
         chatID,
@@ -35,6 +36,7 @@ const chatReducer = (state, action) => {
         owner,
         tempTitle,
         firstMessageID,
+        numOfMembers,
       };
     case "UPDATE_TITLE":
       return { ...state, title: action.payload };
@@ -46,6 +48,8 @@ const chatReducer = (state, action) => {
       return {...state};
     case "UPDATE_FIRST_MESSAGE_ID":
       return {...state, firstMessageID: action.payload };
+    case "UPDATE_NUM_OF_MEMBERS":
+      return {...state, numOfMembers: action.payload };
     case "RESET":
       return initialChatState;
     default:
@@ -153,6 +157,8 @@ export const ChatContextProvider = ({ children }) => {
       ? chatDispatch({ type: "UPDATE_FIRST_MESSAGE_ID", payload: snap.val() })
       : prop === 'memberUids'
       ? chatDispatch({ type: "UPDATE_MEMBER_UIDS", payload: snap.val() })
+      : prop === 'numOfMembers'
+      ? chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: snap.val() })
       : null;
     }
 

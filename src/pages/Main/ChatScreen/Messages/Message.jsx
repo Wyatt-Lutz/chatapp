@@ -10,7 +10,6 @@ import MemberContextMenu from "../MembersBar/MemberContextMenu";
 
 
 const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {
-  console.log('message run');
   const { register, handleSubmit, resetField } = useForm();
   const { chatState } = useContext(ChatContext);
   const {currUser} = useContext(AuthContext);

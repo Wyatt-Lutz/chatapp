@@ -2,7 +2,7 @@ import { push, ref, set, update, get } from "firebase/database";
 import { fetchChatsInData } from "./memberDataService";
 
 
-export const createChat = async(db, memberUids, title, tempTitle, membersList, uids, currUserUid) => {
+export const createChat = async(db, memberUids, title, tempTitle, membersList, uids, numOfMembers, currUserUid) => {
   try {
     const chatsRef = ref(db, "chats/");
     const newChatRef = push(chatsRef);
@@ -15,6 +15,7 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
       owner: currUserUid,
       memberUids: memberUids,
       firstMessageID: "",
+      numOfMembers: numOfMembers,
     }
 
     await Promise.all([

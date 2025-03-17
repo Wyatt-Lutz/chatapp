@@ -12,7 +12,6 @@ import MessagesContextMenu from "./MessagesContextMenu";
 
 
 const Messages = () => {
-  console.log('messagessss run');
   const { chatState, memberState, messageState, messageDispatch } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);
 

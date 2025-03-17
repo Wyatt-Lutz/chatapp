@@ -3,13 +3,11 @@ import { fetchChatUsersByStatus } from "./memberDataService";
 
 
 export const fetchOlderChats = async(endTimestamp, db, chatID) => {
-  console.info('fetchChats run');
   const chatsRef = ref(db, `messages/${chatID}/`);
   const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(endTimestamp), limitToFirst(10));
   const messageSnap = await get(messageQuery);
   return messageSnap.val();
 }
-
 
 
 

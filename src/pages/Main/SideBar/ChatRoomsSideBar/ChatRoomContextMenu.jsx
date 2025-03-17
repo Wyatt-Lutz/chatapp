@@ -4,12 +4,11 @@ import { db } from "../../../../../firebase";
 import { AuthContext } from "../../../../context/AuthContext";
 import { ChatContext } from "../../../../context/ChatContext";
 const ChatRoomContextMenu = ({contextMenuData, points}) => {
-  console.log('chatroom context menu')
   const { currUser } = useContext(AuthContext);
-  const { memberDispatch, chatDispatch, messageDispatch} = useContext(ChatContext);
+  const { chatState, memberDispatch, chatDispatch, messageDispatch} = useContext(ChatContext);
 
   const onLeaveGroupChat = async() => {
-    await removeUserFromChat(db, contextMenuData.chatID, currUser.uid, currUser.displayName, currUser.uid, chatDispatch, memberDispatch, messageDispatch);
+    await removeUserFromChat(db, contextMenuData.chatID, currUser.uid, currUser.displayName, currUser.uid, chatState.numOfMembers, chatDispatch, memberDispatch, messageDispatch);
   }
 
   return (
