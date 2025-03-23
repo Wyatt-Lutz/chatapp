@@ -1,12 +1,19 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
+1. Finish the context splitting ( change all chatContex to membercontext or whatever instead if needed and test everything)
+2. Fix problem when removing user, the tempTitle had client username
+1. Add Add user functionality
+2. Add the request system
 2. If a user is removed, the removed user can still do things normally and like certain data isnt removed correctly like chatsIn and the members listeners will not see changes if someone is remove
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
 5. Prompt users before leaving a group chat
 6. When someone leaves a group chat, the membersList isnt updated
 7. Make like the actual pfps and make username and timestamp on same line with pfp
 8. Add image upload implenetations
+9. Problems with memberListener and stuff
+9. Adding a new chatroom when you are already in one doenst change it to the new chatroom
+9. When you are creating a chat and adding the users, add the users profile pictures before their names
 9. Add the like "new messages since x time" if a user is scrolled up
 10. Fix the layout of search messages
 
@@ -86,8 +93,6 @@ Priority:
       - Make sure I add too many requests
   - Add all the input error handling and all the messages
   - I am importing like app and chatID in all my service functions - see if I can not have to do this, like just import in the file or something
-  - Put all refs I make in firebase.js I guess
-    - Dont pass db and refs as parameters because I can access them from te files anyway
   - Change all the .then() to await
   - When I delete an account, change email address, or change password, I have to reauthenticate with reauthenticateWithCredential if user signed in too long ago
   - Do a full test with signing up and signing in witht he new verifcation system
@@ -152,6 +157,3 @@ Owner system - only owner can remove members (maybe anyone can add)
 Before I do this I n
 
 each chat sender will be the useruid to account for username changes and will fetch each members username with their useruid from the client and store them
-
-
-

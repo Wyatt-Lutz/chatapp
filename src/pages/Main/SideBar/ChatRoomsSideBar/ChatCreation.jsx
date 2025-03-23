@@ -1,13 +1,13 @@
 
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../../context/AuthContext";
+import { AuthContext } from "../../../../context/providers/AuthContext";
 import { db } from "../../../../../firebase";
 import { checkIfDuplicateChat, createChat } from "../../../../services/chatBarDataService";
 import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
-import { ChatContext } from "../../../../context/ChatContext";
+import { ChatContext } from "../../../../context/providers/ChatContext";
 import { fetchProfilePicture } from "../../../../services/storageDataService";
 import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 
@@ -15,7 +15,7 @@ import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
   const { currUser } = useContext(AuthContext);
-  const { chatDispatch } = useContext(ChatContext);
+  const { chatDispatch, memberDispatch, messageDispatch } = useContext(ChatContext);
   const [usersAdded, setUsersAdded] = useState([{uid: currUser.uid, username: currUser.displayName}]);
   const [isUserBlockedWarning, setIsUserBlockedWarning] = useState(null);
   const {register, handleSubmit, resetField} = useForm();
@@ -99,6 +99,9 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     //setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);
     const updatedTempTitle = reduceTempTitle(tempTitle, currUser.displayName);
+    chatDispatch({ type: "RESET"});
+    memberDispatch({ type: "RESET"});
+    messageDispatch({ type: "RESET"});
     chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: newChatID, title, owner: currUser.uid, tempTitle: updatedTempTitle, firstMessageID: "" }});
   }
 

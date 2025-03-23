@@ -1,8 +1,8 @@
 import { useContext } from "react"
 import { deleteChatRoom, removeUserFromChat } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../context/AuthContext";
-import { ChatContext } from "../../../../context/ChatContext";
+import { AuthContext } from "../../../../context/providers/AuthContext";
+import { ChatContext } from "../../../../context/providers/ChatContext";
 const ChatRoomContextMenu = ({contextMenuData, points}) => {
   const { currUser } = useContext(AuthContext);
   const { chatState, memberDispatch, chatDispatch, messageDispatch} = useContext(ChatContext);

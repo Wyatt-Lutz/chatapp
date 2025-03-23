@@ -1,0 +1,62 @@
+import { createContext, useEffect, useReducer } from "react";
+import { ref, onChildChanged, onChildRemoved } from "firebase/database";
+import { db } from "../../../firebase";
+import { chatReducer } from "../reducers/ChatReducer";
+import { initialChatState } from "../initialState";
+
+
+export const ChatContext = createContext();
+
+
+
+export const ChatContextProvider = ({ children }) => {
+  const [chatState, chatDispatch] = useReducer(chatReducer, initialChatState);
+
+
+
+  const chatID = chatState.chatID;
+
+
+  useEffect(() => {
+    if (!chatID) return;
+
+    const onChatroomEdited = (snap) => {
+      const prop = snap.key; //property name
+      prop === 'title'
+      ? chatDispatch({ type: "UPDATE_TITLE", payload: snap.val() })
+      : prop === 'owner'
+      ? chatDispatch({ type: "UPDATE_OWNER", payload: snap.val() })
+      : prop === 'tempTitle'
+      ? chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: snap.val() })
+      : prop === 'firstMessageID'
+      ? chatDispatch({ type: "UPDATE_FIRST_MESSAGE_ID", payload: snap.val() })
+      : prop === 'memberUids'
+      ? chatDispatch({ type: "UPDATE_MEMBER_UIDS", payload: snap.val() })
+      : prop === 'numOfMembers'
+      ? chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: snap.val() })
+      : null;
+    }
+
+    const onChatroomRemoved = () => {
+      chatDispatch({type: "RESET"});
+      memberDispatch({type: "RESET"});
+      messageDispatch({type: "RESET"});
+    }
+
+    const chatroomRef = ref(db, `chats/${chatID}`);
+    const chatRoomEditedListener = onChildChanged(chatroomRef, onChatroomEdited);
+    const chatroomRemovedListener = onChildRemoved(chatroomRef, onChatroomRemoved);
+
+    return () => {
+      chatRoomEditedListener();
+      chatroomRemovedListener();
+    }
+  }, [chatID]);
+
+
+  return (
+    <ChatContext.Provider value={{ chatState, chatDispatch }}>
+      {children}
+    </ChatContext.Provider>
+  );
+};

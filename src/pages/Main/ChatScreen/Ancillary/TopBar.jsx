@@ -1,9 +1,9 @@
 import { useContext, useState } from "react"
 import { useForm } from "react-hook-form";
 import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../context/AuthContext";
+import { AuthContext } from "../../../../context/providers/AuthContext";
 import { editTitle } from "../../../../services/messageDataService";
-import { ChatContext } from "../../../../context/ChatContext";
+import { ChatContext } from "../../../../context/providers/ChatContext";
 import { addUserToChat } from "../../../../services/memberDataService";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);

@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { db } from "../../../../../firebase";
-import { ChatContext } from "../../../../context/ChatContext";
+import { ChatContext } from "../../../../context/providers/ChatContext";
 import { deleteMessage } from "../../../../services/messageDataService";
-import { AuthContext } from "../../../../context/AuthContext";
+import { AuthContext } from "../../../../context/providers/AuthContext";
 const MessagesContextMenu = ({changeEditState, contextMenuData: {sender, messageUid}, points}) => {
   const { chatState } = useContext(ChatContext);
   const { currUser } = useContext(AuthContext);

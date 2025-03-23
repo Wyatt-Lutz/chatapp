@@ -29,8 +29,9 @@ export const fetchChatsInData = async(db, userUid) => {
 
 
 export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, numOfMembers, chatDispatch, memberDispatch, messageDispatch, memberOptions = {}) => {
+  console.log("chatID: " + chatID);
+  console.log("uidToRemove: " + uidToRemove);
   const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
-  const userChatsInRef = ref(db, `users/${uidToRemove}/chatsIn`);
   const chatDataRef = ref(db, `chats/${chatID}`);
 
   const userRemovedServerMessage = uidToRemove === currUserUid
@@ -41,7 +42,7 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
   if (numOfMembers <= 2) {
     memberDispatch({type: "RESET"});
-    await deleteChatRoom(db, chatID, chatDispatch, memberDispatch, messageDispatch, members);
+    await deleteChatRoom(db, chatID, chatDispatch, memberDispatch, messageDispatch);
     return;
   }
 
@@ -50,25 +51,9 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   const newMemberUids = memberUids.replace(uidToRemove, "");
   const newTempTitle = reduceTempTitle(tempTitle, usernameOfUserRemoved);
 
-  chatDispatch({type: "RESET"});
-  memberDispatch({type: "RESET"});
-  messageDispatch({type: "RESET"});
+  console.log("newMemberUids: " + newMemberUids);
+  console.log("newTempTitle: " + newTempTitle);
 
-  const chatsInData = await fetchChatsInData(db, uidToRemove);
-  console.log(chatID);
-  delete chatsInData[chatID];
-  console.log(chatsInData);
-  console.log(uidToRemove);
-
-  await remove(ref(db, `users/${uidToRemove}/chatsIn/${chatID}`));
-
-  /*
-  if (Object.keys(chatsInData).length === 0) {
-    await remove(userChatsInRef);
-  } else {
-    await set(userChatsInRef, chatsInData);
-  }
-    */
 
   await Promise.all([
     update(memberToRemoveRef, {hasBeenRemoved: true, ...memberOptions}),
@@ -77,28 +62,22 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
   await addMessage(userRemovedServerMessage, chatID, "server", db, true, chatDispatch);
 
-  const numOfMembersRef = ref(db, `chats/${chatID}/numOfMembers`);
-  const transactionUpdate = (currData) => {
-    if (currData === null) {
-      console.error('numOfMembers is 0 when updating numofMembers');
-      return;
-    } else {
-      return currData - 1;
-    }
-  }
-  await runTransaction(numOfMembersRef, transactionUpdate).catch((error) => {
-    console.error('error updating numOfMembers' + error);
-  });
+  await updateNumOfMembers(db, chatID, false);
 
 
 
   if (uidToRemove === ownerUid) {
 
-    const randomIndex = Math.floor(Math.random() * members.length);
+    const randomIndex = Math.floor(Math.random() * numOfMembers);
+    const members = await fetchMembersFromChat(db, chatID);
     const randomMemberUid = members[randomIndex];
 
     await transferOwnership(db, chatID, randomMemberUid, chatDispatch);
   }
+
+  const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
+  //const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn`);
+  await remove(chatsInRef);
 
 }
 
@@ -108,6 +87,20 @@ export const addUserToChat = async(db, chatID, userUid) => {
   console.log('lol');
 }
 
+export const updateNumOfMembers = async(db, chatID, isAdd) => {
+  const numOfMembersRef = ref(db, `chats/${chatID}/numOfMembers`);
+  const transactionUpdate = (currData) => {
+    if (currData === null) {
+      console.error('numOfMembers is 0 when updating numofMembers');
+      return;
+    } else {
+      return isAdd ? currData + 1 : currData - 1;
+    }
+  }
+  await runTransaction(numOfMembersRef, transactionUpdate).catch((error) => {
+    console.error('error updating numOfMembers' + error);
+  });
+}
 
 
 export const deleteChatRoom = async(db, chatID, chatDispatch, memberDispatch, messageDispatch, memberData = null) => {
@@ -193,5 +186,3 @@ export const fetchChatUsersByStatus = async(db, chatID, status) => {
 
 
 }
-
-
