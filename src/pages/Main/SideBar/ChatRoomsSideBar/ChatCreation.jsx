@@ -1,21 +1,21 @@
 
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../../context/providers/AuthContext";
+import { useAuth } from "../../../../context/providers/AuthContext";
 import { db } from "../../../../../firebase";
 import { checkIfDuplicateChat, createChat } from "../../../../services/chatBarDataService";
 import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
-import { ChatContext } from "../../../../context/providers/ChatContext";
 import { fetchProfilePicture } from "../../../../services/storageDataService";
 import { reduceTempTitle } from "../../../../utils/chatroomUtils";
+import useChatContexts from "../../../../hooks/useContexts";
 
 
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
-  const { currUser } = useContext(AuthContext);
-  const { chatDispatch, memberDispatch, messageDispatch } = useContext(ChatContext);
+  const { currUser } = useAuth();
+  const { chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
   const [usersAdded, setUsersAdded] = useState([{uid: currUser.uid, username: currUser.displayName}]);
   const [isUserBlockedWarning, setIsUserBlockedWarning] = useState(null);
   const {register, handleSubmit, resetField} = useForm();

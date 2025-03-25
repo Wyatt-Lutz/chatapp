@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { ref, onChildAdded, onChildChanged, onChildRemoved } from "firebase/database";
 import { getBlockData } from "../../services/memberDataService";
-import { AuthContext } from "./AuthContext";
 import { db } from "../../../firebase";
 import { initialMemberState } from "../initialState";
 import { membersReducer } from "../reducers/membersReducer";
+import { useAuth } from "./AuthContext";
 import { ChatContext } from "./ChatContext";
 
 
@@ -14,12 +14,13 @@ export const MemberContext = createContext();
 
 export const MemberContextProvider = ({ children }) => {
   const [memberState, memberDispatch] = useReducer(membersReducer, initialMemberState);
+
   const { chatState } = useContext(ChatContext);
 
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
+
+
   const currUserUid = currUser?.uid;
-
-
   const chatID = chatState.chatID;
   const members = memberState.members;
 
@@ -30,6 +31,7 @@ export const MemberContextProvider = ({ children }) => {
     const membersRef = ref(db, `members/${chatID}`);
 
     const handleMemberAdded = async(snap) => {
+      if (snap.val().hasBeenRemoved) return;
       console.log("handleMemberAdded: " + snap.val().username);
       const userBlockData = await getBlockData(db, currUserUid);
       const memberObj = {...snap.val(), isBlocked: userBlockData[snap.key]};

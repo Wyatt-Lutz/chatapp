@@ -1,11 +1,10 @@
-import { useContext } from "react"
-import { deleteChatRoom, removeUserFromChat } from "../../../../services/memberDataService";
+import { removeUserFromChat } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../context/providers/AuthContext";
-import { ChatContext } from "../../../../context/providers/ChatContext";
+import { useAuth } from "../../../../context/providers/AuthContext";
+import useChatContexts from "../../../../hooks/useContexts";
 const ChatRoomContextMenu = ({contextMenuData, points}) => {
-  const { currUser } = useContext(AuthContext);
-  const { chatState, memberDispatch, chatDispatch, messageDispatch} = useContext(ChatContext);
+  const { currUser } = useAuth();
+  const { chatState, memberDispatch, chatDispatch, messageDispatch} = useChatContexts();
 
   const onLeaveGroupChat = async() => {
     await removeUserFromChat(db, contextMenuData.chatID, currUser.uid, currUser.displayName, currUser.uid, chatState.numOfMembers, chatDispatch, memberDispatch, messageDispatch);

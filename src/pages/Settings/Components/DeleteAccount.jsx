@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import { deleteAccount } from "../../../services/settingsDataService";
-import { ChatContext } from "../../../context/ChatContext";
-import { ChatroomsContext } from "../../../context/ChatroomsContext";
 import { useNavigate } from "react-router-dom";
+import useChatContexts from "../../../hooks/useContexts";
+import { ChatroomsContext } from "../../../context/providers/ChatroomsContext";
 
 const DeleteAccount = ({displayPassModal, db, currUser}) => {
 
-    const {chatState, chatDispatch, memberDispatch, messageDispatch} = useContext(ChatContext);
+    const {chatState, chatDispatch, memberDispatch, messageDispatch} = useChatContexts();
     const {chatRoomsDispatch} = useContext(ChatroomsContext);
     const navigate = useNavigate();
 

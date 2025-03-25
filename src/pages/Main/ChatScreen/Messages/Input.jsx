@@ -1,19 +1,17 @@
-import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../../context/AuthContext";
-import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
 import { addMessage } from "../../../../services/messageDataService";
-
 import Smile from "../../../../components/ui/Smile";
 import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
+import useChatContexts from "../../../../hooks/useContexts";
+import { useAuth } from "../../../../context/providers/AuthContext";
 
 
 
 const Input = () => {
   const { register, handleSubmit, resetField } = useForm();
-  const { currUser } = useContext(AuthContext);
-  const { chatState, messageState, chatDispatch } = useContext(ChatContext);
+  const { currUser } = useAuth();
+  const { chatState, messageState, chatDispatch } = useChatContexts();
 
 
   const handleAddMessage = async({ text }) => {

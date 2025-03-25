@@ -2,9 +2,9 @@ import { useContext, useState } from "react"
 import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
-import { ChatContext } from "../../../../context/ChatContext";
+import useChatContexts from "../../../../hooks/useContexts";
 const MembersBar = () => {
-  const { memberState } = useContext(ChatContext);
+  const { memberState } = useChatContexts();
   const members = memberState.members;
 
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();

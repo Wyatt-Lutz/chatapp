@@ -1,17 +1,13 @@
-
-
-
 import Close from "../../../components/ui/Close";
-import { useContext } from "react";
-import { AuthContext } from "../../../context/AuthContext";
 import { useForm } from "react-hook-form";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
+import { useAuth } from "../../../context/providers/AuthContext";
 
 
 
 const ConfirmPassModal = ({ changeDisplayment, changeConfirmation, modalHeader, modalText, isDeleteAccount }) => {
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
 
   const { register, getValues,  formState: { errors }} = useForm();
 

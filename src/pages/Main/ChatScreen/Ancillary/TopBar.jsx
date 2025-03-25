@@ -1,18 +1,18 @@
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form";
 import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../context/providers/AuthContext";
+import { useAuth } from "../../../../context/providers/AuthContext";
 import { editTitle } from "../../../../services/messageDataService";
-import { ChatContext } from "../../../../context/providers/ChatContext";
 import { addUserToChat } from "../../../../services/memberDataService";
+import useChatContexts from "../../../../hooks/useContexts";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
-  const { chatState, chatDispatch, memberState } = useContext(ChatContext);
+  const { chatState, chatDispatch, memberState } = useChatContexts();
   const chatID = chatState.chatID;
   const title = chatState.title;
   const tempTitle = chatState.tempTitle;
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
 
 
   const onFinishEditTitle = async({ title }) => {

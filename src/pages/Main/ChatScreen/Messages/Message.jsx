@@ -1,18 +1,18 @@
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
 import { editMessage } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
-import { AuthContext } from "../../../../context/AuthContext";
 import { calcTime } from "../../../../utils/messageUtils";
 import MemberContextMenu from "../MembersBar/MemberContextMenu";
+import useChatContexts from "../../../../hooks/useContexts";
+import { useAuth } from "../../../../context/providers/AuthContext";
 
 
 const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {
   const { register, handleSubmit, resetField } = useForm();
-  const { chatState } = useContext(ChatContext);
-  const {currUser} = useContext(AuthContext);
+  const { chatState } = useChatContexts();
+  const {currUser} = useAuth();
   const [usernameContextMenuData, setUsernameContextMenuData] = useState({});
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
 

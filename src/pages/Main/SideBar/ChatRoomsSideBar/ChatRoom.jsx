@@ -1,13 +1,12 @@
-import { useContext } from "react"
-import { ChatContext } from "../../../../context/providers/ChatContext";
 import { fetchChatRoomData } from "../../../../services/chatBarDataService";
 import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../context/providers/AuthContext";
+import { useAuth } from "../../../../context/providers/AuthContext";
 import { reduceTempTitle } from "../../../../utils/chatroomUtils";
+import useChatContexts from "../../../../hooks/useContexts";
 
 const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
-  const { chatState, chatDispatch, memberDispatch, messageDispatch } = useContext(ChatContext);
-  const {currUser} = useContext(AuthContext);
+  const { chatState, chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
+  const {currUser} = useAuth();
   const handleChangeChat = async() => {
     console.log('button clicked')
     chatDispatch({type: "RESET"});

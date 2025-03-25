@@ -1,5 +1,4 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import { useState } from "react";
 import { db } from "../../../firebase";
 import ConfirmPassModal from "./modals/ConfirmPassModal";
 import EmailNotVerified from "../../components/EmailNotVerified";
@@ -10,9 +9,10 @@ import ChangePassword from "./Components/ChangePassword";
 import ChangeEmail from "./Components/ChangeEmail";
 import ChangeUsername from "./Components/ChangeUsername";
 import ChangeProfilePicture from "./Components/ChangeProfilePicture";
+import { useAuth } from "../../context/providers/AuthContext";
 
 const Settings = () => {
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
   const navigate = useNavigate();
 
 

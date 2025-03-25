@@ -1,3 +1,5 @@
+import { initialMemberState } from "../initialState";
+
 export const membersReducer = (state, action) => {
   let newMembers = new Map(state?.members);
   switch(action.type) {

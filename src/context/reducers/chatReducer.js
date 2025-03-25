@@ -1,3 +1,5 @@
+import { initialChatState } from "../initialState";
+
 export const chatReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE_CHAT":

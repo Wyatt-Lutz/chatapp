@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { db } from "../../../../../firebase";
 import { queryMessages } from "../../../../services/searchDataService";
-import { ChatContext } from "../../../../context/ChatContext";
 import Message from "../Messages/Message";
+import useChatContexts from "../../../../hooks/useContexts";
 
 const Search = () => {
   const { register, control } = useForm();
   const searchQuery = useWatch({name: 'searchQuery', control});
-  const { chatState, memberState } = useContext(ChatContext);
+  const { chatState, memberState } = useChatContexts();
   const chatID = chatState.chatID;
   const [searchedMessages, setSearchedMessages] = useState(new Map());
 

@@ -1,19 +1,19 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
-import { ChatContext } from "../../../../context/ChatContext";
-import { AuthContext } from "../../../../context/AuthContext";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
 import { fetchOlderChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import Message from "./Message"
 import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
+import useChatContexts from "../../../../hooks/useContexts";
+import { useAuth } from "../../../../context/providers/AuthContext";
 
 
 const Messages = () => {
-  const { chatState, memberState, messageState, messageDispatch } = useContext(ChatContext);
-  const { currUser } = useContext(AuthContext);
+  const { chatState, memberState, messageState, messageDispatch } = useChatContexts();
+  const { currUser } = useAuth();
 
   const {chatID, title, tempTitle} = chatState;
   const { numUnread, isAtBottom, endTimestamp, messages, isFirstMessageRendered } = messageState;

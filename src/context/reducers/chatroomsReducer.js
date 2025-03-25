@@ -1,3 +1,5 @@
+import { initialChatroomState } from "../initialState";
+
 export const chatroomReducer = (state, action) => {
   let newChatrooms = new Map(state?.chatrooms);
   switch(action.type) {
@@ -12,7 +14,7 @@ export const chatroomReducer = (state, action) => {
       newChatrooms.set(action.payload.key, {...newChatrooms.get(action.payload.key), numUnread: action.payload.data});
       return { chatrooms: newChatrooms };
     case "RESET":
-      return initialState;
+      return initialChatroomState;
     default:
       return state;
   }

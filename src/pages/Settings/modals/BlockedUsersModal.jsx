@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Close from "../../../components/ui/Close";
 import { getBlockData, getUsernameFromUid, updateBlockedStatus } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";
-import { AuthContext } from "../../../context/AuthContext";
 import Minus from "../../../components/ui/Minus";
+import { useAuth } from "../../../context/providers/AuthContext";
 
 const BlockedUsersModal = ({changeDisplayment}) => {
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
   const [blockedUsers, setBlockedUsers] = useState({});
   const [usernames, setUsernames] = useState({});
 

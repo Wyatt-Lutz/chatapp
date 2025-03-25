@@ -1,3 +1,5 @@
+import { initialMessageState } from "../initialState";
+
 export const messagesReducer = (state, action) => {
   let newMessages = new Map(state?.messages);
   switch (action.type) {

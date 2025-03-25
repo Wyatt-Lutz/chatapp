@@ -10,7 +10,7 @@ export const MessageContext = createContext();
 
 
 
-export const ChatContextProvider = ({ children }) => {
+export const MessageContextProvider = ({ children }) => {
   const [messageState, messageDispatch] = useReducer(messagesReducer, initialMessageState);
 
   const { chatState } = useContext(ChatContext);

@@ -1,11 +1,11 @@
 import { onChildAdded, onChildChanged, onChildRemoved, ref } from "firebase/database";
-import { createContext, useContext, useEffect, useReducer } from "react";
+import { createContext, useEffect, useReducer } from "react";
 import { db } from "../../../firebase";
-import { AuthContext } from "./AuthContext";
 import { fetchChatRoomData } from "../../services/chatBarDataService";
 import { reduceTempTitle } from "../../utils/chatroomUtils";
 import { chatroomReducer } from "../reducers/ChatroomsReducer";
 import { initialChatroomState } from "../initialState";
+import { useAuth } from "./AuthContext";
 
 
 export const ChatroomsContext = createContext();
@@ -14,7 +14,7 @@ export const ChatroomsContext = createContext();
 
 export const ChatroomsContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(chatroomReducer, initialChatroomState);
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
 
 
   useEffect(() => {

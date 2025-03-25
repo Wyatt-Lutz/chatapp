@@ -2,15 +2,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import Signin from "./pages/Signin/Signin";
 import { Navigate } from "react-router-dom";
-import { Suspense, lazy, useContext } from "react";
-import { AuthContext } from "./context/AuthContext";
-
+import { Suspense, lazy } from "react";
+import { useAuth } from "./context/providers/AuthContext";
 const Signup = lazy(() => import('./pages/Signup/Signup'));
 const Main = lazy(() => import('./pages/Main/Main'));
 const Settings = lazy(() => import('./pages/Settings/Settings'));
 
 function App() {
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
 
   const AuthProtected = ({ children }) => {
 

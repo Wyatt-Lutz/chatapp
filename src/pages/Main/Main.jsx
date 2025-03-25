@@ -1,20 +1,20 @@
-import { AuthContext } from '../../context/AuthContext';
 import ChatScreen from './ChatScreen/ChatScreen';
-import { sendEmailVerification, signOut } from 'firebase/auth';
+import { sendEmailVerification } from 'firebase/auth';
 import { lazy, Suspense, useContext, useEffect, useState } from 'react';
 import { auth } from '../../../firebase';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
-import { ChatContext } from '../../context/ChatContext';
-import { ChatroomsContext } from '../../context/ChatroomsContext';
 import { useNavigate } from 'react-router-dom';
 import { signUserOut } from '../../utils/userUtils';
+import useChatContexts from '../../hooks/useContexts';
+import { useAuth } from '../../context/providers/AuthContext';
+import { ChatroomsContext } from '../../context/providers/ChatroomsContext';
 
 
 const EmailNotVerified = lazy(() => import('../../components/EmailNotVerified'));
 const Main = () => {
   const [emailVerificationModal, setEmailVerificationModal] = useState(false);
-  const { currUser } = useContext(AuthContext);
-  const {chatDispatch, memberDispatch, messageDispatch} = useContext(ChatContext);
+  const { currUser } = useAuth();
+  const {chatDispatch, memberDispatch, messageDispatch} = useChatContexts();
   const {chatRoomsDispatch} = useContext(ChatroomsContext);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

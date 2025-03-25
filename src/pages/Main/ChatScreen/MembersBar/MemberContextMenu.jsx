@@ -1,14 +1,13 @@
-import { useContext } from "react";
-import { ChatContext } from "../../../../context/ChatContext";
-import { AuthContext } from "../../../../context/AuthContext";
 import { removeUserFromChat, transferOwnership, updateBlockedStatus } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
+import useChatContexts from "../../../../hooks/useContexts";
+import { useAuth } from "../../../../context/providers/AuthContext";
 
 
 
 const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
-  const { chatState, memberDispatch, chatDispatch, messageDispatch} = useContext(ChatContext);
-  const { currUser } = useContext(AuthContext);
+  const { chatState, memberDispatch, chatDispatch, messageDispatch} = useChatContexts();
+  const { currUser } = useAuth();
 
 
   const onChangeBlockStatus = async(newBlockStatus) => {
