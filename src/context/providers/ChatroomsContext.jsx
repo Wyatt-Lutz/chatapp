@@ -2,7 +2,7 @@ import { onChildAdded, onChildChanged, onChildRemoved, ref } from "firebase/data
 import { createContext, useEffect, useReducer } from "react";
 import { db } from "../../../firebase";
 import { fetchChatRoomData } from "../../services/chatBarDataService";
-import { reduceTempTitle } from "../../utils/chatroomUtils";
+import { updateTempTitle } from "../../utils/chatroomUtils";
 import { chatroomReducer } from "../reducers/ChatroomsReducer";
 import { initialChatroomState } from "../initialState";
 import { useAuth } from "./AuthContext";
@@ -25,7 +25,7 @@ export const ChatroomsContextProvider = ({ children }) => {
       const newChatID = snap.key;
       const {title, tempTitle} = await fetchChatRoomData(db, newChatID);
 
-      const updatedTempTitle = reduceTempTitle(tempTitle, currUser.displayName);
+      const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
       const chatroomObj = {numUnread: snap.val(), title, tempTitle: updatedTempTitle};
       dispatch({ type: "ADD_CHATROOM", payload: {key: newChatID, data: chatroomObj}});
     }

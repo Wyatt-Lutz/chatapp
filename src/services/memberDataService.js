@@ -1,7 +1,7 @@
 import { get, ref, remove, runTransaction, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
-import { reduceTempTitle } from "../utils/chatroomUtils";
 import { fetchChatRoomData } from "./chatBarDataService";
+import { updateTempTitle } from "../utils/chatroomUtils";
 
 
 /**
@@ -39,7 +39,7 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   : `${usernameOfUserRemoved} has been removed from the chat.`;
 
   console.log(chatID);
-
+  console.log(numOfMembers);
   if (numOfMembers <= 2) {
     memberDispatch({type: "RESET"});
     await deleteChatRoom(db, chatID, chatDispatch, memberDispatch, messageDispatch);
@@ -49,7 +49,7 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   const {tempTitle, ownerUid, memberUids} = await fetchChatRoomData(db, chatID);
 
   const newMemberUids = memberUids.replace(uidToRemove, "");
-  const newTempTitle = reduceTempTitle(tempTitle, usernameOfUserRemoved);
+  const newTempTitle = updateTempTitle(tempTitle, usernameOfUserRemoved);
 
   console.log("newMemberUids: " + newMemberUids);
   console.log("newTempTitle: " + newTempTitle);
@@ -104,6 +104,7 @@ export const updateNumOfMembers = async(db, chatID, isAdd) => {
 
 
 export const deleteChatRoom = async(db, chatID, chatDispatch, memberDispatch, messageDispatch, memberData = null) => {
+  console.log('deleting chat room');
   if (!memberData) {
     memberData = Object.keys(await fetchMembersFromChat(db, chatID));
   }

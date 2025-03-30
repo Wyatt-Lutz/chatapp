@@ -6,7 +6,7 @@ import { useAuth } from "../../../../context/providers/AuthContext";
 
 
 const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
-  const { chatState, memberDispatch, chatDispatch, messageDispatch} = useChatContexts();
+  const { chatState, memberDispatch, chatDispatch, messageDispatch } = useChatContexts();
   const { currUser } = useAuth();
 
 

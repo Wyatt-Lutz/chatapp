@@ -3,7 +3,7 @@ import { initialChatState } from "../initialState";
 export const chatReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE_CHAT":
-      const { chatID, firstMessageID, owner, tempTitle, title, numOfMembers} = action.payload;
+      const { chatID, firstMessageID, owner, tempTitle, title, numOfMembers } = action.payload;
       return {
         ...state,
         chatID,
@@ -16,6 +16,7 @@ export const chatReducer = (state, action) => {
     case "UPDATE_TITLE":
       return { ...state, title: action.payload };
     case "UPDATE_TEMP_TITLE":
+
       return { ...state, tempTitle: action.payload};
     case "UPDATE_OWNER":
       return {...state, owner: action.payload };

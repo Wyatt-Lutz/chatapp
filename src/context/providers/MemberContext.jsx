@@ -6,6 +6,7 @@ import { initialMemberState } from "../initialState";
 import { membersReducer } from "../reducers/membersReducer";
 import { useAuth } from "./AuthContext";
 import { ChatContext } from "./ChatContext";
+import { updateTempTitle } from "../../utils/chatroomUtils";
 
 
 export const MemberContext = createContext();
@@ -15,7 +16,7 @@ export const MemberContext = createContext();
 export const MemberContextProvider = ({ children }) => {
   const [memberState, memberDispatch] = useReducer(membersReducer, initialMemberState);
 
-  const { chatState } = useContext(ChatContext);
+  const { chatState, chatDispatch } = useContext(ChatContext);
 
   const { currUser } = useAuth();
 
@@ -35,7 +36,7 @@ export const MemberContextProvider = ({ children }) => {
       console.log("handleMemberAdded: " + snap.val().username);
       const userBlockData = await getBlockData(db, currUserUid);
       const memberObj = {...snap.val(), isBlocked: userBlockData[snap.key]};
-      memberDispatch({type:"ADD_MEMBER", payload: {key: snap.key, data: memberObj }});
+      memberDispatch({type:"ADD_MEMBER", payload: { userUid: snap.key, data: memberObj }});
     }
 
     const handleMemberRemoved = (snap) => {
@@ -46,25 +47,18 @@ export const MemberContextProvider = ({ children }) => {
     }
 
     const handleUpdateMember = (snap) => {
-      console.log(snap.key);
-      if (!members) return;
-      const member = members.get(snap.key);
-      if (!member) return;
-      const data = snap.val();
-      console.log(data);
-      console.log(member);
-
-      if ((member.username !== data.username) && (snap.key !== currUser.uid)) {
-        console.log('will update temp title');
-        const tempTitle = chatState.tempTitle.split(', ').filter((name) => name !== member.username).concat(data.username);
-        chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: tempTitle});
-      } else if (member.isOnline !== data.isOnline) {
-        member.isOnline = data.isOnline;
-      } else if (member.hasBeenRemoved !== data.hasBeenRemoved) {
-        member.hasBeenRemoved = data.hasBeenRemoved;
-      }
-
-      memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: snap.key, data: member}});
+      memberDispatch({
+        type: "UPDATE_MEMBER_DATA",
+        payload: {
+          userUid: snap.key, //userUid
+          data: snap.val(), //updated data
+          currUserUid: currUser.uid,
+          updateTempTitle: (oldUsername, newUsername) => {
+            const tempTitle = updateTempTitle(chatState.tempTitle, oldUsername, newUsername);
+            chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: tempTitle});
+          }
+        }
+      })
     }
 
 

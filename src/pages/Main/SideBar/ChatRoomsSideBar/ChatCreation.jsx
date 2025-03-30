@@ -8,8 +8,8 @@ import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
 import { fetchProfilePicture } from "../../../../services/storageDataService";
-import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 import useChatContexts from "../../../../hooks/useContexts";
+import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
 
 
@@ -98,11 +98,11 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     const newChatID = await createChat(db, memberUids, title, tempTitle, membersList, uids, usersAdded.length, currUser.uid);
     //setUsersAdded([{uid: currUser.uid, username: currUser.displayName}]);
     changeChatRoomCreationState(false);
-    const updatedTempTitle = reduceTempTitle(tempTitle, currUser.displayName);
+    const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
     chatDispatch({ type: "RESET"});
     memberDispatch({ type: "RESET"});
     messageDispatch({ type: "RESET"});
-    chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: newChatID, title, owner: currUser.uid, tempTitle: updatedTempTitle, firstMessageID: "" }});
+    chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: newChatID, title, owner: currUser.uid, tempTitle: updatedTempTitle, numOfMembers: usersAdded.length, firstMessageID: "" }});
   }
 
 

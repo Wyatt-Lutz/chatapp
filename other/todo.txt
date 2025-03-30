@@ -1,7 +1,6 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
-1. Finish the context splitting ( change all chatContex to membercontext or whatever instead if needed and test everything)
 2. Fix problem when removing user, the tempTitle had client username
 1. Add Add user functionality
 2. Add the request system

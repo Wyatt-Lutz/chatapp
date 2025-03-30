@@ -1,8 +1,8 @@
 import { fetchChatRoomData } from "../../../../services/chatBarDataService";
 import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
-import { reduceTempTitle } from "../../../../utils/chatroomUtils";
 import useChatContexts from "../../../../hooks/useContexts";
+import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
 const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
   const { chatState, chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
@@ -14,10 +14,10 @@ const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
     messageDispatch({type: "RESET"});
 
 
-    const {firstMessageID, owner, tempTitle, title} = await fetchChatRoomData(db, chatID);
-    const updatedTempTitle = reduceTempTitle(tempTitle, currUser.displayName);
+    const {firstMessageID, owner, tempTitle, title, numOfMembers} = await fetchChatRoomData(db, chatID);
+    const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
     console.log(updatedTempTitle);
-    chatDispatch({ type: "CHANGE_CHAT", payload: {chatID, firstMessageID, owner, tempTitle: updatedTempTitle, title}});
+    chatDispatch({ type: "CHANGE_CHAT", payload: {chatID, firstMessageID, owner, tempTitle: updatedTempTitle, title, numOfMembers}});
 
   };
 
