@@ -1,4 +1,4 @@
-import { useChatContexts } from "../../hooks/useContexts";
+import { useChatContexts, useResetChatContexts } from "../../hooks/useContexts";
 import { initialMemberState } from "../initialState";
 
 export const membersReducer = (state, action) => {
@@ -13,10 +13,8 @@ export const membersReducer = (state, action) => {
       console.log('update member');
 
       if (userUid === currUserUid) {
-        const { chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
-        chatDispatch({ type: "RESET" });
-        memberDispatch({ type: "RESET" });
-        messageDispatch({ type: "RESET" });
+        const resetContexts = useResetChatContexts();
+        resetContexts();
         return;
       }
 

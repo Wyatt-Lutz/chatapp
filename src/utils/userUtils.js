@@ -1,12 +1,12 @@
 import { signOut } from "firebase/auth";
+import { useResetChatContexts } from "../hooks/useContexts";
 
 
 export const signUserOut = async(auth, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch) => {
 
   //Reset the context data
-  chatDispatch({type: "RESET"});
-  memberDispatch({type: "RESET"});
-  messageDispatch({type: "RESET"});
+  const resetContexts = useResetChatContexts();
+  resetContexts();
   chatRoomsDispatch({type: "RESET"});
 
   //Firebase sign out

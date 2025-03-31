@@ -2,6 +2,7 @@ import { get, increment, ref, remove, runTransaction, set, update } from "fireba
 import { addMessage } from "./messageDataService";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
+import { useResetChatContexts } from "../hooks/useContexts";
 
 
 /**
@@ -115,9 +116,8 @@ export const deleteChatRoom = async(db, chatID, chatDispatch, memberDispatch, me
     memberData = Object.keys(await fetchMembersFromChat(db, chatID));
   }
 
-  chatDispatch({type: "RESET"});
-  memberDispatch({type: "RESET"});
-  messageDispatch({type: "RESET"});
+  const resetContexts = useResetChatContexts();
+  resetContexts();
 
   const membersRef = ref(db, `members/${chatID}`);
 

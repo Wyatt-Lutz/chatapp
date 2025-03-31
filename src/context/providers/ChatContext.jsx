@@ -47,8 +47,6 @@ export const ChatContextProvider = ({ children }) => {
 
     const onChatroomRemoved = () => {
       chatDispatch({type: "RESET"});
-      memberDispatch({type: "RESET"});
-      messageDispatch({type: "RESET"});
     }
 
     const chatroomRef = ref(db, `chats/${chatID}`);

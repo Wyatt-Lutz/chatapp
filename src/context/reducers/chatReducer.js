@@ -1,3 +1,4 @@
+import { useResetChatContexts } from "../../hooks/useContexts";
 import { initialChatState } from "../initialState";
 
 export const chatReducer = (state, action) => {
@@ -26,6 +27,8 @@ export const chatReducer = (state, action) => {
     case "UPDATE_NUM_OF_MEMBERS":
       return {...state, numOfMembers: action.payload };
     case "RESET":
+      const resetContexts = useResetChatContexts();
+      resetContexts();
       return initialChatState;
     default:
       return state;
