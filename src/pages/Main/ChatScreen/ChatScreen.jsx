@@ -2,7 +2,7 @@ import MembersBar from './MembersBar/MembersBar';
 import TopBar from './Ancillary/TopBar';
 import Messages from './Messages/Messages';
 import Search from './Ancillary/Search';
-import useChatContexts from '../../../hooks/useContexts';
+import { useChatContexts } from '../../../hooks/useContexts';
 
 const ChatScreen = () => {
   const { chatState } = useChatContexts();

@@ -7,7 +7,7 @@ import { useContextMenu } from "../../../../hooks/useContextMenu";
 import Message from "./Message"
 import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
 
@@ -143,17 +143,13 @@ const Messages = () => {
                     {[...messages].map(([messageUid, messageData], index) => {
                       const memberDataOfSender = memberState.members.get(messageData.sender);
                       return (
-                        <div>
-
-                          <div key={messageUid} onContextMenu={(e) => handleMessageContextMenu(e, messageUid, messageData)}>
-                            <Message messageUid={messageUid} memberDataOfSender={memberDataOfSender} messageData={messageData} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
+                        <div key={messageUid} onContextMenu={(e) => handleMessageContextMenu(e, messageUid, messageData)}>
+                          <Message messageUid={messageUid} memberDataOfSender={memberDataOfSender} messageData={messageData} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
 
 
-                            {index === messageData.size - 1 && (
-                              <div ref = {lastMessageRef} />
-                            )}
-
-                          </div>
+                          {index === messageData.size - 1 && (
+                            <div ref = {lastMessageRef} />
+                          )}
 
                         </div>
 

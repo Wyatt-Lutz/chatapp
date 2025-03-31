@@ -3,7 +3,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { db } from "../../../../../firebase";
 import { queryMessages } from "../../../../services/searchDataService";
 import Message from "../Messages/Message";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 
 const Search = () => {
   const { register, control } = useForm();

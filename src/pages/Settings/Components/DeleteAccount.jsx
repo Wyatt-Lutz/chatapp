@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { deleteAccount } from "../../../services/settingsDataService";
 import { useNavigate } from "react-router-dom";
-import useChatContexts from "../../../hooks/useContexts";
+import { useChatContexts } from "../../../hooks/useContexts";
 import { ChatroomsContext } from "../../../context/providers/ChatroomsContext";
 
 const DeleteAccount = ({displayPassModal, db, currUser}) => {

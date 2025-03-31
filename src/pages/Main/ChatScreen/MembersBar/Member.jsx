@@ -1,4 +1,4 @@
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 
 const Member = ({ memberUid, memberData }) => {
   const { chatState } = useChatContexts();

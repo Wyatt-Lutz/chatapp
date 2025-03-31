@@ -5,7 +5,7 @@ import { editMessage } from "../../../../services/messageDataService";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import { calcTime } from "../../../../utils/messageUtils";
 import MemberContextMenu from "../MembersBar/MemberContextMenu";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
 

@@ -8,7 +8,7 @@ import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
 import { fetchProfilePicture } from "../../../../services/storageDataService";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
 

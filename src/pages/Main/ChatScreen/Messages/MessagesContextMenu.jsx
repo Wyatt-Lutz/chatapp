@@ -1,7 +1,7 @@
 import { db } from "../../../../../firebase";
 import { deleteMessage } from "../../../../services/messageDataService";
 import { useAuth } from "../../../../context/providers/AuthContext";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 const MessagesContextMenu = ({changeEditState, contextMenuData: {sender, messageUid}, points}) => {
   const { chatState } = useChatContexts();
   const { currUser } = useAuth();

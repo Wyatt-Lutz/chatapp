@@ -3,6 +3,8 @@ import { ref, onChildChanged, onChildRemoved } from "firebase/database";
 import { db } from "../../../firebase";
 import { chatReducer } from "../reducers/ChatReducer";
 import { initialChatState } from "../initialState";
+import { updateTempTitle } from "../../utils/chatroomUtils";
+import { useAuth } from "./AuthContext";
 
 
 export const ChatContext = createContext();
@@ -12,6 +14,7 @@ export const ChatContext = createContext();
 export const ChatContextProvider = ({ children }) => {
   const [chatState, chatDispatch] = useReducer(chatReducer, initialChatState);
 
+  const { currUser } = useAuth();
 
 
   const chatID = chatState.chatID;
@@ -27,7 +30,12 @@ export const ChatContextProvider = ({ children }) => {
       : prop === 'owner'
       ? chatDispatch({ type: "UPDATE_OWNER", payload: snap.val() })
       : prop === 'tempTitle'
-      ? chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: snap.val() })
+      ? (
+          (() => {
+            const newTempTitle = updateTempTitle(snap.val(), currUser.displayName);
+            chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: newTempTitle });
+          })()
+        )
       : prop === 'firstMessageID'
       ? chatDispatch({ type: "UPDATE_FIRST_MESSAGE_ID", payload: snap.val() })
       : prop === 'memberUids'

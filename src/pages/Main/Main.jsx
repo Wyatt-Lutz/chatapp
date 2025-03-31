@@ -5,7 +5,7 @@ import { auth } from '../../../firebase';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 import { useNavigate } from 'react-router-dom';
 import { signUserOut } from '../../utils/userUtils';
-import useChatContexts from '../../hooks/useContexts';
+import { useChatContexts } from '../../hooks/useContexts';
 import { useAuth } from '../../context/providers/AuthContext';
 import { ChatroomsContext } from '../../context/providers/ChatroomsContext';
 

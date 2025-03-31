@@ -1,4 +1,4 @@
-import { ref, query, set, get, update, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst } from 'firebase/database';
+import { ref, query, set, get, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst, increment, update } from 'firebase/database';
 import { fetchChatUsersByStatus } from "./memberDataService";
 
 
@@ -57,17 +57,12 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
 const updateUnreadCount = async(db, chatID) => {
   const offlineMembers = await fetchChatUsersByStatus(db, chatID, false);
   for (const userUid of offlineMembers) {
-    const userDataRef = ref(db, `users/${userUid}/chatsIn/${chatID}`);
-    const transactionUpdate = (currData) => {
-      if (currData === null) {
-        return 0;
-      } else {
-        return currData + 1;
-      }
-    }
-    await runTransaction(userDataRef, transactionUpdate).catch((error) => {
-      console.error('update unreadcount transaction failed:' + error);
-    });
+    const userDataRef = ref(db, `users/${userUid}/chatsIn`);
+
+    const updates = {
+      [`${chatID}`]: increment(1),
+    };
+    await update(userDataRef, updates);
   }
 }
 

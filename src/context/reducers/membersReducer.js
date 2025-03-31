@@ -1,3 +1,4 @@
+import { useChatContexts } from "../../hooks/useContexts";
 import { initialMemberState } from "../initialState";
 
 export const membersReducer = (state, action) => {
@@ -8,21 +9,18 @@ export const membersReducer = (state, action) => {
       newMembers.set(action.payload.userUid, action.payload.data);
       return { members: newMembers };
     case "UPDATE_MEMBER_DATA":
-      const { userUid, data, currUserUid, updateTempTitle } = action.payload;
-      console.log(data);
-      const member = newMembers.get(userUid);
-
-      if (member && (member.username !== data.username) && (userUid !== currUserUid)) {
-        updateTempTitle(member.username, data.username);
-      }
+      const { userUid, data, currUserUid } = action.payload;
       console.log('update member');
-      console.log(action.payload.key);
-      console.log(action.payload.data);
-      console.log(newMembers);
+
+      if (userUid === currUserUid) {
+        const { chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
+        chatDispatch({ type: "RESET" });
+        memberDispatch({ type: "RESET" });
+        messageDispatch({ type: "RESET" });
+        return;
+      }
+
       newMembers.set(userUid, data);
-      return { members: newMembers };
-    case "REMOVE_MEMBER":
-      newMembers.delete(action.payload);
       return { members: newMembers };
     case "RESET":
       return initialMemberState;

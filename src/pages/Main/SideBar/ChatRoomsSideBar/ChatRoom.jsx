@@ -1,7 +1,7 @@
 import { fetchChatRoomData } from "../../../../services/chatBarDataService";
 import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
 const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {

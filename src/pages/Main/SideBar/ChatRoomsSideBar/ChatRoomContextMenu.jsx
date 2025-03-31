@@ -1,7 +1,7 @@
 import { removeUserFromChat } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 const ChatRoomContextMenu = ({contextMenuData, points}) => {
   const { currUser } = useAuth();
   const { chatState, memberDispatch, chatDispatch, messageDispatch} = useChatContexts();

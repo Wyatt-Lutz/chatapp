@@ -4,7 +4,7 @@ import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { editTitle } from "../../../../services/messageDataService";
 import { addUserToChat } from "../../../../services/memberDataService";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();

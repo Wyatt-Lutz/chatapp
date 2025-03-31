@@ -1,4 +1,4 @@
-import { get, ref, remove, runTransaction, set, update } from "firebase/database";
+import { get, increment, ref, remove, runTransaction, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
@@ -27,6 +27,13 @@ export const fetchChatsInData = async(db, userUid) => {
   return ((await get(chatsInRef)).val());
 }
 
+export const fetchNumOfMembers = async(db, chatID) => {
+  const chatRef = ref(db, `chats/${chatID}/numOfMembers`);
+  const numOfMembers = (await get(chatRef)).val();
+  console.log(numOfMembers);
+  return numOfMembers;
+}
+
 
 export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, numOfMembers, chatDispatch, memberDispatch, messageDispatch, memberOptions = {}) => {
   console.log("chatID: " + chatID);
@@ -40,7 +47,13 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
   console.log(chatID);
   console.log(numOfMembers);
-  if (numOfMembers <= 2) {
+
+  if (!numOfMembers) {
+    numOfMembers = await fetchNumOfMembers(db, chatID);
+  }
+
+
+  if (numOfMembers && numOfMembers <= 2) {
     memberDispatch({type: "RESET"});
     await deleteChatRoom(db, chatID, chatDispatch, memberDispatch, messageDispatch);
     return;
@@ -88,18 +101,11 @@ export const addUserToChat = async(db, chatID, userUid) => {
 }
 
 export const updateNumOfMembers = async(db, chatID, isAdd) => {
-  const numOfMembersRef = ref(db, `chats/${chatID}/numOfMembers`);
-  const transactionUpdate = (currData) => {
-    if (currData === null) {
-      console.error('numOfMembers is 0 when updating numofMembers');
-      return;
-    } else {
-      return isAdd ? currData + 1 : currData - 1;
-    }
-  }
-  await runTransaction(numOfMembersRef, transactionUpdate).catch((error) => {
-    console.error('error updating numOfMembers' + error);
-  });
+  const numOfMembersRef = ref(db, `chats/${chatID}`);
+  const updates = {
+    [`numOfMembers`]: increment(isAdd ? 1 : -1),
+  };
+  await update(numOfMembersRef, updates);
 }
 
 

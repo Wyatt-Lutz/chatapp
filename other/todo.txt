@@ -1,7 +1,6 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
-2. Fix problem when removing user, the tempTitle had client username
 1. Add Add user functionality
 2. Add the request system
 2. If a user is removed, the removed user can still do things normally and like certain data isnt removed correctly like chatsIn and the members listeners will not see changes if someone is remove
@@ -56,7 +55,8 @@ Priority:
   - Test to see what happens if a user clicks on a chat as soon as a messaeg is added
   - add optimistic updates (its like so fast I dont even need it, unless I added it without knowing)
 
-
+Rules -
+  - Make sure that users that have the hasbeenremoved are unable to send messages to a chatroom like if it breaks. Add all the rules for things like this
 
 -topbar
   - If the user is chanign title in topbar and they leave it as "", then recalcuate the temptitle and use that

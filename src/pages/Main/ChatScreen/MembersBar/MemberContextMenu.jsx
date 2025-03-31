@@ -1,6 +1,6 @@
 import { removeUserFromChat, transferOwnership, updateBlockedStatus } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
 
@@ -14,7 +14,7 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
     await updateBlockedStatus(db, currUser.uid, memberUid, newBlockStatus);
     const newMemberObj = {...memberData, isBlocked: newBlockStatus}
     console.log(newMemberObj);
-    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: memberUid, data: newMemberObj}});
+    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: memberUid, data: newMemberObj, currUserUid: currUser.uid}});
   }
 
   const onRemoveMemberFromChat = async() => {

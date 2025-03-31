@@ -3,7 +3,7 @@ import { db } from "../../../../../firebase";
 import { addMessage } from "../../../../services/messageDataService";
 import Smile from "../../../../components/ui/Smile";
 import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
-import useChatContexts from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
 
