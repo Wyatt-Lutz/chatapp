@@ -1,17 +1,16 @@
 import { fetchChatRoomData } from "../../../../services/chatBarDataService";
 import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
-import { useChatContexts, useResetChatContexts } from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
 const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
-  const { chatState, chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
+  const { chatState, chatDispatch, resetAllChatContexts } = useChatContexts();
   const {currUser} = useAuth();
-  const resetContexts = useResetChatContexts();
   const handleChangeChat = async() => {
     console.log('button clicked')
 
-    resetContexts();
+    resetAllChatContexts();
 
 
     const {firstMessageID, owner, tempTitle, title, numOfMembers} = await fetchChatRoomData(db, chatID);

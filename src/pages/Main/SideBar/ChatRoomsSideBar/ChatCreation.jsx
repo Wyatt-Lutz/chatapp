@@ -8,18 +8,17 @@ import { checkIfUserExists } from "../../../../services/globalDatService";
 import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
 import { fetchProfilePicture } from "../../../../services/storageDataService";
-import { useChatContexts, useResetChatContexts } from "../../../../hooks/useContexts";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
 
 
 const ChatCreation = ({changeChatRoomCreationState}) => {
   const { currUser } = useAuth();
-  const { chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
+  const { chatDispatch, resetAllChatContexts, memberDispatch, messageDispatch } = useChatContexts();
   const [usersAdded, setUsersAdded] = useState([{uid: currUser.uid, username: currUser.displayName}]);
   const [isUserBlockedWarning, setIsUserBlockedWarning] = useState(null);
   const {register, handleSubmit, resetField} = useForm();
-  const resetContexts = useResetChatContexts();
 
   const addUser = async ({newUser}) => {
     resetField('newUser');
@@ -100,7 +99,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     changeChatRoomCreationState(false);
     const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
 
-    resetContexts();
+    resetAllChatContexts();
     chatDispatch({ type: "CHANGE_CHAT", payload: { chatID: newChatID, title, owner: currUser.uid, tempTitle: updatedTempTitle, numOfMembers: usersAdded.length, firstMessageID: "" }});
   }
 

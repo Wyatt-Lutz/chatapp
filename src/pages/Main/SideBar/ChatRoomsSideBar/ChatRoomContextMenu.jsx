@@ -4,10 +4,10 @@ import { useAuth } from "../../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../../hooks/useContexts";
 const ChatRoomContextMenu = ({contextMenuData, points}) => {
   const { currUser } = useAuth();
-  const { chatState, memberDispatch, chatDispatch, messageDispatch} = useChatContexts();
+  const { chatState, chatDispatch, resetAllChatContexts} = useChatContexts();
 
   const onLeaveGroupChat = async() => {
-    await removeUserFromChat(db, contextMenuData.chatID, currUser.uid, currUser.displayName, currUser.uid, chatState.numOfMembers, chatDispatch, memberDispatch, messageDispatch);
+    await removeUserFromChat(db, contextMenuData.chatID, currUser.uid, currUser.displayName, currUser.uid, chatState.numOfMembers, chatDispatch, resetAllChatContexts);
   }
 
   return (

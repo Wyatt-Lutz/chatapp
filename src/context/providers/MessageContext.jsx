@@ -3,7 +3,7 @@ import { limitToLast, orderByChild, query, startAt, ref, onChildAdded, onChildCh
 import { db } from "../../../firebase";
 import { messagesReducer } from "../reducers/messagesReducer";
 import { initialMessageState } from "../initialState";
-import { ChatContext } from "./ChatContext";
+import { ChatContext, ResetChatContext } from "./ChatContext";
 
 
 export const MessageContext = createContext();
@@ -12,9 +12,8 @@ export const MessageContext = createContext();
 
 export const MessageContextProvider = ({ children }) => {
   const [messageState, messageDispatch] = useReducer(messagesReducer, initialMessageState);
-
   const { chatState } = useContext(ChatContext);
-
+  const { isReset, setIsReset } = useContext(ResetChatContext);
 
 
 
@@ -28,6 +27,11 @@ export const MessageContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (!chatID) return;
+
+    if (isReset) {
+      setIsReset(!isReset);
+      messageDispatch({ type: "RESET" });
+    }
 
     const handleMessageAdded = (snap) => {
       if (messages.size === 0) {
@@ -77,7 +81,7 @@ export const MessageContextProvider = ({ children }) => {
       chatChangedListener();
       chatRemovedListener();
     };
-  }, [chatID, endTimestamp, numUnread, isAtBottom]);
+  }, [chatID, isReset, isAtBottom, numUnread, endTimestamp]);
 
 
   return (

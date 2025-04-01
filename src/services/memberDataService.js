@@ -2,7 +2,6 @@ import { get, increment, ref, remove, runTransaction, set, update } from "fireba
 import { addMessage } from "./messageDataService";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
-import { useResetChatContexts } from "../hooks/useContexts";
 
 
 /**
@@ -36,7 +35,7 @@ export const fetchNumOfMembers = async(db, chatID) => {
 }
 
 
-export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, numOfMembers, chatDispatch, memberDispatch, messageDispatch, memberOptions = {}) => {
+export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, numOfMembers, chatDispatch, resetAllChatContexts, memberOptions = {}) => {
   console.log("chatID: " + chatID);
   console.log("uidToRemove: " + uidToRemove);
   const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
@@ -55,8 +54,7 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
   if (numOfMembers && numOfMembers <= 2) {
-    memberDispatch({type: "RESET"});
-    await deleteChatRoom(db, chatID, chatDispatch, memberDispatch, messageDispatch);
+    await deleteChatRoom(db, chatID, resetAllChatContexts);
     return;
   }
 
@@ -110,14 +108,13 @@ export const updateNumOfMembers = async(db, chatID, isAdd) => {
 }
 
 
-export const deleteChatRoom = async(db, chatID, chatDispatch, memberDispatch, messageDispatch, memberData = null) => {
+export const deleteChatRoom = async(db, chatID, resetAllChatContexts, memberData = null) => {
   console.log('deleting chat room');
   if (!memberData) {
     memberData = Object.keys(await fetchMembersFromChat(db, chatID));
   }
 
-  const resetContexts = useResetChatContexts();
-  resetContexts();
+  resetAllChatContexts();
 
   const membersRef = ref(db, `members/${chatID}`);
 

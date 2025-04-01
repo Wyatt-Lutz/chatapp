@@ -6,7 +6,7 @@ import { useAuth } from "../../../../context/providers/AuthContext";
 
 
 const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
-  const { chatState, memberDispatch, chatDispatch, messageDispatch } = useChatContexts();
+  const { chatState, memberDispatch, chatDispatch, resetAllChatContexts } = useChatContexts();
   const { currUser } = useAuth();
 
 
@@ -18,7 +18,7 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
   }
 
   const onRemoveMemberFromChat = async() => {
-    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, chatState.numOfMembers, chatDispatch, memberDispatch, messageDispatch);
+    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, chatState.numOfMembers, chatDispatch, resetAllChatContexts);
   }
 
 

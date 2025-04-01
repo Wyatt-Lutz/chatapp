@@ -6,7 +6,7 @@ import { ChatroomsContext } from "../../../context/providers/ChatroomsContext";
 
 const DeleteAccount = ({displayPassModal, db, currUser}) => {
 
-    const {chatState, chatDispatch, memberDispatch, messageDispatch} = useChatContexts();
+    const {chatState, chatDispatch, memberDispatch, messageDispatch, resetAllChatContexts} = useChatContexts();
     const {chatRoomsDispatch} = useContext(ChatroomsContext);
     const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ const DeleteAccount = ({displayPassModal, db, currUser}) => {
 
         await displayPassModal(deleteAccountHeader, deleteAccountText, true);
 
-        await deleteAccount(db, currUser, chatState.numOfMembers, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch, navigate);
+        await deleteAccount(db, currUser, chatState.numOfMembers, chatDispatch, chatRoomsDispatch, navigate, resetAllChatContexts);
     }
     return (
         <>

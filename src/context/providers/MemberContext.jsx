@@ -5,7 +5,7 @@ import { db } from "../../../firebase";
 import { initialMemberState } from "../initialState";
 import { membersReducer } from "../reducers/membersReducer";
 import { useAuth } from "./AuthContext";
-import { ChatContext } from "./ChatContext";
+import { ChatContext, ResetChatContext } from "./ChatContext";
 
 
 export const MemberContext = createContext();
@@ -14,7 +14,7 @@ export const MemberContext = createContext();
 
 export const MemberContextProvider = ({ children }) => {
   const [memberState, memberDispatch] = useReducer(membersReducer, initialMemberState);
-
+  const {isReset, setIsReset } = useContext(ResetChatContext);
   const { chatState } = useContext(ChatContext);
 
   const { currUser } = useAuth();
@@ -26,6 +26,12 @@ export const MemberContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (!chatID) return;
+
+    if (isReset) {
+      setIsReset(!isReset);
+      memberDispatch({ type: "RESET" });
+    }
+
     const membersRef = ref(db, `members/${chatID}`);
 
     const handleMemberAdded = async(snap) => {
@@ -49,7 +55,7 @@ export const MemberContextProvider = ({ children }) => {
       memberAddedListener();
       memberUpdatedListener();
     }
-  }, [chatID, currUserUid]);
+  }, [chatID, currUserUid, isReset]);
 
 
 

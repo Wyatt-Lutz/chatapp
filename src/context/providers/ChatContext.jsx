@@ -1,4 +1,4 @@
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useCallback, useEffect, useReducer, useState } from "react";
 import { ref, onChildChanged, onChildRemoved } from "firebase/database";
 import { db } from "../../../firebase";
 import { chatReducer } from "../reducers/ChatReducer";
@@ -8,16 +8,21 @@ import { useAuth } from "./AuthContext";
 
 
 export const ChatContext = createContext();
-
+export const ResetChatContext = createContext();
 
 
 export const ChatContextProvider = ({ children }) => {
   const [chatState, chatDispatch] = useReducer(chatReducer, initialChatState);
-
+  const [isReset, setIsReset] = useState(false);
   const { currUser } = useAuth();
 
 
   const chatID = chatState.chatID;
+
+  const resetAllChatContexts = () => {
+    chatDispatch({ type: "RESET" });
+    setIsReset((prev) => !prev);
+  };
 
 
   useEffect(() => {
@@ -46,7 +51,7 @@ export const ChatContextProvider = ({ children }) => {
     }
 
     const onChatroomRemoved = () => {
-      chatDispatch({type: "RESET"});
+      resetAllChatContexts();
     }
 
     const chatroomRef = ref(db, `chats/${chatID}`);
@@ -61,8 +66,10 @@ export const ChatContextProvider = ({ children }) => {
 
 
   return (
-    <ChatContext.Provider value={{ chatState, chatDispatch }}>
-      {children}
+    <ChatContext.Provider value={{ chatState, chatDispatch, resetAllChatContexts }}>
+      <ResetChatContext.Provider value={{ isReset, setIsReset} }>
+        {children}
+      </ResetChatContext.Provider>
     </ChatContext.Provider>
   );
 };

@@ -14,7 +14,7 @@ const EmailNotVerified = lazy(() => import('../../components/EmailNotVerified'))
 const Main = () => {
   const [emailVerificationModal, setEmailVerificationModal] = useState(false);
   const { currUser } = useAuth();
-  const {chatDispatch, memberDispatch, messageDispatch} = useChatContexts();
+  const {resetAllChatContexts} = useChatContexts();
   const {chatRoomsDispatch} = useContext(ChatroomsContext);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ const Main = () => {
 
   const signCurrUserOut = async() => {
 
-    await signUserOut(auth, chatDispatch, memberDispatch, messageDispatch, chatRoomsDispatch);
+    await signUserOut(auth, resetAllChatContexts, chatRoomsDispatch);
   }
 
 
