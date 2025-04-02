@@ -101,7 +101,7 @@ export const editMessage = async(messageUid, text, chatID, db) => {
   });
 }
 
-export const deleteMessage = async(messageUid, db, chatID) => {
+export const deleteMessage = async(db, chatID, messageUid) => {
   const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
   await remove(chatRef);
 }

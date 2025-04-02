@@ -1,9 +1,10 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
+2. If a user is removed, the removed user can still do things normally and like certain data isnt removed correctly like chatsIn and the members listeners will not see changes if someone is remove
+  - infinite loop when removing a member in the membercontext probably because of the call to resetChatwhatever, could try just dispatch
 1. Add Add user functionality
 2. Add the request system
-2. If a user is removed, the removed user can still do things normally and like certain data isnt removed correctly like chatsIn and the members listeners will not see changes if someone is remove
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
 5. Prompt users before leaving a group chat
 6. When someone leaves a group chat, the membersList isnt updated

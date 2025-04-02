@@ -14,14 +14,16 @@ export const MemberContext = createContext();
 
 export const MemberContextProvider = ({ children }) => {
   const [memberState, memberDispatch] = useReducer(membersReducer, initialMemberState);
-  const {isReset, setIsReset } = useContext(ResetChatContext);
+  const { isReset, setIsReset } = useContext(ResetChatContext);
   const { chatState } = useContext(ChatContext);
+  const { resetAllChatContexts } = useContext(ResetChatContext);
 
   const { currUser } = useAuth();
 
 
   const currUserUid = currUser?.uid;
   const chatID = chatState.chatID;
+  const members = memberState.members;
 
 
   useEffect(() => {
@@ -43,6 +45,13 @@ export const MemberContextProvider = ({ children }) => {
 
 
     const handleUpdateMember = (snap) => {
+      console.log(snap.val());
+      console.log(memberState.members);
+      if ((currUser.uid === snap.key) && (snap.val().hasBeenRemoved !== memberState.members.get(currUser.uid).hasBeenRemoved)) {
+        resetAllChatContexts();
+      }
+
+
       memberDispatch({ type: "UPDATE_MEMBER_DATA", payload: { userUid: snap.key, data: snap.val(), currUserUid: currUser.uid }});
     }
 
@@ -55,7 +64,7 @@ export const MemberContextProvider = ({ children }) => {
       memberAddedListener();
       memberUpdatedListener();
     }
-  }, [chatID, currUserUid, isReset]);
+  }, [chatID, currUserUid, isReset, members]);
 
 
 

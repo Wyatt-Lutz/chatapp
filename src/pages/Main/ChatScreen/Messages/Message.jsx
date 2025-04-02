@@ -9,7 +9,7 @@ import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
 
-const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {
+const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState, index }) => {
   const { register, handleSubmit, resetField } = useForm();
   const { chatState } = useChatContexts();
   const {currUser} = useAuth();
@@ -34,10 +34,13 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
         {(messageData.renderTimeAndSender || index === 0) && (
           <div>
             {messageData.sender !== 'server' && (
-              <div className="flex" onContextMenu={(e) => handleUsernameContextMenu(e, messageData.sender, memberDataOfSender)}>
+              <div className="flex items-center gap-2" onContextMenu={(e) => handleUsernameContextMenu(e, messageData.sender, memberDataOfSender)}>
                 {memberDataOfSender && (
-                  <div>
-                    <img src={memberDataOfSender.profilePictureURL} alt="profile picture"/>
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full overflow-hidden">
+                      <img className="h-full w-full object-cover" src={memberDataOfSender.profilePictureURL} alt="profile picture"/>
+                    </div>
+
                     {memberDataOfSender.isBlocked ? (
                       <div>Blocked User</div>
                     ) : (

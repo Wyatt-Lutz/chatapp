@@ -144,7 +144,7 @@ const Messages = () => {
                       const memberDataOfSender = memberState.members.get(messageData.sender);
                       return (
                         <div key={messageUid} onContextMenu={(e) => handleMessageContextMenu(e, messageUid, messageData)}>
-                          <Message messageUid={messageUid} memberDataOfSender={memberDataOfSender} messageData={messageData} isEditing={editState[messageUid]} changeEditState={changeEditState}/>
+                          <Message messageUid={messageUid} memberDataOfSender={memberDataOfSender} messageData={messageData} isEditing={editState[messageUid]} changeEditState={changeEditState} index={index}/>
 
 
                           {index === messageData.size - 1 && (

@@ -5,12 +5,13 @@ import { useChatContexts } from "../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
 const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
-  const { chatState, chatDispatch, resetAllChatContexts } = useChatContexts();
+  const { chatState, chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
   const {currUser} = useAuth();
   const handleChangeChat = async() => {
     console.log('button clicked')
 
-    resetAllChatContexts();
+    memberDispatch({ type: "RESET" });
+    messageDispatch({ type: "RESET" });
 
 
     const {firstMessageID, owner, tempTitle, title, numOfMembers} = await fetchChatRoomData(db, chatID);
