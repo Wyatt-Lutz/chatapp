@@ -13,7 +13,6 @@ dist-ssr
 *.local
 FIREBASE_CONFIG.js
 eslint.config.js
-other
 .env
 
 
@@ -27,3 +26,4 @@ other
 *.njsproj
 *.sln
 *.sw?
+/other

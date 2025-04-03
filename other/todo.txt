@@ -40,6 +40,10 @@ Priority:
   - could preload the default image in signupform
   - Make the form errors toasts or something - well Idk, because its cool when they pop up immedietly like if username.length > 15
 
+-Signup
+  - If you press eenter while in the email input to go to the password input, it thinks you tried to signin and gives password error. Or pressing enter doesnt even go to next input in first place and just tries to sign in
+
+
 -messages
   - test t he firstmessageid and top of messages, it may be a little glitchy
   - see if there is better ways to handle the unseen messages than all the scroll listeners and checks
@@ -73,6 +77,7 @@ Rules -
   - Sort the chatbar for most recent chatted in on top, need to add a timestamp or something
 
 -app
+  - It doesnt like me calling resetAllChatContexts from like membercontextprovider or mesasge because its under chatcontext and I reset chatcontext first
   - the services are for all functions that access the database, so move any non-database get or set functions to some utils thing.
   - use react-hook-form useWatch instead of its watch
   - see if I can avoid reinitializing like currUser or DB and pass them to componenets in a lifecycle like in Settings
