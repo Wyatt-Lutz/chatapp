@@ -3,7 +3,7 @@ import { initialMemberState } from "../initialState";
 import { membersReducer } from "../reducers/membersReducer";
 import { useAuth } from "./AuthContext";
 import { ChatContext, ResetChatContext } from "./ChatContext";
-import { MemberListenerService } from "../listenerServices/MemberListenerService";
+import { MemberListenerService } from "../listenerServices/memberListenerService";
 
 
 export const MemberContext = createContext();

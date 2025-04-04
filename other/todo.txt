@@ -1,8 +1,6 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
-2. If a user is removed, the removed user can still do things normally and like certain data isnt removed correctly like chatsIn and the members listeners will not see changes if someone is remove
-  - infinite loop when removing a member in the membercontext probably because of the call to resetChatwhatever, could try just dispatch
 1. Add Add user functionality
 2. Add the request system
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
@@ -15,6 +13,7 @@ Priority:
 9. When you are creating a chat and adding the users, add the users profile pictures before their names
 9. Add the like "new messages since x time" if a user is scrolled up
 10. Fix the layout of search messages
+11. Make the Chat and Chatroom listener services
 
 
 -PasswordReset
