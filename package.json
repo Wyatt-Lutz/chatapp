@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.9",
+    "@tailwindcss/vite": "^4.0.14",
     "browser-image-resizer": "^2.4.1",
     "dayjs": "^1.11.13",
     "firebase": "^11.4.0",
