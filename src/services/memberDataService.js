@@ -95,8 +95,19 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
 
-export const addUserToChat = async(db, chatID, userUid) => {
-  console.log('lol');
+export const addUserToChat = async(db, chatID, userUid, username, profilePictureURL) => {
+  const memberRef = ref(db, `members/${chatID}/${userUid}`);
+  await set(memberRef, {
+    hasBeenRemoved: false,
+    isOnline: false,
+    username: username,
+    profilePictureURL: profilePictureURL,
+  });
+
+  const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
+  await update(chatsInRef, {
+    [chatID]: 0,
+  });
 }
 
 export const updateNumOfMembers = async(db, chatID, isAdd) => {

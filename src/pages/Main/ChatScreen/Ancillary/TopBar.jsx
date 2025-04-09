@@ -5,6 +5,7 @@ import { useAuth } from "../../../../context/providers/AuthContext";
 import { editTitle } from "../../../../services/messageDataService";
 import { addUserToChat } from "../../../../services/memberDataService";
 import { useChatContexts } from "../../../../hooks/useContexts";
+import AddUserModal from "../modals/AddUserModal";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
@@ -13,6 +14,7 @@ const TopBar = () => {
   const title = chatState.title;
   const tempTitle = chatState.tempTitle;
   const { currUser } = useAuth();
+  const [isDisplayAddUser, setIsDisplayAddUser] = useState(null);
 
 
   const onFinishEditTitle = async({ title }) => {
@@ -24,13 +26,13 @@ const TopBar = () => {
     await editTitle(title, chatID , db, currUser.displayName, chatDispatch);
   }
 
-  const onAddUserToChat = async() => {
-    await addUserToChat()
-  }
 
 
   return (
     <>
+      {isDisplayAddUser && (
+        <AddUserModal setIsDisplayAddUser={setIsDisplayAddUser} />
+      )}
       <div className="ring" onMouseOver={() => setIsEditingTitle(true)} onMouseLeave={() => setIsEditingTitle(false)}>
 
         {memberState.members.size > 2 && isEditingTitle ? (
@@ -44,7 +46,7 @@ const TopBar = () => {
 
       </div>
 
-      <button onClick={onAddUserToChat}>Add User</button>
+      <button onClick={() => setIsDisplayAddUser(true)}>Add User</button>
     </>
 
 

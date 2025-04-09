@@ -2,7 +2,7 @@ import { ref, query, set, get, endBefore, runTransaction, push, orderByChild, re
 import { fetchChatUsersByStatus } from "./memberDataService";
 
 
-export const fetchOlderChats = async(endTimestamp, db, chatID) => {
+export const fetchOlderChats = async(db, chatID, endTimestamp) => {
   const chatsRef = ref(db, `messages/${chatID}/`);
   const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(endTimestamp), limitToFirst(10));
   const messageSnap = await get(messageQuery);
@@ -13,7 +13,6 @@ export const fetchOlderChats = async(endTimestamp, db, chatID) => {
 
 
 export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID, chatDispatch) => {
-  console.log(firstMessageID);
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
   const timestamp = serverTimestamp();
@@ -101,9 +100,11 @@ export const editMessage = async(messageUid, text, chatID, db) => {
   });
 }
 
-export const deleteMessage = async(db, chatID, messageUid) => {
+export const deleteMessage = async(db, chatID, messageUid, firstMessageID) => {
   const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
   await remove(chatRef);
+
+  
 }
 
 

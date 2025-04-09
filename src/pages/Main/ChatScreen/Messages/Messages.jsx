@@ -83,7 +83,10 @@ const Messages = () => {
 
 
     const handleFetchMore = debounce(async() => {
-      const messageData = await fetchOlderChats(endTimestamp, db, chatID);
+      console.log('handle fetch more run')
+      console.log(endTimestamp);
+      console.log(isFirstMessageRendered);
+      const messageData = await fetchOlderChats(db, chatID, endTimestamp);
       const keysOfMessages = Object.keys(messageData);
       if (messageData && keysOfMessages.length > 0) {
         const timestampOfOldestMessage = messageData[keysOfMessages[0].timestamp];

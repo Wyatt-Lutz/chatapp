@@ -4,6 +4,7 @@ import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchProfilePicture, uploadPicture } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
+import { update } from "firebase/database";
 
 
 
@@ -13,6 +14,8 @@ const ProfilePictureUpload = ({user}) => {
 
   const {register, handleSubmit} = useForm();
   const [profilePicture, setProfilePicture] = useState(null);
+
+  const userUid = user.userCredential.user.uid;
 
   useEffect(() => {
     const fetchDefaultProfilePicture = async() => {
@@ -32,13 +35,17 @@ const ProfilePictureUpload = ({user}) => {
   }
 
   const onFinish = async() => {
-    const photoStorageLocation = `users/${user.userCredential.user.uid}`;
+    const photoStorageLocation = `users/${userUid}`;
     try {
       const photoUrl = await uploadPicture(profilePicture, photoStorageLocation);
       console.log('photo url: ' + photoUrl);
       await updateProfile(user.userCredential.user, {
         displayName: user.displayName,
-        photoURL: photoUrl
+        photoURL: photoUrl,
+      });
+
+      await update(db, `users/${userUid}`, {
+        profilePictureURL: photoUrl,
       });
 
     } catch (err) {

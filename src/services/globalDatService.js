@@ -1,4 +1,4 @@
-import { ref, get, query, orderByChild, equalTo, set } from "firebase/database";
+import { ref, get, query, orderByChild, equalTo, set, startAt, endAt } from "firebase/database";
 
 
 export const fetchUsernameData = async(db) => {
@@ -6,7 +6,13 @@ export const fetchUsernameData = async(db) => {
   const usersQuerySnap = await get(usersQuery);
   const usersData = usersQuerySnap.val();
   const usernames = Object.values(usersData).map((user) => user.username);
-  return usernames
+  return usernames;
+}
+
+export const queryUsernames = async(db, username) => {
+  const usernameQuery = query(ref(db, "users"), orderByChild('username'), startAt(username), endAt(username + "\uf8ff"));
+  const usernameQueryData = (await get(usernameQuery)).val();
+  return usernameQueryData;
 }
 
 

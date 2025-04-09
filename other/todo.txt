@@ -44,6 +44,7 @@ Priority:
 
 
 -messages
+  - the loading thing I do is bad
   - test t he firstmessageid and top of messages, it may be a little glitchy
   - see if there is better ways to handle the unseen messages than all the scroll listeners and checks
   - I think theres like an error if a user loaded a chatroom before midnight, the messages will say Today at 10PM right, but then if its open as the day changes, the old messages I think would still say Today and 10PM even though it was yesterday
@@ -76,12 +77,14 @@ Rules -
   - Sort the chatbar for most recent chatted in on top, need to add a timestamp or something
 
 -app
+  - use .trim() where neccessary - like searching usernames, messages, signing in/up, etc
+  - using react-hook-form for like just one input is overkill, just do simple useState thing
   - It doesnt like me calling resetAllChatContexts from like membercontextprovider or mesasge because its under chatcontext and I reset chatcontext first
   - the services are for all functions that access the database, so move any non-database get or set functions to some utils thing.
   - use react-hook-form useWatch instead of its watch
   - see if I can avoid reinitializing like currUser or DB and pass them to componenets in a lifecycle like in Settings
   - make sure I dont set any jsx to like a useState, should only store data there
-  - set default values to function parameters that are optional, as it they may not be there
+  - set default values to function parameters that are optional, as it they may not be there. Also do this for components like Messages component
   - make a progress bar hook if needed
   - it says authenticaitng... on like signup and signin when not signed in, probably because auth wraps everything
   - fix our horrible folder system, and also some name things, like I have a main.jsx and Main.jsx

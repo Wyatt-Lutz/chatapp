@@ -6,15 +6,15 @@ import Message from "../Messages/Message";
 import { useChatContexts } from "../../../../hooks/useContexts";
 
 const Search = () => {
-  const { register, control } = useForm();
-  const searchQuery = useWatch({name: 'searchQuery', control});
+  const [searchQuery, setSearchQuery] = useState("");
   const { chatState, memberState } = useChatContexts();
   const chatID = chatState.chatID;
   const [searchedMessages, setSearchedMessages] = useState(new Map());
 
   useEffect(() => {
 
-    if (!searchQuery) {
+    if (!searchQuery.trim()) {
+      setSearchedMessages(new Map());
       return;
     }
 
@@ -22,7 +22,6 @@ const Search = () => {
       const messagesObject = await queryMessages(db, chatID, searchQuery);
       if (!messagesObject) {
         setSearchedMessages(new Map());
-
         return;
       }
 
@@ -30,19 +29,20 @@ const Search = () => {
       console.log(messagesArray);
       setSearchedMessages(new Map(messagesArray));
 
-
-      searchedMessages.set(messagesObject.key, Object.values(messagesObject));
-      [...searchedMessages].map(([messageID, messageData]) => {
-        console.log(messageID);
-      });
     }
-    fetchMessages();
+
+    const timeout = setTimeout(() => {
+      fetchMessages();
+    }, 300);
+
+    return () => clearTimeout(timeout);
+    
 
   }, [searchQuery, chatID]);
 
   return (
     <>
-      <input type="text" placeholder="Search messages..." {...register('searchQuery')}/>
+      <input type="text" placeholder="Search messages..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
       {(searchedMessages && searchedMessages.size > 0) ? (
         <div>
           {[...searchedMessages].map(([messageID, messageData], index) => (
@@ -57,4 +57,6 @@ const Search = () => {
     </>
   )
 }
+
+
 export default Search;

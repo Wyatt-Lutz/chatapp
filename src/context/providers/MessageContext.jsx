@@ -37,7 +37,7 @@ export const MessageContextProvider = ({ children }) => {
           messageDispatch({type: "UPDATE_END_TIMESTAMP", payload: messageData.timestamp});
         }
 
-        if (!messageState.isFirstMessageRendered && (messageID == chatState.firstMessageID)) {
+        if (!messageState.isFirstMessageRendered && (messageID === chatState.firstMessageID)) {
           messageDispatch({type: "UPDATE_IS_FIRST_MESSAGE_RENDERED", payload: true});
         }
 

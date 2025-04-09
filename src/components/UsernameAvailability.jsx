@@ -1,40 +1,40 @@
-import { useEffect, useRef, useState } from "react";
-import { fetchUsernameData } from "../services/globalDatService";
+import { useEffect, useState } from "react";
+import { queryUsernames } from "../services/globalDatService";
 import { db } from "../../firebase";
 
 
 const UsernameAvailability = ({newUsername, setIsButtonDisabled}) => {
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
-  const [usernames, setUsernames] = useState([]);
 
   useEffect(() => {
+
     const fetchUsernames = async() => {
-      console.log('fetched usernames');
-      const usernameData = await fetchUsernameData(db);
-      setUsernames(usernameData);
+      
+      if (!newUsername.trim()) {
+        setIsUsernameAvailable(null);
+        setIsButtonDisabled(true);
+        return;
+      }
+
+      const usernameData = await queryUsernames(db, newUsername);
+
+      if (!usernameData) {
+        setIsUsernameAvailable(true);
+        setIsButtonDisabled(false);
+      }
+
+      const topUsername = Object.values(usernameData)[0]?.username;
+      const isAvailable = topUsername !== newUsername
+
+      setIsUsernameAvailable(isAvailable);
+      setIsButtonDisabled(!isAvailable);
     }
-    fetchUsernames();
-  }, []);
-
-
-  useEffect(() => {
-    if (!newUsername) {
-      setIsUsernameAvailable(null);
-      setIsButtonDisabled(true);
-      return;
-    }
-
-    const checkUsernameAvailability = () => {
-      const isUsernameTaken = usernames.includes(newUsername);
-      setIsUsernameAvailable(!isUsernameTaken);
-      setIsButtonDisabled(isUsernameTaken);
-    };
-
-
-    const timeout = setTimeout(checkUsernameAvailability, 500);
+    const timeout = setTimeout(fetchUsernames, 500);
     return () => clearTimeout(timeout);
 
-  }, [usernames, newUsername, setIsButtonDisabled]);
+  }, [newUsername]);
+
+
 
 
   return (
