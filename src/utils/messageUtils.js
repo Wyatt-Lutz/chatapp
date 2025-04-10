@@ -23,9 +23,15 @@ export const calcTime = (time) => {
  * @param {*} currUser
  * @returns {Boolean}
  */
-export const calculateRenderTimeAndSender = (lastMessage, currUserDisplayName) => {
-  if (lastMessage && lastMessage.sender === currUserDisplayName && (Date.now() - lastMessage.timestamp < 180000)) {
-    return false;
+export const calculateRenderTimeAndSender = (lastMessage, currUserUid) => {
+  if (!lastMessage) return false;
+
+
+  const currTime = Date.now();
+
+  if (new Date(currTime).getDay() !== new Date(lastMessage.timestamp).getDay()) {
+    return true;
   }
-  return true;
+
+  return !(lastMessage.sender === currUserUid && currTime - lastMessage.timestamp < 180000);
 }

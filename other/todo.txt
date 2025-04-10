@@ -1,7 +1,6 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
-1. Add Add user functionality
 2. Add the request system
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
 5. Prompt users before leaving a group chat

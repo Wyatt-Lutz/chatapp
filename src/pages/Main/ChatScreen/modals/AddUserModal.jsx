@@ -9,16 +9,16 @@ const AddUserModal = ({setIsDisplayAddUser}) => {
 
   const [addedUsers, setAddedUsers] = useState([])
 
-  const { chatState } = useChatContexts();
+  const { chatState, chatDispatch } = useChatContexts();
 
   const onFinishAddingUsers = async() => {
     if (addedUsers.length === 0) {
       return; //toast
     }
-   
+
     addedUsers.forEach(async(user) => {
       console.log(user);
-      await addUserToChat(db, chatState.chatID, user.userUid, user.username, user.profilePictureURL);
+      await addUserToChat(db, chatState.chatID, user.userUid, user.username, user.profilePictureURL, chatState.tempTitle, chatDispatch);
     });
 
     setIsDisplayAddUser(null);
@@ -44,17 +44,17 @@ const AddUserModal = ({setIsDisplayAddUser}) => {
                     <button onClick={() => setAddedUsers((prev) => prev.filter((addedUser) => addedUser.userUid !== user.userUid ))}>
                         <Close />
                     </button>
-                    
+
                 </div>
             ))}
           </div>
         )}
-        
+
 
         <div className="flex justify-end space-x-2">
           <button disabled={addedUsers.length === 0} onClick={onFinishAddingUsers}>Finish</button>
           <button onClick={() => {setIsDisplayAddUser(null)}} className="px-4 py-2 text-white">Cancel</button>
-          
+
 
         </div>
 

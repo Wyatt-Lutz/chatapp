@@ -16,8 +16,10 @@ const Input = () => {
 
   const handleAddMessage = async({ text }) => {
     resetField('text');
-    const lastMessage = [...messageState.messages].pop() || {};
-    const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.displayName);
+    if (!text?.trim()) return;
+    const messageKeys = Array.from(messageState.messages.keys());
+    const lastMessage = messageKeys.length > 0 ? messageState.messages.get(messageKeys[messageKeys.length - 1]) : null;
+    const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.uid);
     await addMessage(text, chatState.chatID, currUser.uid, db, willRenderTimeAndSender, chatState.firstMessageID, chatDispatch);
   };
 

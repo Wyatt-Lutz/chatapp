@@ -95,19 +95,34 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
 
-export const addUserToChat = async(db, chatID, userUid, username, profilePictureURL) => {
+export const addUserToChat = async(db, chatID, userUid, username, profilePictureURL, tempTitle, chatDispatch) => {
   const memberRef = ref(db, `members/${chatID}/${userUid}`);
-  await set(memberRef, {
-    hasBeenRemoved: false,
-    isOnline: false,
-    username: username,
-    profilePictureURL: profilePictureURL,
-  });
-
   const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
-  await update(chatsInRef, {
-    [chatID]: 0,
-  });
+  const chatRef = ref(db, `chats/${chatID}`);
+  const updatedTempTitle = updateTempTitle(tempTitle, "", username);
+
+  await Promise.all([
+    set(memberRef, {
+      hasBeenRemoved: false,
+      isOnline: false,
+      username: username,
+      profilePictureURL: profilePictureURL,
+    }),
+
+
+    update(chatsInRef, {
+      [chatID]: 0,
+    }),
+
+
+    update(chatRef, {
+      tempTitle: updatedTempTitle,
+    }),
+  ]);
+
+
+  chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: updatedTempTitle});
+
 }
 
 export const updateNumOfMembers = async(db, chatID, isAdd) => {

@@ -3,6 +3,8 @@ import { messagesReducer } from "../reducers/messagesReducer";
 import { initialMessageState } from "../initialState";
 import { ChatContext, ResetChatContext } from "./ChatContext";
 import { MessageListenerService } from "../listenerServices/messageListenerService";
+import { updateFirstMessageID } from "../../services/messageDataService";
+import { db } from "../../../firebase";
 
 
 export const MessageContext = createContext();
@@ -11,7 +13,7 @@ export const MessageContext = createContext();
 
 export const MessageContextProvider = ({ children }) => {
   const [messageState, messageDispatch] = useReducer(messagesReducer, initialMessageState);
-  const { chatState } = useContext(ChatContext);
+  const { chatState, chatDispatch } = useContext(ChatContext);
   const { isReset, setIsReset } = useContext(ResetChatContext);
 
   const messages = useRef(messageState.messages);
@@ -43,7 +45,7 @@ export const MessageContextProvider = ({ children }) => {
 
 
         if (!messageState.isAtBottom) {
-          messageDispatch({type: "UPDATE_UNREAD", payload: (numUnread.current + 1)});
+          messageDispatch({type: "UPDATE_UNREAD", payload: (messageState.numUnread + 1)});
         }
 
       },
@@ -59,7 +61,14 @@ export const MessageContextProvider = ({ children }) => {
         messageDispatch({type: "EDIT_MESSAGE", payload: {key: messageID, data: message}});
       },
 
-      onMessageDeleted: (messageID) => {
+      onMessageDeleted: async(messageID) => {
+        if (messageID === chatState.firstMessageID) {
+          const messageKeys = Array.from(messages.current.keys());
+          const nextMessageID = messageKeys.length > 1 ? messageKeys[1] : "";
+          await updateFirstMessageID(db, chatState.chatID, nextMessageID);
+          chatDispatch({ type: "UPDATE_FIRST_MESSAGE_ID", payload: nextMessageID });
+        }
+
         messageDispatch({type: "REMOVE_MESSAGE", payload: messageID});
       }
     });

@@ -47,6 +47,14 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
 };
 
 
+export const updateFirstMessageID = async(db, chatID, messageID) => {
+  const chatRef = ref(db, `chats/${chatID}`);
+  await update(chatRef, {
+    firstMessageID: messageID,
+  });
+}
+
+
 /**
  * Updates the number of unread messages for each offline user in a chatroom.
  * Uses runTransaction to ensure atomicity
@@ -104,7 +112,7 @@ export const deleteMessage = async(db, chatID, messageUid, firstMessageID) => {
   const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
   await remove(chatRef);
 
-  
+
 }
 
 
