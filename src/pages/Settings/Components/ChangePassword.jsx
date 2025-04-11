@@ -1,14 +1,16 @@
 import { updatePassword } from "firebase/auth";
 import { useForm, useWatch } from "react-hook-form";
+import { useAuth } from "../../../context/providers/AuthContext";
 
-const ChangePassword = ({currUser, displayPassModal, passwordModalHeader, passwordModalText}) => {
+const ChangePassword = ({displayPassModal, passwordModalHeader, passwordModalText}) => {
 
     const {register, resetField, control} = useForm({
         defaultValues: {
             newPassword: "",
             confirmNewPassword: "",
         }
-    })
+    });
+    const { currUser } = useAuth();
     const newPassword = useWatch({ name: 'newPassword', control });
     const confirmNewPassword = useWatch({ name: 'confirmNewPassword', control });
 

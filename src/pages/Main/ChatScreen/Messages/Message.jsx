@@ -1,32 +1,20 @@
-import { useState } from "react"
 import { useForm } from "react-hook-form";
 import { db } from "../../../../../firebase";
 import { editMessage } from "../../../../services/messageDataService";
-import { useContextMenu } from "../../../../hooks/useContextMenu";
 import { calcTime } from "../../../../utils/messageUtils";
-import MemberContextMenu from "../MembersBar/MemberContextMenu";
 import { useChatContexts } from "../../../../hooks/useContexts";
-import { useAuth } from "../../../../context/providers/AuthContext";
 
-
-const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState, index }) => {
+const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState, index, onMemberContextMenu, onMessageContextMenu}) => {
   const { register, handleSubmit, resetField } = useForm();
   const { chatState } = useChatContexts();
-  const {currUser} = useAuth();
-  const [usernameContextMenuData, setUsernameContextMenuData] = useState({});
-  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
+
 
   const onSubmitEdit = async({ editMessageText }) => {
     resetField('editMessage');
     await editMessage(messageUid, editMessageText, chatState.chatID, db);
     await changeEditState(messageUid, false);
   }
-  const handleUsernameContextMenu = (e, memberUid, memberData) => {
-    e.preventDefault();
-    setContextMenu(prev => ({...prev, 'username': true}));
-    setPoints(prev => ({...prev, 'username': {x: e.pageX, y: e.pageY}}));
-    setUsernameContextMenuData({memberUid, memberData})
-  }
+
 
   return (
     <>
@@ -34,7 +22,7 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
         {(messageData.renderTimeAndSender || index === 0) && (
           <div>
             {messageData.sender !== 'server' && (
-              <div className="flex items-center gap-2" onContextMenu={(e) => handleUsernameContextMenu(e, messageData.sender, memberDataOfSender)}>
+              <div className="flex items-center gap-2" onContextMenu={(e) => onMemberContextMenu(e, messageData.sender, memberDataOfSender)}>
                 {memberDataOfSender && (
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-full overflow-hidden">
@@ -67,20 +55,21 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
             {memberDataOfSender && memberDataOfSender.isBlocked ? (
               <div>Blocked User</div>
             ) : (
-              <div className="text-wrap">
-              <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
+              <div className="text-wrap" onContextMenu={(e) => onMessageContextMenu(e, messageUid, messageData)}>
+                <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
+                {messageData.imageRef && (
+                  <img src={messageData.imageRef} />
+                )}
 
-              {messageData.hasBeenEdited && (
-                <div>Edited</div>
-              )}
+
+                {messageData.hasBeenEdited && (
+                  <div>Edited</div>
+                )}
               </div>
             )}
           </>
 
 
-        )}
-        {(contextMenu.username && usernameContextMenuData.memberUid !== currUser.uid) && (
-          <MemberContextMenu contextMenuData={usernameContextMenuData} points={points.username} />
         )}
       </div>
     </>

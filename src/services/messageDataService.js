@@ -1,5 +1,8 @@
 import { ref, query, set, get, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst, increment, update } from 'firebase/database';
 import { fetchChatUsersByStatus } from "./memberDataService";
+import { storage } from '../../firebase';
+import { ref as storageRef } from 'firebase/storage';
+import { uploadPicture } from './storageDataService';
 
 
 export const fetchOlderChats = async(db, chatID, endTimestamp) => {
@@ -11,10 +14,18 @@ export const fetchOlderChats = async(db, chatID, endTimestamp) => {
 
 
 
-
-export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID, chatDispatch) => {
+export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID, chatDispatch, imageToUpload = null) => {
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
+  let imageRef = null;
+  if (imageToUpload) {
+    const imageStorageLocation = storageRef(storage, `chats/${chatID}/${newMessageRef.key}`)
+    imageRef = await uploadPicture(imageToUpload, imageStorageLocation);
+    console.log(imageToUpload)
+    console.log(imageRef);
+  }
+
+
   const timestamp = serverTimestamp();
   const newMessage = {
     timestamp,
@@ -22,8 +33,11 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
     sender: userUID,
     renderTimeAndSender,
     hasBeenEdited: false,
+    imageRef: imageRef
   }
   await set(newMessageRef, newMessage);
+
+
 
    //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
   if (!firstMessageID) {

@@ -3,12 +3,13 @@ import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
 import { fetchOlderChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
-import { useContextMenu } from "../../../../hooks/useContextMenu";
 import Message from "./Message"
 import Input from "./Input";
-import MessagesContextMenu from "./MessagesContextMenu";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
+import { useContextMenu } from "../../../../hooks/useContextMenu";
+import MessagesContextMenu from "./MessagesContextMenu";
+import MemberContextMenu from "../MembersBar/MemberContextMenu";
 
 
 const Messages = () => {
@@ -17,13 +18,13 @@ const Messages = () => {
 
   const {chatID, title, tempTitle} = chatState;
   const { numUnread, isAtBottom, endTimestamp, messages, isFirstMessageRendered } = messageState;
-  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
 
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
 
-
+  const [memberContextMenuData, setMemberContextMenuData] = useState({});
   const [messageContextMenuData, setMessageContextMenuData] = useState({});
+  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
 
 
   const messagesContainerRef = useRef(null);
@@ -114,18 +115,8 @@ const Messages = () => {
 
 
   const changeEditState = (id, state) => {
-    console.info('i ran');
     setEditState(prev => ({...prev, [id]: state}));
   };
-
-
-  const handleMessageContextMenu = (e, messageUid, messageData) => {
-    e.preventDefault();
-    setContextMenu(prev => ({...prev, 'messages': true}));
-    setPoints(prev => ({...prev, 'messages': {x: e.pageX, y: e.pageY}}));
-    setMessageContextMenuData({ messageUid, text: messageData.text, sender: messageData.sender });
-  }
-
 
 
 
@@ -146,8 +137,29 @@ const Messages = () => {
                     {[...messages].map(([messageUid, messageData], index) => {
                       const memberDataOfSender = memberState.members.get(messageData.sender);
                       return (
-                        <div key={messageUid} onContextMenu={(e) => handleMessageContextMenu(e, messageUid, messageData)}>
-                          <Message messageUid={messageUid} memberDataOfSender={memberDataOfSender} messageData={messageData} isEditing={editState[messageUid]} changeEditState={changeEditState} index={index}/>
+                        <div key={messageUid}>
+                          <Message
+                            messageUid={messageUid}
+                            memberDataOfSender={memberDataOfSender}
+                            messageData={messageData}
+                            isEditing={editState[messageUid]}
+                            changeEditState={changeEditState}
+                            index={index}
+                            onMemberContextMenu={(e, memberUid, memberData) => {
+                              e.preventDefault();
+                              setContextMenu({member: true});
+                              setPoints({member: {x: e.pageX, y: e.pageY}});
+                              setMemberContextMenuData({memberUid, memberData});
+                            }}
+                            onMessageContextMenu={(e, messageUid, messageData) => {
+                              e.preventDefault();
+                              setContextMenu({messages: true});
+                              setPoints({ messages: {x: e.pageX, y: e.pageY}});
+                              setMessageContextMenuData({ messageUid, messageData });
+                            }}
+
+
+                            />
 
 
                           {index === messageData.size - 1 && (
@@ -173,9 +185,15 @@ const Messages = () => {
       {numUnread > 0 && (
         <div>{numUnread} new messages</div>
       )}
-      {(contextMenu.messages && messageContextMenuData.sender !== 'server' && (messageContextMenuData.sender === currUser.uid || currUser.uid === chatState.owner)) && (
-        <MessagesContextMenu changeEditState={changeEditState} contextMenuData={messageContextMenuData} points={points.messages} />
+
+      {(contextMenu.member && memberContextMenuData.memberUid !== currUser.uid) && (
+        <MemberContextMenu contextMenuData={memberContextMenuData} points={points.member} />
       )}
+
+      {(contextMenu.messages && messageContextMenuData.messageData.sender !== 'server' && (messageContextMenuData.messageData.sender === currUser.uid || currUser.uid === chatState.owner)) && (
+        <MessagesContextMenu changeEditState={changeEditState} contextMenuData={messageContextMenuData} points={points.messages}/>
+      )}
+
 
 
 

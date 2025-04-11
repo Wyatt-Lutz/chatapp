@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { db } from "../../../firebase";
 import ConfirmPassModal from "./modals/ConfirmPassModal";
 import EmailNotVerified from "../../components/EmailNotVerified";
 import BlockedUsersModal from "./modals/BlockedUsersModal";
@@ -51,11 +50,11 @@ const Settings = () => {
           </div>
 
 
-          <ChangeUsername db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
-          <ChangeEmail db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
-          <ChangePassword currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
-          <DeleteAccount db={db} currUser={currUser} displayPassModal={displayPassModal} />
-          <ChangeProfilePicture currUser={currUser} />
+          <ChangeUsername displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
+          <ChangeEmail displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
+          <ChangePassword displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
+          <DeleteAccount displayPassModal={displayPassModal} />
+          <ChangeProfilePicture />
 
           <button onClick={() => setModal({ type: "BlockedUsersModal", props: {changeDisplayment: () => setModal({ type: null, props: {} }) }})} className="bg-gray-500">Blocked Users</button>
 

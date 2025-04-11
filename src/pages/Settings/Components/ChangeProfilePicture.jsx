@@ -5,11 +5,12 @@ import { deleteObject, ref } from "firebase/storage";
 import { storage } from "../../../../firebase";
 import { uploadPicture } from "../../../services/storageDataService";
 import { compressImage } from "../../../utils/mediaUtils";
+import { useAuth } from "../../../context/providers/AuthContext";
 
-const ChangeProfilePicture = ({currUser}) => {
+const ChangeProfilePicture = () => {
     const {register, handleSubmit} = useForm();
     const [profilePicture, setProfilePicture] = useState(currUser.photoURL);
-
+    const { currUser } = useAuth();
 
     const onSubmitImage = async({image}) => {
         const tempProfilePicture = await compressImage(image[0]);
@@ -17,14 +18,11 @@ const ChangeProfilePicture = ({currUser}) => {
     }
 
     const onFinish = async() => {
-        const photoStorageLocation = `users/${currUser.uid}` ;
-        try {
-            await deleteObject(ref(storage, photoStorageLocation));
-            await uploadPicture(profilePicture, photoStorageLocation);
-            await updateProfile(currUser, {photoURL: profilePicture});
-        } catch (err) {
-            console.error(err);
-        }
+      const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
+
+      await deleteObject(photoStorageLocation);
+      await uploadPicture(profilePicture, photoStorageLocation);
+      await updateProfile(currUser, {photoURL: profilePicture});
 
     }
 

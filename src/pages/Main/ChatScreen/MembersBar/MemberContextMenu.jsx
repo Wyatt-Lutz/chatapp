@@ -27,24 +27,20 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
   }
 
   return (
-    <>
-      {memberUid !== currUser.uid && (
-        <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
-          {memberData.isBlocked ? (
-            <button onClick={() => onChangeBlockStatus(false)}>Unblock User</button>
-          ) : (
-            <button onClick={() => onChangeBlockStatus(true)}>Block User</button>
-          )}
-
-          {currUser.uid === chatState.owner && (
-            <>
-              <button onClick={onRemoveMemberFromChat}>Remove User</button>
-              <button onClick={onTransferOwnership}>Transfer Ownership</button>
-            </>
-          )}
-        </div>
+    <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
+      {memberData.isBlocked ? (
+        <button onClick={() => onChangeBlockStatus(false)}>Unblock User</button>
+      ) : (
+        <button onClick={() => onChangeBlockStatus(true)}>Block User</button>
       )}
-    </>
+
+      {currUser.uid === chatState.owner && (
+        <>
+          <button onClick={onRemoveMemberFromChat}>Remove User</button>
+          <button onClick={onTransferOwnership}>Transfer Ownership</button>
+        </>
+      )}
+    </div>
 
 
   )
