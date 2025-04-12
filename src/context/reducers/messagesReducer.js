@@ -4,6 +4,17 @@ export const messagesReducer = (state, action) => {
   let newMessages = new Map(state?.messages);
   switch (action.type) {
     case "ADD_MESSAGE":
+
+      const isFirstMessage = state.messages.size === 0;
+      let numUnread = state.numUnread;
+
+      if (!state.isAtBottom) {
+        numUnread = state.numUnread + 1;
+      }
+
+      newMessages.set(action.payload.key, action.payload.data);
+      return { ...state, messages: newMessages, numUnread, endTimestamp: isFirstMessage ? action.payload.data.timestamp: state.endTimestamp };
+
     case "EDIT_MESSAGE":
       newMessages.set(action.payload.key, action.payload.data);
       return { ...state, messages: newMessages };

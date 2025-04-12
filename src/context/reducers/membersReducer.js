@@ -11,8 +11,9 @@ export const membersReducer = (state, action) => {
       const { userUid, data, currUserUid, resetChatContexts } = action.payload;
       console.log('update member');
 
-
+      console.log(currUserUid)
       if ((currUserUid === userUid) && state.members.get(currUserUid) && (data.hasBeenRemoved !== state.members.get(currUserUid).hasBeenRemoved)) {
+        console.log('hi there');
         resetChatContexts();
       }
 

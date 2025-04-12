@@ -5,9 +5,10 @@ import { db } from "../../../firebase";
 export const MessageListenerService = {
 
   setUpMessageListeners(chatID, endTimestamp, action) {
+    console.log(endTimestamp);
     const unsubscribers = [];
     const chatsRef = ref(db, `messages/${chatID}/`);
-    const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp), limitToLast(10));
+    const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp), limitToLast(15));
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp));
 
     if (action.onMessageAdded) {

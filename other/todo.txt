@@ -2,7 +2,6 @@
 
 Priority:
 1. There was some issue where I wanted to do something but the import was ref which conflicting with the like firebase ref so I just went with another plan which was probably worse
-3. Optomisitc updates with texts, because if theres an image, theres a lag
 2. Add the request system
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
 5. Prompt users before leaving a group chat

@@ -16,11 +16,11 @@ const ChatRoomsSideBar = () => {
     setIsCreatingChat(state);
   };
 
-  const handleContextMenu = (e, chatID) => {
+  const handleContextMenu = (e, chatID, numOfMembers) => {
     e.preventDefault();
     setContextMenu({'chatroom': true});
     setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({chatID: chatID});
+    setContextMenuData({chatID: chatID, numOfMembers: numOfMembers});
   }
 
 
@@ -39,7 +39,7 @@ const ChatRoomsSideBar = () => {
       ) : (
         <div className="flex flex-col">
           {[...chatrooms].map(([chatID, chatroomData]) => (
-            <div key={chatID} onContextMenu={(e) => handleContextMenu(e, chatID)}>
+            <div key={chatID} onContextMenu={(e) => handleContextMenu(e, chatID, chatroomData.numOfMembers)}>
               <ChatRoom chatID={chatID} chatroomData={chatroomData}/>
             </div>
           ))}
@@ -50,7 +50,7 @@ const ChatRoomsSideBar = () => {
 
 
       {contextMenu.chatroom && (
-        <ChatRoomContextMenu contextMenuData={contextMenuData} points={points}/>
+        <ChatRoomContextMenu contextMenuData={contextMenuData} setContextMenu={setContextMenu} points={points}/>
       )}
 
 

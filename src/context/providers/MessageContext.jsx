@@ -19,8 +19,8 @@ export const MessageContextProvider = ({ children }) => {
   const messages = useRef(messageState.messages);
 
   useEffect(() => {
-    console.log(messageState.messages);
     messages.current = messageState.messages;
+    console.log(messageState.messages);
   }, [messageState.messages]);
 
 
@@ -35,22 +35,12 @@ export const MessageContextProvider = ({ children }) => {
     const unsubscribe = MessageListenerService.setUpMessageListeners(chatState.chatID, messageState.endTimestamp, {
       onMessageAdded: (messageID, messageData) => {
 
-        messageDispatch({type: "ADD_MESSAGE", payload: {key: messageID, data: messageData}});
-        const m = messages.current;
-        console.log(m);
-        if (messages.current.size === 0) {
-          console.log('yoo')
-          messageDispatch({type: "UPDATE_END_TIMESTAMP", payload: messageData.timestamp});
-        }
-
         if (!messageState.isFirstMessageRendered && (messageID === chatState.firstMessageID)) {
           messageDispatch({type: "UPDATE_IS_FIRST_MESSAGE_RENDERED", payload: true});
         }
 
+        messageDispatch({type: "ADD_MESSAGE", payload: {key: messageID, data: messageData}});
 
-        if (!messageState.isAtBottom) {
-          messageDispatch({type: "UPDATE_UNREAD", payload: (messageState.numUnread + 1)});
-        }
 
       },
 

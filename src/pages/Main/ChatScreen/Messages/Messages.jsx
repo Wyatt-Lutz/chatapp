@@ -68,7 +68,6 @@ const Messages = () => {
 
     };
 
-    console.log([...messages]);
 
     const container = messagesContainerRef.current;
 
@@ -86,13 +85,10 @@ const Messages = () => {
 
 
     const handleFetchMore = debounce(async() => {
-      console.log('handle fetch more run')
-      console.log(endTimestamp);
-      console.log(isFirstMessageRendered);
       const messageData = await fetchOlderChats(db, chatID, endTimestamp);
       const keysOfMessages = Object.keys(messageData);
       if (messageData && keysOfMessages.length > 0) {
-        const timestampOfOldestMessage = messageData[keysOfMessages[0].timestamp];
+        const timestampOfOldestMessage = messageData[keysOfMessages[0]].timestamp;
         messageDispatch({type:"UPDATE_END_TIMESTAMP", payload: timestampOfOldestMessage});
 
         const newMessageMap = new Map(Object.entries(messageData));

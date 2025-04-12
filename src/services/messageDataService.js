@@ -1,4 +1,4 @@
-import { ref, query, set, get, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst, increment, update } from 'firebase/database';
+import { ref, query, set, get, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst, increment, update, limitToLast } from 'firebase/database';
 import { fetchChatUsersByStatus } from "./memberDataService";
 import { storage } from '../../firebase';
 import { ref as storageRef } from 'firebase/storage';
@@ -7,7 +7,7 @@ import { uploadPicture } from './storageDataService';
 
 export const fetchOlderChats = async(db, chatID, endTimestamp) => {
   const chatsRef = ref(db, `messages/${chatID}/`);
-  const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(endTimestamp), limitToFirst(10));
+  const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(endTimestamp), limitToLast(10));
   const messageSnap = await get(messageQuery);
   console.log(messageSnap.val());
   return messageSnap.val();
