@@ -7,12 +7,13 @@ import { db } from "../../../../firebase";
 
 
 const ChangeEmail = ({displayPassModal, passwordModalHeader, passwordModalText}) => {
+    const { currUser } = useAuth();
     const {register, control} = useForm({
         defaultValues: {
             newEmail: currUser.email,
         }
     });
-    const { currUser } = useAuth();
+
     const navigate = useNavigate();
     const newEmail = useWatch({ name: 'newEmail', control });
     const editEmail = async() => {

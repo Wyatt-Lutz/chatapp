@@ -5,7 +5,6 @@ export const messagesReducer = (state, action) => {
   switch (action.type) {
     case "ADD_MESSAGE":
     case "EDIT_MESSAGE":
-      console.log('add message or edit message');
       newMessages.set(action.payload.key, action.payload.data);
       return { ...state, messages: newMessages };
 

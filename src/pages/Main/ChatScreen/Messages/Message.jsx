@@ -57,9 +57,17 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
             ) : (
               <div className="text-wrap" onContextMenu={(e) => onMessageContextMenu(e, messageUid, messageData)}>
                 <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
+
                 {messageData.imageRef && (
-                  <img src={messageData.imageRef} />
+                  messageData.imageRef === 'uploading' ? (
+                    <div className="rounded-md p-4 bg-gray-600 text-white">
+                      <div className="text-center font-medium">Uploading</div>
+                    </div>
+                  ) : (
+                    <img src={messageData.imageRef} />
+                  )
                 )}
+
 
 
                 {messageData.hasBeenEdited && (

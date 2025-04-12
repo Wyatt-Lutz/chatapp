@@ -7,12 +7,13 @@ import { useAuth } from "../../../context/providers/AuthContext";
 import { db } from "../../../../firebase";
 
 const ChangeUsername = ({displayPassModal, passwordModalHeader, passwordModalText}) => {
+  const { currUser } = useAuth();
     const {register, control} = useForm({
         defaultValues: {
             newUsername: currUser.displayName,
         }
     });
-    const { currUser } = useAuth();
+
     const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
     const newUsername = useWatch({ name: 'newUsername', control });
 

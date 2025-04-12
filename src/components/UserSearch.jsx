@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { queryUsernames } from "../services/globalDatService";
 import { db } from "../../firebase";
-import Close from "./ui/Close";
 
 const UserSearch = ({setAddedUsers}) => {
 
     const [usernameQueryData, setUsernameQueryData] = useState([]);
     const [searchedUsername, setSearchedUsername] = useState("");
-    
+
 
     useEffect(() => {
         if (!searchedUsername.trim()) {
@@ -38,16 +37,16 @@ const UserSearch = ({setAddedUsers}) => {
 
 
     return (
-        <div> 
+        <div>
             <div>
 
                 <input placeholder="username..." type="text" value={searchedUsername} onChange={(e) => setSearchedUsername(e.target.value)} />
-           
+
 
                 {usernameQueryData && usernameQueryData.length > 0 ? (
                     <div>
                         {usernameQueryData.map((user) => (
-                        
+
                             <div key={user.userUid}>
                                 <button onClick={() => setAddedUsers((prev) => [...prev, user])}>
                                     <div className="h-8 w-8 rounded-full overflow-hidden">
@@ -57,7 +56,7 @@ const UserSearch = ({setAddedUsers}) => {
                                 </button>
                             </div>
 
-                            
+
                         ))}
                     </div>
                 ) : (

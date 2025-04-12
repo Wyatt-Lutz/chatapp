@@ -12,7 +12,7 @@ const DeleteAccount = ({displayPassModal}) => {
     const {chatState, chatDispatch, resetAllChatContexts} = useChatContexts();
     const {chatRoomsDispatch} = useContext(ChatroomsContext);
     const navigate = useNavigate();
-    const {currUser} = useAuth();
+    const { currUser } = useAuth();
 
     const handleDeleteAccount = async() => {
 

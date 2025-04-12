@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef} from "react";
 import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
@@ -67,6 +67,8 @@ const Messages = () => {
       }
 
     };
+
+    console.log([...messages]);
 
     const container = messagesContainerRef.current;
 

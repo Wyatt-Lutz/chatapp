@@ -5,11 +5,11 @@ import { useAuth } from "../../../../context/providers/AuthContext";
 import { db } from "../../../../../firebase";
 import { checkIfDuplicateChat, createChat } from "../../../../services/chatBarDataService";
 import { checkIfUserExists } from "../../../../services/globalDatService";
-import Close from "../../../../components/ui/Close";
 import { getBlockData } from "../../../../services/memberDataService";
 import { fetchProfilePicture } from "../../../../services/storageDataService";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../utils/chatroomUtils";
+import CloseModal from "../../../../components/ui/CloseModal";
 
 
 
@@ -109,7 +109,7 @@ const ChatCreation = ({changeChatRoomCreationState}) => {
     <>
         <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
           <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
-            <button onClick={() => changeChatRoomCreationState(false)} className="absolute top-4 right-4"><Close /></button>
+            <button onClick={() => changeChatRoomCreationState(false)} className="absolute top-4 right-4"><CloseModal /></button>
             {isUserBlockedWarning ? (
               <div>
                 <h2 className="mb-4 text-lg font-semibold">Blocked User</h2>

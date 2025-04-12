@@ -9,6 +9,7 @@ export const fetchOlderChats = async(db, chatID, endTimestamp) => {
   const chatsRef = ref(db, `messages/${chatID}/`);
   const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(endTimestamp), limitToFirst(10));
   const messageSnap = await get(messageQuery);
+  console.log(messageSnap.val());
   return messageSnap.val();
 }
 
@@ -17,13 +18,6 @@ export const fetchOlderChats = async(db, chatID, endTimestamp) => {
 export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID, chatDispatch, imageToUpload = null) => {
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
-  let imageRef = null;
-  if (imageToUpload) {
-    const imageStorageLocation = storageRef(storage, `chats/${chatID}/${newMessageRef.key}`)
-    imageRef = await uploadPicture(imageToUpload, imageStorageLocation);
-    console.log(imageToUpload)
-    console.log(imageRef);
-  }
 
 
   const timestamp = serverTimestamp();
@@ -33,9 +27,20 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
     sender: userUID,
     renderTimeAndSender,
     hasBeenEdited: false,
-    imageRef: imageRef
+    imageRef: imageToUpload ? 'uploading': null,
   }
   await set(newMessageRef, newMessage);
+
+
+  if (imageToUpload) {
+    const imageStorageLocation = storageRef(storage, `chats/${chatID}/${newMessageRef.key}`)
+    const imageRef = await uploadPicture(imageToUpload, imageStorageLocation);
+    await update(newMessageRef, {
+      imageRef: imageRef,
+    });
+  }
+
+
 
 
 

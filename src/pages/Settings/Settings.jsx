@@ -45,7 +45,7 @@ const Settings = () => {
           <h2>My Account</h2>
 
           <div className="flex">
-            <img alt="PFP"/>
+            <ChangeProfilePicture />
             <div>{currUser.displayName}</div>
           </div>
 
@@ -54,7 +54,7 @@ const Settings = () => {
           <ChangeEmail displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
           <ChangePassword displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
           <DeleteAccount displayPassModal={displayPassModal} />
-          <ChangeProfilePicture />
+
 
           <button onClick={() => setModal({ type: "BlockedUsersModal", props: {changeDisplayment: () => setModal({ type: null, props: {} }) }})} className="bg-gray-500">Blocked Users</button>
 
