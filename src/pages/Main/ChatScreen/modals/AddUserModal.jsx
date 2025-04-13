@@ -31,24 +31,7 @@ const AddUserModal = ({setIsDisplayAddUser}) => {
         <h2 className="mb-4 text-lg font-semibold">Add User</h2>
 
         <p>Enter username:</p>
-        <UserSearch setAddedUsers={setAddedUsers} />
-
-        {addedUsers && addedUsers.length > 0 && (
-          <div>
-            {addedUsers.map((user) => (
-                <div key={user.userUid}>
-                    <div className="h-8 w-8 rounded-full overflow-hidden">
-                        <img className="h-full w-full object-cover" src={user.profilePictureURL} />
-                    </div>
-                    <span>{user.username}</span>
-                    <button onClick={() => setAddedUsers((prev) => prev.filter((addedUser) => addedUser.userUid !== user.userUid ))}>
-                        <CloseModal />
-                    </button>
-
-                </div>
-            ))}
-          </div>
-        )}
+        <UserSearch addedUsers={addedUsers} setAddedUsers={setAddedUsers}  />
 
 
         <div className="flex justify-end space-x-2">

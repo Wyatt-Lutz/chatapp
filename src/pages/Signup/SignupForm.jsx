@@ -3,7 +3,7 @@ import { db, auth } from "../../../firebase";
 import { createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
 import { useState } from "react";
-import { createUserData, fetchUsernameData } from "../../services/globalDatService";
+import { createUserData, fetchUsernameData } from "../../services/globalDataService";
 
 
 const SignupForm = ({ onSubmitForm }) => {

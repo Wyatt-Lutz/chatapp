@@ -1,10 +1,10 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
+1. Error with like blocking a user when you are in the chat, it like adds that user again to memberState
 1. There was some issue where I wanted to do something but the import was ref which conflicting with the like firebase ref so I just went with another plan which was probably worse
 2. Add the request system
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
-5. Prompt users before leaving a group chat
 6. When someone leaves a group chat, the membersList isnt updated
 7. Make like the actual pfps and make username and timestamp on same line with pfp
 8. Add image upload implenetations

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { queryUsernames } from "../services/globalDatService";
+import { queryUsernames } from "../services/globalDataService";
 import { db } from "../../firebase";
 
 
@@ -9,7 +9,7 @@ const UsernameAvailability = ({newUsername, setIsButtonDisabled}) => {
   useEffect(() => {
 
     const fetchUsernames = async() => {
-      
+
       if (!newUsername.trim()) {
         setIsUsernameAvailable(null);
         setIsButtonDisabled(true);

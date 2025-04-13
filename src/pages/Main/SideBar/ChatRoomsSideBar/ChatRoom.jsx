@@ -8,8 +8,6 @@ const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
   const { chatState, chatDispatch, memberDispatch, messageDispatch } = useChatContexts();
   const {currUser} = useAuth();
   const handleChangeChat = async() => {
-    console.log('button clicked')
-
     memberDispatch({ type: "RESET" });
     messageDispatch({ type: "RESET" });
 
@@ -24,7 +22,7 @@ const ChatRoom = ({chatID, chatroomData: {title, tempTitle, numUnread}}) => {
   return (
 
     <div className="flex">
-      <button className="ring m-2" onClick={handleChangeChat}>
+      <button disabled={chatState.chatID === chatID} className="ring m-2" onClick={handleChangeChat}>
         {chatState.chatID === chatID ? (
           <>
             {chatState.title || chatState.tempTitle}

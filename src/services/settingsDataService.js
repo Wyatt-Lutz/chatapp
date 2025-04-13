@@ -2,13 +2,13 @@
 import { deleteUser, updateProfile } from "firebase/auth";
 
 import { get, update, ref, remove} from "firebase/database";
-import { checkIfUserExists } from "./globalDatService";
+import { queryUsernames } from "./globalDataService";
 import { fetchChatsInData, removeUserFromChat } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
 import { auth } from "../../firebase";
 
 export const changeUsername = async(db, newUsername, currUser) => {
-  const userData = await checkIfUserExists(db, newUsername);
+  const userData = await queryUsernames(db, newUsername);
   if (userData) {
     console.log('username already exists');
     return;

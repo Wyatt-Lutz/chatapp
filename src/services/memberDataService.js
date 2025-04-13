@@ -38,6 +38,9 @@ export const fetchNumOfMembers = async(db, chatID) => {
 export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, numOfMembers, chatDispatch, resetAllChatContexts, memberOptions = {}) => {
   console.log("chatID: " + chatID);
   console.log("uidToRemove: " + uidToRemove);
+  if (uidToRemove === currUserUid) {
+    resetAllChatContexts();
+  }
   const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
   const chatDataRef = ref(db, `chats/${chatID}`);
 
@@ -90,6 +93,9 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
   const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
   //const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn`);
   await remove(chatsInRef);
+
+
+
 
 }
 

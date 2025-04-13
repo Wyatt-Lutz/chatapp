@@ -16,15 +16,12 @@ export const queryUsernames = async(db, username) => {
 }
 
 
-export const checkIfUserExists = async(db, newUser) => {
-  const usersQuery = query(ref(db, "users"), orderByChild('username'), equalTo(newUser));
-  const usersQuerySnap = await get(usersQuery);
-  if (!usersQuerySnap.exists()) {
-    return null;
-  }
-  console.log(usersQuerySnap.val());
-  return usersQuerySnap.val();
 
+export const fetchUserData = async(db, userUid) => {
+  const userDataRef = ref(db, `users/${userUid}`);
+  const userData = (await get(userDataRef)).val();
+  console.log(userData);
+  return userData;
 }
 
 

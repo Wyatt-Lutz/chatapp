@@ -3,8 +3,9 @@ import Plus from "../../../../components/ui/Plus";
 import ChatRoom from "./ChatRoom";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import ChatRoomContextMenu from "./ChatRoomContextMenu";
-import ChatCreation from "./ChatCreation";
+import ChatCreation from "./modals/ChatCreationModal";
 import { ChatroomsContext } from "../../../../context/providers/ChatroomsContext";
+import ChatCreationModal from "./modals/ChatCreationModal";
 const ChatRoomsSideBar = () => {
   const { chatRoomsData } = useContext(ChatroomsContext);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
@@ -29,7 +30,7 @@ const ChatRoomsSideBar = () => {
 
       <button className="m-2 ring" onClick={() => setIsCreatingChat(true)}><Plus /></button>
       {isCreatingChat && (
-        <ChatCreation changeChatRoomCreationState={changeChatRoomCreationState} />
+        <ChatCreationModal changeChatRoomCreationState={changeChatRoomCreationState} />
       )}
 
       {!chatrooms ? (
