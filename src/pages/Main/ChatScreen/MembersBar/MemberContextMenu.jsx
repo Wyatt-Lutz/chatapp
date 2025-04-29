@@ -14,7 +14,7 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
     await updateBlockedStatus(db, currUser.uid, memberUid, newBlockStatus);
     const newMemberObj = {...memberData, isBlocked: newBlockStatus}
     console.log(newMemberObj);
-    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: {key: memberUid, data: newMemberObj, currUserUid: currUser.uid, resetChatContexts: () => resetAllChatContexts() }});
+    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: { userUid: memberUid, data: newMemberObj }});
   }
 
   const onRemoveMemberFromChat = async() => {

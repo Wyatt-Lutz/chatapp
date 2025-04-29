@@ -36,7 +36,7 @@ export const MemberContextProvider = ({ children }) => {
       },
 
       onMemberUpdated: (userUid, memberData, currUserUid) => {
-        memberDispatch({ type: "UPDATE_MEMBER_DATA", payload: { userUid, data: memberData, currUserUid, resetChatContexts: () => resetAllChatContexts() }});
+        memberDispatch({ type: "UPDATE_MEMBER_DATA", payload: { userUid, data: memberData, currUserUid }});
       }
     })
 

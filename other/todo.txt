@@ -14,6 +14,7 @@ Priority:
 9. Add the like "new messages since x time" if a user is scrolled up
 10. Fix the layout of search messages
 11. Make the Chat and Chatroom listener services
+12. if you remove a user from a group chat, and then add them back, it should be like nothing happened
 
 
 -PasswordReset
