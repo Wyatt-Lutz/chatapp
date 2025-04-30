@@ -1,17 +1,13 @@
-
-
-
-import Close from "../../../components/ui/Close";
-import { useContext } from "react";
-import { AuthContext } from "../../../context/AuthContext";
 import { useForm } from "react-hook-form";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
+import { useAuth } from "../../../context/providers/AuthContext";
+import CloseModal from "../../../components/ui/CloseModal";
 
 
 
 const ConfirmPassModal = ({ changeDisplayment, changeConfirmation, modalHeader, modalText, isDeleteAccount }) => {
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
 
   const { register, getValues,  formState: { errors }} = useForm();
 
@@ -30,7 +26,7 @@ const ConfirmPassModal = ({ changeDisplayment, changeConfirmation, modalHeader, 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
       <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
-        <button onClick={() => changeDisplayment(null)} className="absolute top-4 right-4"><Close /></button>
+        <button onClick={() => changeDisplayment(null)} className="absolute top-4 right-4"><CloseModal /></button>
         <h2 className="mb-4 text-lg font-semibold">{modalHeader}</h2>
 
         <p>{modalText}</p>

@@ -1,42 +1,92 @@
-import { useContext } from "react";
-import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../../context/AuthContext";
-import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
-import { addMessage, calculateRenderTimeAndSender } from "../../../../services/messageDataService";
-
+import { addMessage } from "../../../../services/messageDataService";
 import Smile from "../../../../components/ui/Smile";
+import Plus from "../../../../components/ui/Plus";
+import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
+import { useChatContexts } from "../../../../hooks/useContexts";
+import { useAuth } from "../../../../context/providers/AuthContext";
+import { useRef, useState } from "react";
+import { compressImage } from "../../../../utils/mediaUtils";
+import CloseFile from "../../../../components/ui/CloseFile";
 
 
 
 const Input = () => {
-  const { register, handleSubmit, resetField } = useForm();
-  const { currUser } = useContext(AuthContext);
-  const { chatState, messageState } = useContext(ChatContext);
+  const { currUser } = useAuth();
+  const { chatState, messageState, chatDispatch } = useChatContexts();
+  const [imageToUpload, setImageToUpload] = useState(null);
+  const [text, setText] = useState("");
+  const textInputRef = useRef(null);
 
 
-
-  console.log('input run');
-  const handleAddMessage = async({ text }) => {
-    resetField('text');
-    const lastMessage = [...messageState.messages].pop() || {};
-    const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.displayName);
-    await addMessage(text, chatState.chatID, currUser.uid, db, willRenderTimeAndSender, chatState.firstMessageID);
+  const handleAddMessage = async(e) => {
+    e.preventDefault();
+    setText("");
+    const trimmedText = text.trim();
+    if (!trimmedText && !imageToUpload) return;
+    if (imageToUpload) {
+      setImageToUpload(null);
+      URL.revokeObjectURL(imageToUpload);
+    }
+    const messageKeys = Array.from(messageState.messages.keys());
+    const lastMessage = messageKeys.length > 0 ? messageState.messages.get(messageKeys[messageKeys.length - 1]) : null;
+    const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.uid);
+    await addMessage(trimmedText, chatState.chatID, currUser.uid, db, willRenderTimeAndSender, chatState.firstMessageID, chatDispatch, imageToUpload);
   };
+
+  const handlePickImage = async(e) => {
+    const file = e.target.files[0];
+    e.target.value = null; //Allows the onChange to trigger again if the user tries to add the same picture to a different message
+    if (!file) return;
+    const compressedImage = await compressImage(file);
+    setImageToUpload(compressedImage);
+    textInputRef.current?.focus(); //Will refocus the text input so the user doesn't have to reclick the input to send the message
+  }
+
+  const handleRemoveImage = () => {
+    setImageToUpload(null);
+    URL.revokeObjectURL(imageToUpload);
+    textInputRef.current?.focus();
+  }
 
 
 
   return (
-    <>
+    <div>
+      {imageToUpload && (
+        <div className="relative w-20 h-20 mb-2 ml-2 rounded-md overflow-hidden group">
+          <img src={imageToUpload instanceof Blob ? URL.createObjectURL(imageToUpload) : null} alt="hi" className="w-full h-full object-cover"/>
+          <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+            <button
+              onClick={handleRemoveImage}
+              className="opacity-0 group-hover:opacity-100 bg-red-500 text-white rounded-full p-1 transform transition-all duration-200"
+            >
+              <CloseFile />
+            </button>
+          </div>
+        </div>
 
-      <form onSubmit={handleSubmit(handleAddMessage)}>
-        <input placeholder="Type here..." {...register('text', { required: false, maxLength: 200})} />
-        <button><Smile /></button>
-      </form>
+      )}
 
 
 
-    </>
+
+      <div className="flex items-center">
+        <div>
+          <label htmlFor="filePicker" className="cursor-pointer p-2 text-gray-500 hover:text-blue-500"><Plus /></label>
+          <input type="file" id="filePicker" disabled={imageToUpload} hidden accept="image/*" onChange={handlePickImage}/>
+        </div>
+        <form className="flex-1 flex items-center" onSubmit={handleAddMessage}>
+          <input className="flex-1 p-2 outline-none border" value={text} placeholder="Type here..." ref={textInputRef} onChange={(e) => setText(e.target.value)} maxLength={200} />
+          <button><Smile /></button>
+        </form>
+
+
+
+      </div>
+
+    </div>
+
   )
 }
 export default Input;

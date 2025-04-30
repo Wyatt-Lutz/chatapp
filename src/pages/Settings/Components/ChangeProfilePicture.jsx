@@ -1,42 +1,67 @@
 import { useState } from "react";
 import { updateProfile } from "firebase/auth";
-import { useForm } from "react-hook-form";
 import { deleteObject, ref } from "firebase/storage";
 import { storage } from "../../../../firebase";
-import { compressImage, uploadPicture } from "../../../services/storageDataService";
+import { uploadPicture } from "../../../services/storageDataService";
+import { compressImage } from "../../../utils/mediaUtils";
+import { useAuth } from "../../../context/providers/AuthContext";
+import Camera from "../../../components/ui/Camera";
 
-const ChangeProfilePicture = ({currUser}) => {
-    const {register, handleSubmit} = useForm();
+const ChangeProfilePicture = () => {
+    const { currUser } = useAuth();
     const [profilePicture, setProfilePicture] = useState(currUser.photoURL);
+    const [isChangingPicture, setIsChangingPicture] = useState(false);
 
-
-    const onSubmitImage = async({image}) => {
-        const tempProfilePicture = await compressImage(image[0]);
-        setProfilePicture(tempProfilePicture);
-    }
 
     const onFinish = async() => {
-        const photoStorageLocation = `users/${currUser.uid}` ;
-        try {
-            await deleteObject(ref(storage, photoStorageLocation));
-            await uploadPicture(profilePicture, photoStorageLocation);
-            await updateProfile(currUser, {photoURL: profilePicture});
-        } catch (err) {
-            console.error(err);
-        }
+      const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
+
+      await deleteObject(photoStorageLocation);
+      await uploadPicture(profilePicture, photoStorageLocation);
+      await updateProfile(currUser, {photoURL: profilePicture});
+      setIsChangingPicture(false);
+      // add successful toast
+    }
+
+    const handlePickImage = async(e) => {
+      setIsChangingPicture(true);
+      const file = e.target.files[0];
+      e.target.value = null; //Allows the onChange to trigger again if the user tries to add the same picture to a different message
+      if (!file) {
+        setIsChangingPicture(false);
+        return;
+      };
+      const compressedImage = await compressImage(file);
+      setProfilePicture(compressedImage);
+    }
+
+    const onCancel = () => {
+      setProfilePicture(currUser.photoURL);
+      setIsChangingPicture(false);
+      URL.revokeObjectURL(imageToUpload);
 
     }
 
 
     return (
         <div>
-           <img src={profilePicture} />
-           <form onSubmit={handleSubmit(onSubmitImage)}>
-                <input type="file" {...register('image')}/>
-                <button type="submit">Choose</button>
-            </form>
+          <div className="relative w-32 h-32 group">
+            <img src={profilePicture instanceof Blob ? URL.createObjectURL(profilePicture) : profilePicture} alt="hi" className="w-full h-full rounded-full overflow-hidden"/>
+            <label htmlFor="filePicker" className="absolute inset-0 flex items-center justify-center rounded-full cursor-pointer invisible group-hover:visible">
+              <div className="absolute inset-0 bg-black opacity-50 rounded-full"></div>
+              <Camera />
+            </label>
+            <input type="file" id="filePicker" hidden accept="image/*" onChange={handlePickImage}/>
 
-            <button onClick={onFinish}>Complete</button>
+
+          </div>
+          {isChangingPicture && (
+            <div>
+              <button onClick={onCancel}>Cancel</button>
+              <button onClick={onFinish}>Save</button>
+            </div>
+          )}
+
         </div>
     )
 }

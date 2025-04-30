@@ -1,5 +1,8 @@
-import { get, ref, remove, update } from "firebase/database";
+import { get, increment, ref, remove, runTransaction, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
+import { fetchChatRoomData } from "./chatBarDataService";
+import { updateTempTitle } from "../utils/chatroomUtils";
+
 
 
 /**
@@ -15,51 +18,168 @@ export const updateBlockedStatus = async(db, clientUserUid, uidToBlock, newBlock
   await update(userBlockListRef, newBlockData);
 }
 
-
-export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, memberDispatch) => {
-  console.log('removeUserFromChat run');
-
-
-  const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
+export const fetchMembersFromChat = async(db, chatID) => {
   const membersRef = ref(db, `members/${chatID}`);
-  const userChatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
-  const currUserChatsInRef = ref(db, `users/${currUserUid}/chatsIn/${chatID}`);
+  return ((await get(membersRef)).val());
+}
 
-  // If the current user calls the function for themselves to be removed, if they want to leave the chat, change the message accordingly
+export const fetchChatsInData = async(db, userUid) => {
+  const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
+  return ((await get(chatsInRef)).val());
+}
+
+export const fetchNumOfMembers = async(db, chatID) => {
+  const chatRef = ref(db, `chats/${chatID}/numOfMembers`);
+  const numOfMembers = (await get(chatRef)).val();
+  console.log(numOfMembers);
+  return numOfMembers;
+}
+
+
+export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, numOfMembers, chatDispatch, resetAllChatContexts, memberOptions = {}) => {
+  console.log("chatID: " + chatID);
+  console.log("uidToRemove: " + uidToRemove);
+  if (uidToRemove === currUserUid) {
+    resetAllChatContexts();
+  }
+  const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
+  const chatDataRef = ref(db, `chats/${chatID}`);
+
   const userRemovedServerMessage = uidToRemove === currUserUid
   ? `${usernameOfUserRemoved} has left the chat.`
   : `${usernameOfUserRemoved} has been removed from the chat.`;
 
-  await remove(userChatsInRef);
+  console.log(chatID);
+  console.log(numOfMembers);
 
-  const membersListSnap = await get(membersRef);
-  console.log(membersListSnap);
-  if (Object.keys(membersListSnap.val()).length < 3) {
-    memberDispatch({type: "RESET"});
-    await Promise.all([
-      remove(membersRef),
-      remove(currUserChatsInRef),
-      remove(ref(db, `messages/${chatID}`)),
-      remove(ref(db, `chats/${chatID}`)),
-    ]);
+  if (!numOfMembers) {
+    numOfMembers = await fetchNumOfMembers(db, chatID);
+  }
+
+
+  if (numOfMembers && numOfMembers <= 2) {
+    await deleteChatRoom(db, chatID);
+    resetAllChatContexts();
     return;
   }
 
+  const {tempTitle, ownerUid, memberUids} = await fetchChatRoomData(db, chatID);
+
+  const newMemberUids = memberUids.replace(uidToRemove, "");
+  const newTempTitle = updateTempTitle(tempTitle, usernameOfUserRemoved);
+
+  console.log("newMemberUids: " + newMemberUids);
+  console.log("newTempTitle: " + newTempTitle);
+
+
   await Promise.all([
-    update(memberToRemoveRef, {hasBeenRemoved: true}),
-    addMessage(userRemovedServerMessage, chatID, "server", db, true), // message, id of chat, sender, database reference, bool whether to show timestamp of message
+    update(memberToRemoveRef, {hasBeenRemoved: true, ...memberOptions}),
+    update(chatDataRef, {memberUids: newMemberUids, tempTitle: newTempTitle}),
   ]);
+
+  await addMessage(userRemovedServerMessage, chatID, "server", db, true, chatDispatch);
+
+  await updateNumOfMembers(db, chatID, false);
+
+
+
+  if (uidToRemove === ownerUid) {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+
+    // Normalize to [0, 1)
+    const randomValue = arr[0] / 2**32;
+
+    // Scale to [0, numOfMembers)
+    const scaledRandomValue = randomValue * numOfMembers;
+    const members = await fetchMembersFromChat(db, chatID);
+    const randomMemberUid = members[scaledRandomValue];
+
+    await transferOwnership(db, chatID, randomMemberUid, chatDispatch);
+  }
+
+  const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
+  //const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn`);
+  await remove(chatsInRef);
+
 
 
 
 }
 
 
-export const transferOwnership = async (db, chatID, newOwnerUid) => {
+
+export const addUserToChat = async(db, chatID, userUid, username, profilePictureURL, numOfMembers, chatDispatch) => {
+  const memberRef = ref(db, `members/${chatID}/${userUid}`);
+  const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
+  const chatRef = ref(db, `chats/${chatID}`);
+  const {tempTitle} = await fetchChatRoomData(db, chatID);
+  const updatedTempTitle = updateTempTitle(tempTitle, "", username);
+  console.log(updatedTempTitle);
+
+  await Promise.all([
+    set(memberRef, {
+      hasBeenRemoved: false,
+      isOnline: false,
+      username: username,
+      profilePictureURL: profilePictureURL,
+    }),
+
+
+    update(chatsInRef, {
+      [chatID]: 0,
+    }),
+
+
+    update(chatRef, {
+      tempTitle: updatedTempTitle,
+      numOfMembers: numOfMembers + 1,
+    }),
+  ]);
+
+
+  chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: numOfMembers + 1 });
+
+
+}
+
+export const updateNumOfMembers = async(db, chatID, isAdd) => {
+  const numOfMembersRef = ref(db, `chats/${chatID}`);
+  const updates = {
+    [`numOfMembers`]: increment(isAdd ? 1 : -1),
+  };
+  await update(numOfMembersRef, updates);
+}
+
+
+export const deleteChatRoom = async(db, chatID, memberData = null) => {
+  console.log('deleting chat room');
+  if (!memberData) {
+    memberData = Object.keys(await fetchMembersFromChat(db, chatID));
+  }
+
+  const membersRef = ref(db, `members/${chatID}`);
+
+  for (const memberUid of memberData) {
+    const chatsInRef = ref(db, `users/${memberUid}/chatsIn/${chatID}`);
+    await remove(chatsInRef);
+  }
+  await Promise.all([
+    remove(membersRef),
+    remove(ref(db, `messages/${chatID}`)),
+    remove(ref(db, `chats/${chatID}`)),
+  ]);
+
+}
+
+export const transferOwnership = async (db, chatID, newOwnerUid, chatDispatch) => {
   const chatMetadataRef = ref(db, `chats/${chatID}`);
   await update(chatMetadataRef, {
     owner: newOwnerUid,
   });
+
+  chatDispatch({type: "UPDATE_OWNER", payload: newOwnerUid});
+
 }
 
 
@@ -96,10 +216,9 @@ export const getUsernameFromUid = async(db, userUid) => {
 }
 
 
-export const fetchOnlineUsersForChat = async(db, chatID, status) => {
-  const membersRef = ref(db, `members/${chatID}`);
-  const membersSnap = await get(membersRef);
-  const membersData = membersSnap.val();
+export const fetchChatUsersByStatus = async(db, chatID, status) => {
+
+  const membersData = await fetchMembersFromChat(db, chatID);
 
   const onlineMembers = [];
 
@@ -114,5 +233,3 @@ export const fetchOnlineUsersForChat = async(db, chatID, status) => {
 
 
 }
-
-

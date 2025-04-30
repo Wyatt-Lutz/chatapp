@@ -1,27 +1,31 @@
-import { useContext } from "react"
-import { removeUserFromChat } from "../../../../services/memberDataService";
-import { db } from "../../../../../firebase";
-import { AuthContext } from "../../../../context/AuthContext";
-import { ChatContext } from "../../../../context/ChatContext";
-const ChatRoomContextMenu = ({chatRoomID, points}) => {
-  console.log('chatroom context menu')
-  const { currUser } = useContext(AuthContext);
-  const { memberDispatch } = useContext(ChatContext);
+import { useEffect, useState } from "react";
+import LeaveChatModal from "./modals/LeaveChatModal";
+const ChatRoomContextMenu = ({contextMenuData, setContextMenu, points}) => {
+  const [modal, setModal] = useState({type: ""});
 
-  const onRemoveUserFromChat = async() => {
-    try {
-      await removeUserFromChat(db, chatRoomID, currUser.uid, currUser.displayName, currUser.uid, memberDispatch);
-    } catch (err) {
-      console.error(err);
-      return;
-    }
-
+  const onLeaveGroupChat = async(e) => {
+    e.stopPropagation(); //Because this is a contextmenu, when clicking the leave group chat button, the contextmenu will try to close before rendering the modal, so this line stops that action
+    setModal({type: "leaveChat"});
   }
 
+
   return (
-    <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
-      <button onClick={onRemoveUserFromChat}>Leave Group Chat</button>
+
+    <div>
+      <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
+        <button onClick={onLeaveGroupChat}>Leave Group Chat</button>
+      </div>
+
+      {modal.type === "leaveChat" && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <LeaveChatModal setModal={setModal} contextMenuData={contextMenuData} setContextMenu={setContextMenu} />
+        </div>
+
+      )}
+
     </div>
+
+
   )
 }
 export default ChatRoomContextMenu;

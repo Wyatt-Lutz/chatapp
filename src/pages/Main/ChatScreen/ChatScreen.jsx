@@ -1,19 +1,15 @@
-import { useContext } from 'react';
-
-
 import MembersBar from './MembersBar/MembersBar';
-import TopBar from './TopBar';
+import TopBar from './Ancillary/TopBar';
 import Messages from './Messages/Messages';
-import Search from './Search';
-import { ChatContext } from '../../../context/ChatContext';
+import Search from './Ancillary/Search';
+import { useChatContexts } from '../../../hooks/useContexts';
 
 const ChatScreen = () => {
-  console.log('chatScreen run');
-  const { chatState } = useContext(ChatContext);
+  const { chatState } = useChatContexts();
   return(
     <section>
       {!chatState.chatID ? (
-        <div>Chat Requests</div>
+        <div>Hello</div>
       ) : (
         <>
           <TopBar />

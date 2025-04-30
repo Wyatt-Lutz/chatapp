@@ -1,9 +1,11 @@
 import { sendEmailVerification } from "firebase/auth";
-import { auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/providers/AuthContext";
 
 const EmailNotVerified = ({ email }) => {
-  const currUser = auth.currentUser;
+
+  const { currUser } = useAuth();
+
   const navigate = useNavigate();
   const resendEmail = async () => {
     try {

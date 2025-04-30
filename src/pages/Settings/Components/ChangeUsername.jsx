@@ -3,13 +3,17 @@ import UsernameAvailability from "../../../components/UsernameAvailability";
 import { changeUsername } from "../../../services/settingsDataService";
 import { useState } from "react";
 import { fetchLastUsernameChangeTime } from "../../../services/userDataService";
+import { useAuth } from "../../../context/providers/AuthContext";
+import { db } from "../../../../firebase";
 
-const ChangeUsername = ({db, currUser, displayPassModal, passwordModalHeader, passwordModalText}) => {
+const ChangeUsername = ({displayPassModal, passwordModalHeader, passwordModalText}) => {
+  const { currUser } = useAuth();
     const {register, control} = useForm({
         defaultValues: {
             newUsername: currUser.displayName,
         }
-    })
+    });
+
     const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
     const newUsername = useWatch({ name: 'newUsername', control });
 
@@ -22,10 +26,8 @@ const ChangeUsername = ({db, currUser, displayPassModal, passwordModalHeader, pa
 
         await displayPassModal(passwordModalHeader, passwordModalText);
 
-        const isChanged = await changeUsername(db, newUsername, currUser);
-        if (isChanged) {
-          console.log("username changed");
-        }
+        await changeUsername(db, newUsername, currUser);
+
 
     }
     return (

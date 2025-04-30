@@ -1,6 +1,6 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../../firebase";
-import { readAndCompressImage } from "browser-image-resizer";
+
 
 export const fetchProfilePicture = async(userUid) => {
   const pictureRef = ref(storage, `users/${userUid}`);
@@ -8,17 +8,6 @@ export const fetchProfilePicture = async(userUid) => {
   return pictureUrl;
 }
 
-
-export const compressImage = async(originalImage) => {
-  const imageCompressionConfig = {
-      quality: 3.0,
-      maxWidth: 512,
-      maxHeight: 512,
-  };
-
-  const resizedImage = await readAndCompressImage(originalImage, imageCompressionConfig);
-  return resizedImage;
-}
 
 
 export const uploadPicture = async(image, storageLocation) => {

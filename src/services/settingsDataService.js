@@ -1,14 +1,17 @@
 
 import { deleteUser, updateProfile } from "firebase/auth";
 
-import { get, update, ref} from "firebase/database";
-import { checkIfUserExists } from "./globalDatService";
+import { get, update, ref, remove} from "firebase/database";
+import { queryUsernames } from "./globalDataService";
+import { fetchChatsInData, removeUserFromChat } from "./memberDataService";
+import { signUserOut } from "../utils/userUtils";
+import { auth } from "../../firebase";
 
 export const changeUsername = async(db, newUsername, currUser) => {
-  const userData = await checkIfUserExists(db, newUsername);
+  const userData = await queryUsernames(db, newUsername);
   if (userData) {
     console.log('username already exists');
-    return false;
+    return;
   }
 
 
@@ -18,41 +21,36 @@ export const changeUsername = async(db, newUsername, currUser) => {
     lastUsernameChange: Date.now(),
   });
 
-  const chatsInRef = ref(db, `users/${currUser.uid}/chatsIn`);
-  const chatsInSnap = await get(chatsInRef);
-  if (chatsInSnap.val()) {
-    const chatroomIds = Object.keys(chatsInSnap.val());
-    await Promise.all(
-      chatroomIds.map(async (chatroomID) => {
-        const chatroomMemberRef = ref(db, `members/${chatroomID}/${currUser.uid}`);
-        const chatRoomRef = ref(db, `chats/${chatroomID}`);
-        const chatRoomDataSnap = await get(chatRoomRef);
-        const chatRoomData = chatRoomDataSnap.val();
-        const tempTitle = chatRoomData.tempTitle;
-        const updatedTempTitle = tempTitle.split(', ').filter((user) => user !== currUser.displayName).concat(newUsername).join(', ');
+  const chatsInData = await fetchChatsInData(db, currUser.uid);
+
+  if (chatsInData) {
+    const updateChatroomsPromise = Object.keys(chatsInData).map(async (chatID) => {
+      const chatroomMemberRef = ref(db, `members/${chatID}/${currUser.uid}`);
+      const chatRoomRef = ref(db, `chats/${chatID}`);
+      const chatRoomDataSnap = await get(chatRoomRef);
+      const chatRoomData = chatRoomDataSnap.val();
+      const tempTitle = chatRoomData.tempTitle;
+      const updatedTempTitle = tempTitle.split(', ').filter((user) => user !== currUser.displayName).concat(newUsername).join(', ');
+
+      return Promise.all([
         update(chatroomMemberRef, {
           username: newUsername,
-        });
+        }),
 
         update(chatRoomRef, {
           tempTitle: updatedTempTitle,
-        });
+        }),
+      ]);
 
-
-      })
-    );
+    });
+    await Promise.all(updateChatroomsPromise);
   }
 
 
-  updateProfile(currUser, {
+
+  await updateProfile(currUser, {
     displayName: newUsername,
   });
-
-
-
-
-
-  return true;
 }
 
 
@@ -65,17 +63,29 @@ export const changeEmail = async(db, currUser, newEmail) => {
 }
 
 
-export const deleteAccount = async(db, currUser) => {
+export const deleteAccount = async(db, currUser, numOfMembers, chatDispatch, chatRoomsDispatch, navigate, resetAllChatContexts) => {
+
+  navigate("/");
+
+  const userRef = ref(db, `users/${currUser.uid}`);
+
+  const chatsInData = await fetchChatsInData(db, currUser.uid);
+
+  const memberOptions = {
+    profilePictureURL: "",
+    username: "Removed User",
+    isOnline: false,
+  }
+  for (const chatID in chatsInData) {
+    await removeUserFromChat(db, chatID, currUser.uid, currUser.displayName, currUser.uid, numOfMembers, chatDispatch, resetAllChatContexts, memberOptions);
+  }
 
 
+  await remove(userRef);
 
   await deleteUser(currUser);
 
+  await signUserOut(auth, resetAllChatContexts, chatRoomsDispatch);
 
 
-
-
-  //remove user data except for username and make it user deleted
-  //and transfer ownership in owned chats
 }
-

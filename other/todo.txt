@@ -1,5 +1,20 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
+Priority:
+1. There was some issue where I wanted to do something but the import was ref which conflicting with the like firebase ref so I just went with another plan which was probably worse
+2. Add the request system
+3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
+6. When someone leaves a group chat, the membersList isnt updated
+7. Make like the actual pfps and make username and timestamp on same line with pfp
+8. Add image upload implenetations
+9. Problems with memberListener and stuff
+9. Adding a new chatroom when you are already in one doenst change it to the new chatroom
+9. When you are creating a chat and adding the users, add the users profile pictures before their names
+9. Add the like "new messages since x time" if a user is scrolled up
+10. Fix the layout of search messages
+11. Make the Chat and Chatroom listener services
+
+
 -PasswordReset
   - Optimize it and make it better wiuth change Password, like add
 
@@ -14,7 +29,6 @@
   - Whenever a user changes thier username, tell them in ui that like you can only change it every 10 days, like during the success toast or screen or something
 
 -members
-  - whenever you remove a user and theres only 2 users in the chat originally, so the entire chat is deleted, the chatrooms sidebar data like disappears or something
   - Make sure you can block members even if they have been removed or something, because its not like theyre accounts have been deleted
 
 
@@ -24,7 +38,13 @@
   - could preload the default image in signupform
   - Make the form errors toasts or something - well Idk, because its cool when they pop up immedietly like if username.length > 15
 
+-Signup
+  - If you press eenter while in the email input to go to the password input, it thinks you tried to signin and gives password error. Or pressing enter doesnt even go to next input in first place and just tries to sign in
+
+
 -messages
+  - the loading thing I do is bad
+  - test t he firstmessageid and top of messages, it may be a little glitchy
   - see if there is better ways to handle the unseen messages than all the scroll listeners and checks
   - I think theres like an error if a user loaded a chatroom before midnight, the messages will say Today at 10PM right, but then if its open as the day changes, the old messages I think would still say Today and 10PM even though it was yesterday
   - If a user changes their name, does the title reflect that? - check
@@ -39,7 +59,8 @@
   - Test to see what happens if a user clicks on a chat as soon as a messaeg is added
   - add optimistic updates (its like so fast I dont even need it, unless I added it without knowing)
 
-
+Rules -
+  - Make sure that users that have the hasbeenremoved are unable to send messages to a chatroom like if it breaks. Add all the rules for things like this
 
 -topbar
   - If the user is chanign title in topbar and they leave it as "", then recalcuate the temptitle and use that
@@ -55,10 +76,14 @@
   - Sort the chatbar for most recent chatted in on top, need to add a timestamp or something
 
 -app
+  - use .trim() where neccessary - like searching usernames, messages, signing in/up, etc
+  - using react-hook-form for like just one input is overkill, just do simple useState thing
+  - It doesnt like me calling resetAllChatContexts from like membercontextprovider or mesasge because its under chatcontext and I reset chatcontext first
+  - the services are for all functions that access the database, so move any non-database get or set functions to some utils thing.
   - use react-hook-form useWatch instead of its watch
   - see if I can avoid reinitializing like currUser or DB and pass them to componenets in a lifecycle like in Settings
   - make sure I dont set any jsx to like a useState, should only store data there
-  - set default values to function parameters that are optional, as it they may not be there
+  - set default values to function parameters that are optional, as it they may not be there. Also do this for components like Messages component
   - make a progress bar hook if needed
   - it says authenticaitng... on like signup and signin when not signed in, probably because auth wraps everything
   - fix our horrible folder system, and also some name things, like I have a main.jsx and Main.jsx
@@ -74,8 +99,6 @@
       - Make sure I add too many requests
   - Add all the input error handling and all the messages
   - I am importing like app and chatID in all my service functions - see if I can not have to do this, like just import in the file or something
-  - Put all refs I make in firebase.js I guess
-    - Dont pass db and refs as parameters because I can access them from te files anyway
   - Change all the .then() to await
   - When I delete an account, change email address, or change password, I have to reauthenticate with reauthenticateWithCredential if user signed in too long ago
   - Do a full test with signing up and signing in witht he new verifcation system
@@ -140,6 +163,3 @@ Owner system - only owner can remove members (maybe anyone can add)
 Before I do this I n
 
 each chat sender will be the useruid to account for username changes and will fetch each members username with their useruid from the client and store them
-
-
-

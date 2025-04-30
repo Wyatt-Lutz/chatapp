@@ -1,31 +1,20 @@
-import { useContext, useState } from "react"
 import { useForm } from "react-hook-form";
-import { ChatContext } from "../../../../context/ChatContext";
 import { db } from "../../../../../firebase";
-import { calcTime, editMessage } from "../../../../services/messageDataService";
-import { useContextMenu } from "../../../../hooks/useContextMenu";
-import { AuthContext } from "../../../../context/AuthContext";
+import { editMessage } from "../../../../services/messageDataService";
+import { calcTime } from "../../../../utils/messageUtils";
+import { useChatContexts } from "../../../../hooks/useContexts";
 
-
-const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState }) => {
-  console.log('message run');
+const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, changeEditState, index, onMemberContextMenu, onMessageContextMenu}) => {
   const { register, handleSubmit, resetField } = useForm();
-  const { chatState } = useContext(ChatContext);
-  const {currUser} = useContext(AuthContext);
-  const [usernameContextMenuData, setUsernameContextMenuData] = useState({});
-  const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
+  const { chatState } = useChatContexts();
+
 
   const onSubmitEdit = async({ editMessageText }) => {
     resetField('editMessage');
     await editMessage(messageUid, editMessageText, chatState.chatID, db);
     await changeEditState(messageUid, false);
   }
-  const handleUsernameContextMenu = (e, memberUid, memberData) => {
-    e.preventDefault();
-    setContextMenu(prev => ({...prev, 'username': true}));
-    setPoints(prev => ({...prev, 'username': {x: e.pageX, y: e.pageY}}));
-    setUsernameContextMenuData({memberUid, memberData})
-  }
+
 
   return (
     <>
@@ -33,14 +22,20 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
         {(messageData.renderTimeAndSender || index === 0) && (
           <div>
             {messageData.sender !== 'server' && (
-              <div className="flex" onContextMenu={(e) => handleUsernameContextMenu(e, messageData.sender, memberDataOfSender)}>
+              <div className="flex items-center gap-2" onContextMenu={(e) => onMemberContextMenu(e, messageData.sender, memberDataOfSender)}>
                 {memberDataOfSender && (
-                  <div>
-                    <img src={memberDataOfSender.profilePictureURL} alt="profile picture"/>
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full overflow-hidden">
+                      <img className="h-full w-full object-cover" src={memberDataOfSender.profilePictureURL} alt="profile picture"/>
+                    </div>
+
                     {memberDataOfSender.isBlocked ? (
                       <div>Blocked User</div>
                     ) : (
                       <div>{memberDataOfSender && memberDataOfSender.username}</div>
+                    )}
+                    {memberDataOfSender.hasBeenRemoved && (
+                      <div> (Removed user) </div>
                     )}
                   </div>
 
@@ -61,22 +56,31 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
         ) : (
           <>
             {memberDataOfSender && memberDataOfSender.isBlocked ? (
-              <div>Blocked User</div>
+              <div>Blocked Message</div>
             ) : (
-              <div className="text-wrap">
-              <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
+              <div className="text-wrap" onContextMenu={(e) => onMessageContextMenu(e, messageUid, messageData)}>
+                <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>
 
-              {messageData.hasBeenEdited && (
-                <div>Edited</div>
-              )}
+                {messageData.imageRef && (
+                  messageData.imageRef === 'uploading' ? (
+                    <div className="rounded-md p-4 bg-gray-600 text-white">
+                      <div className="text-center font-medium">Uploading</div>
+                    </div>
+                  ) : (
+                    <img src={messageData.imageRef} />
+                  )
+                )}
+
+
+
+                {messageData.hasBeenEdited && (
+                  <div>Edited</div>
+                )}
               </div>
             )}
           </>
 
 
-        )}
-        {(contextMenu.username && usernameContextMenuData.memberUid !== currUser.uid) && (
-          <MemberContextMenu contextMenuData={usernameContextMenuData} points={points.username} />
         )}
       </div>
     </>

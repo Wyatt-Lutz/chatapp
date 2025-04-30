@@ -2,10 +2,9 @@ import { useContext, useState } from "react"
 import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
-import { ChatContext } from "../../../../context/ChatContext";
+import { useChatContexts } from "../../../../hooks/useContexts";
 const MembersBar = () => {
-  console.log('memberBar run');
-  const { memberState } = useContext(ChatContext);
+  const { memberState } = useChatContexts();
   const members = memberState.members;
 
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
@@ -25,7 +24,7 @@ const MembersBar = () => {
           <div>Loading members...</div>
         ) : (
           <>
-            {[...members].map(([memberUid, memberData]) => (
+            {[...members].filter(([_, memberData]) => !memberData.hasBeenRemoved).map(([memberUid, memberData]) => (
               <div key={memberUid} onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
                 <Member memberUid={memberUid} memberData={memberData} />
               </div>

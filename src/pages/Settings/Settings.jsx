@@ -1,6 +1,4 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import { db } from "../../../firebase";
+import { useState } from "react";
 import ConfirmPassModal from "./modals/ConfirmPassModal";
 import EmailNotVerified from "../../components/EmailNotVerified";
 import BlockedUsersModal from "./modals/BlockedUsersModal";
@@ -10,10 +8,10 @@ import ChangePassword from "./Components/ChangePassword";
 import ChangeEmail from "./Components/ChangeEmail";
 import ChangeUsername from "./Components/ChangeUsername";
 import ChangeProfilePicture from "./Components/ChangeProfilePicture";
+import { useAuth } from "../../context/providers/AuthContext";
 
 const Settings = () => {
-  console.log('settings run')
-  const { currUser } = useContext(AuthContext);
+  const { currUser } = useAuth();
   const navigate = useNavigate();
 
 
@@ -47,16 +45,16 @@ const Settings = () => {
           <h2>My Account</h2>
 
           <div className="flex">
-            <img alt="PFP"/>
+            <ChangeProfilePicture />
             <div>{currUser.displayName}</div>
           </div>
 
 
-          <ChangeUsername db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
-          <ChangeEmail db={db} currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
-          <ChangePassword currUser={currUser} displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
-          <DeleteAccount db={db} currUser={currUser} displayPassModal={displayPassModal} />
-          <ChangeProfilePicture currUser={currUser} />
+          <ChangeUsername displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
+          <ChangeEmail displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
+          <ChangePassword displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
+          <DeleteAccount displayPassModal={displayPassModal} />
+
 
           <button onClick={() => setModal({ type: "BlockedUsersModal", props: {changeDisplayment: () => setModal({ type: null, props: {} }) }})} className="bg-gray-500">Blocked Users</button>
 

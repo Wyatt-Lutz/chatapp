@@ -1,9 +1,7 @@
-import { useContext } from "react"
-import { ChatContext } from "../../../../context/ChatContext";
+import { useChatContexts } from "../../../../hooks/useContexts";
 
 const Member = ({ memberUid, memberData }) => {
-  console.log('member run');
-  const { chatState } = useContext(ChatContext);
+  const { chatState } = useChatContexts();
 
   return (
     <div className="flex">

@@ -1,22 +1,23 @@
-import { AuthContext } from '../../context/AuthContext';
 import ChatScreen from './ChatScreen/ChatScreen';
-import { sendEmailVerification, signOut } from 'firebase/auth';
-import { lazy, Suspense, useContext, useEffect, useRef, useState } from 'react';
+import { sendEmailVerification } from 'firebase/auth';
+import { lazy, Suspense, useContext, useEffect, useState } from 'react';
 import { auth } from '../../../firebase';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
-import { ChatContext } from '../../context/ChatContext';
-import { ChatroomsContext } from '../../context/ChatroomsContext';
 import { useNavigate } from 'react-router-dom';
+import { signUserOut } from '../../utils/userUtils';
+import { useAuth } from '../../context/providers/AuthContext';
+import { ChatroomsContext } from '../../context/providers/ChatroomsContext';
+import { useChatContexts } from '../../hooks/useContexts';
 
 
 const EmailNotVerified = lazy(() => import('../../components/EmailNotVerified'));
 const Main = () => {
   const [emailVerificationModal, setEmailVerificationModal] = useState(false);
-  const { currUser } = useContext(AuthContext);
-  const {chatDispatch, memberDispatch, messageDispatch} = useContext(ChatContext);
+  const { currUser } = useAuth();
   const {chatRoomsDispatch} = useContext(ChatroomsContext);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const {resetAllChatContexts} = useChatContexts();
 
 
 
@@ -46,19 +47,9 @@ const Main = () => {
   }, [currUser]);
 
 
-  const signCurrUserOut = () => {
-    //Reset the context data
-    chatDispatch({type: "RESET"});
-    memberDispatch({type: "RESET"});
-    messageDispatch({type: "RESET"});
-    chatRoomsDispatch({type: "RESET"});
+  const signCurrUserOut = async() => {
 
-    //Firebase sign out
-    signOut(auth).then(() => {
-      console.info("Sign out successful")
-    }).catch((error) => {
-      console.error(error);
-    });
+    await signUserOut(auth, resetAllChatContexts, chatRoomsDispatch);
   }
 
 
