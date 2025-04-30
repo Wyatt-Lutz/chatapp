@@ -2,7 +2,7 @@ import { get, increment, ref, remove, runTransaction, set, update } from "fireba
 import { addMessage } from "./messageDataService";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
-import { randomInt } from "crypto";
+
 
 
 /**
@@ -84,9 +84,16 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
   if (uidToRemove === ownerUid) {
-    const randomIndex = randomInt(0, numOfMembers);
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+
+    // Normalize to [0, 1)
+    const randomValue = arr[0] / 2**32;
+
+    // Scale to [0, numOfMembers)
+    const scaledRandomValue = randomValue * numOfMembers;
     const members = await fetchMembersFromChat(db, chatID);
-    const randomMemberUid = members[randomIndex];
+    const randomMemberUid = members[scaledRandomValue];
 
     await transferOwnership(db, chatID, randomMemberUid, chatDispatch);
   }

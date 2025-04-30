@@ -1,7 +1,6 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
-1. Error with like blocking a user when you are in the chat, it like adds that user again to memberState
 1. There was some issue where I wanted to do something but the import was ref which conflicting with the like firebase ref so I just went with another plan which was probably worse
 2. Add the request system
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
@@ -14,7 +13,6 @@ Priority:
 9. Add the like "new messages since x time" if a user is scrolled up
 10. Fix the layout of search messages
 11. Make the Chat and Chatroom listener services
-12. if you remove a user from a group chat, and then add them back, it should be like nothing happened
 
 
 -PasswordReset
