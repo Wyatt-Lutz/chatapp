@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 import { initialMemberState } from "../initialState";
 import { membersReducer } from "../reducers/membersReducer";
 import { useAuth } from "./AuthContext";
-import { ChatContext, ResetChatContext } from "./ChatContext";
 import { MemberListenerService } from "../listenerServices/memberListenerService";
+import { useChatContexts } from "../../hooks/useContexts";
+import { ChatContext } from "./ChatContext";
 
 
 export const MemberContext = createContext();
@@ -12,10 +13,8 @@ export const MemberContext = createContext();
 
 export const MemberContextProvider = ({ children }) => {
   const [memberState, memberDispatch] = useReducer(membersReducer, initialMemberState);
-  const { isReset, setIsReset } = useContext(ResetChatContext);
-  const { chatState, resetAllChatContexts } = useContext(ChatContext);
-
   const { currUser } = useAuth();
+  const { chatState } = useContext(ChatContext);
 
 
   const currUserUid = currUser?.uid;
@@ -24,11 +23,6 @@ export const MemberContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (!chatID) return;
-
-    if (isReset) {
-      setIsReset(!isReset);
-      memberDispatch({ type: "RESET" });
-    }
 
     const unsubscribe = MemberListenerService.setUpMemberListeners(chatID, currUserUid, {
       onMemberAdded: (userUid, memberData) => {
@@ -43,7 +37,7 @@ export const MemberContextProvider = ({ children }) => {
 
 
     return unsubscribe;
-  }, [chatID, currUserUid, isReset, resetAllChatContexts]);
+  }, [chatID, currUserUid]);
 
 
 

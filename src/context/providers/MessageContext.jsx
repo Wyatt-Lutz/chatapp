@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from "react";
 import { messagesReducer } from "../reducers/messagesReducer";
 import { initialMessageState } from "../initialState";
-import { ChatContext, ResetChatContext } from "./ChatContext";
+import { ChatContext } from "./ChatContext";
 import { MessageListenerService } from "../listenerServices/messageListenerService";
 import { updateFirstMessageID } from "../../services/messageDataService";
 import { db } from "../../../firebase";
@@ -14,7 +14,6 @@ export const MessageContext = createContext();
 export const MessageContextProvider = ({ children }) => {
   const [messageState, messageDispatch] = useReducer(messagesReducer, initialMessageState);
   const { chatState, chatDispatch } = useContext(ChatContext);
-  const { isReset, setIsReset } = useContext(ResetChatContext);
 
   const messages = useRef(messageState.messages);
 
@@ -26,11 +25,6 @@ export const MessageContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (!chatState.chatID) return;
-
-    if (isReset) {
-      setIsReset(!isReset);
-      messageDispatch({ type: "RESET" });
-    }
 
     const unsubscribe = MessageListenerService.setUpMessageListeners(chatState.chatID, messageState.endTimestamp, {
       onMessageAdded: (messageID, messageData) => {
@@ -68,7 +62,7 @@ export const MessageContextProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  }, [chatState.chatID, chatState.firstMessageID, isReset, messageState.isAtBottom, messageState.numUnread, messageState.endTimestamp, messageState.isFirstMessageRendered]);
+  }, [chatState.chatID, chatState.firstMessageID, messageState.isAtBottom, messageState.numUnread, messageState.endTimestamp, messageState.isFirstMessageRendered]);
 
 
   return (

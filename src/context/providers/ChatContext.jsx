@@ -8,21 +8,14 @@ import { useAuth } from "./AuthContext";
 
 
 export const ChatContext = createContext();
-export const ResetChatContext = createContext();
 
 
 export const ChatContextProvider = ({ children }) => {
   const [chatState, chatDispatch] = useReducer(chatReducer, initialChatState);
-  const [isReset, setIsReset] = useState(false);
   const { currUser } = useAuth();
 
 
   const chatID = chatState.chatID;
-
-  const resetAllChatContexts = () => {
-    chatDispatch({ type: "RESET" });
-    setIsReset((prev) => !prev);
-  };
 
 
   useEffect(() => {
@@ -50,26 +43,20 @@ export const ChatContextProvider = ({ children }) => {
       : null;
     }
 
-    const onChatroomRemoved = () => {
-      resetAllChatContexts();
-    }
-
     const chatroomRef = ref(db, `chats/${chatID}`);
     const chatRoomEditedListener = onChildChanged(chatroomRef, onChatroomEdited);
-    const chatroomRemovedListener = onChildRemoved(chatroomRef, onChatroomRemoved);
+    //const chatroomRemovedListener = onChildRemoved(chatroomRef, onChatroomRemoved);
 
     return () => {
       chatRoomEditedListener();
-      chatroomRemovedListener();
+      //chatroomRemovedListener();
     }
   }, [chatID]);
 
 
   return (
-    <ChatContext.Provider value={{ chatState, chatDispatch, resetAllChatContexts }}>
-      <ResetChatContext.Provider value={{ isReset, setIsReset} }>
-        {children}
-      </ResetChatContext.Provider>
+    <ChatContext.Provider value={{ chatState, chatDispatch }}>
+      {children}
     </ChatContext.Provider>
   );
 };

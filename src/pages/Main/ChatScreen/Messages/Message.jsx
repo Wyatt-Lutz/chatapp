@@ -34,6 +34,9 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
                     ) : (
                       <div>{memberDataOfSender && memberDataOfSender.username}</div>
                     )}
+                    {memberDataOfSender.hasBeenRemoved && (
+                      <div> (Removed user) </div>
+                    )}
                   </div>
 
                 )}
@@ -53,7 +56,7 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
         ) : (
           <>
             {memberDataOfSender && memberDataOfSender.isBlocked ? (
-              <div>Blocked User</div>
+              <div>Blocked Message</div>
             ) : (
               <div className="text-wrap" onContextMenu={(e) => onMessageContextMenu(e, messageUid, messageData)}>
                 <div className="text-xl font-bold py-2 w-max">{messageData.text}</div>

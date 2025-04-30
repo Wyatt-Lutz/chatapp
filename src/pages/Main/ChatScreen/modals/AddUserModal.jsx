@@ -4,6 +4,7 @@ import UserSearch from "../../../../components/UserSearch";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { addUserToChat } from "../../../../services/memberDataService";
 import CloseModal from "../../../../components/ui/CloseModal";
+import { addMessage } from "../../../../services/messageDataService";
 
 const AddUserModal = ({setIsDisplayAddUser}) => {
 
@@ -18,9 +19,12 @@ const AddUserModal = ({setIsDisplayAddUser}) => {
 
     addedUsers.forEach(async(user) => {
       console.log(user);
-      await addUserToChat(db, chatState.chatID, user.userUid, user.username, user.profilePictureURL, chatState.tempTitle, chatDispatch);
-    });
+      await addUserToChat(db, chatState.chatID, user.userUid, user.username, user.profilePictureURL, chatState.numOfMembers, chatDispatch);
 
+    });
+    const userAddedServerMessage = addedUsers.map((user) => ' ' + user.username).toString().trim() + " has been added to the chat!";
+    console.log(userAddedServerMessage);
+    await addMessage(userAddedServerMessage, chatState.chatID, 'server', db, true, chatState.firstMessageID, chatDispatch);
     setIsDisplayAddUser(null);
   }
 

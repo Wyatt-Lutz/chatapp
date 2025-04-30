@@ -41,9 +41,6 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
   }
 
 
-
-
-
    //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
   if (!firstMessageID) {
 

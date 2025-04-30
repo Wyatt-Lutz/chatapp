@@ -57,7 +57,8 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
   if (numOfMembers && numOfMembers <= 2) {
-    await deleteChatRoom(db, chatID, resetAllChatContexts);
+    await deleteChatRoom(db, chatID);
+    resetAllChatContexts();
     return;
   }
 
@@ -101,11 +102,13 @@ export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserR
 
 
 
-export const addUserToChat = async(db, chatID, userUid, username, profilePictureURL, tempTitle, chatDispatch) => {
+export const addUserToChat = async(db, chatID, userUid, username, profilePictureURL, numOfMembers, chatDispatch) => {
   const memberRef = ref(db, `members/${chatID}/${userUid}`);
   const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
+  const {tempTitle} = await fetchChatRoomData(db, chatID);
   const updatedTempTitle = updateTempTitle(tempTitle, "", username);
+  console.log(updatedTempTitle);
 
   await Promise.all([
     set(memberRef, {
@@ -123,11 +126,13 @@ export const addUserToChat = async(db, chatID, userUid, username, profilePicture
 
     update(chatRef, {
       tempTitle: updatedTempTitle,
+      numOfMembers: numOfMembers + 1,
     }),
   ]);
 
 
-  chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: updatedTempTitle});
+  chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: numOfMembers + 1 });
+
 
 }
 
@@ -140,13 +145,11 @@ export const updateNumOfMembers = async(db, chatID, isAdd) => {
 }
 
 
-export const deleteChatRoom = async(db, chatID, resetAllChatContexts, memberData = null) => {
+export const deleteChatRoom = async(db, chatID, memberData = null) => {
   console.log('deleting chat room');
   if (!memberData) {
     memberData = Object.keys(await fetchMembersFromChat(db, chatID));
   }
-
-  resetAllChatContexts();
 
   const membersRef = ref(db, `members/${chatID}`);
 
@@ -159,6 +162,7 @@ export const deleteChatRoom = async(db, chatID, resetAllChatContexts, memberData
     remove(ref(db, `messages/${chatID}`)),
     remove(ref(db, `chats/${chatID}`)),
   ]);
+
 }
 
 export const transferOwnership = async (db, chatID, newOwnerUid, chatDispatch) => {

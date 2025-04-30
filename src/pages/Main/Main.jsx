@@ -5,19 +5,19 @@ import { auth } from '../../../firebase';
 import ChatRoomsSideBar from './SideBar/ChatRoomsSideBar/ChatRoomsSideBar';
 import { useNavigate } from 'react-router-dom';
 import { signUserOut } from '../../utils/userUtils';
-import { useChatContexts } from '../../hooks/useContexts';
 import { useAuth } from '../../context/providers/AuthContext';
 import { ChatroomsContext } from '../../context/providers/ChatroomsContext';
+import { useChatContexts } from '../../hooks/useContexts';
 
 
 const EmailNotVerified = lazy(() => import('../../components/EmailNotVerified'));
 const Main = () => {
   const [emailVerificationModal, setEmailVerificationModal] = useState(false);
   const { currUser } = useAuth();
-  const {resetAllChatContexts} = useChatContexts();
   const {chatRoomsDispatch} = useContext(ChatroomsContext);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const {resetAllChatContexts} = useChatContexts();
 
 
 

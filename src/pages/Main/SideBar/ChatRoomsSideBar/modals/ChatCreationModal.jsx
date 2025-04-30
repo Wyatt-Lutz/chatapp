@@ -17,7 +17,6 @@ const ChatCreationModal = ({changeChatRoomCreationState}) => {
   const { currUser } = useAuth();
   const { chatDispatch, resetAllChatContexts } = useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
-  const [isUserBlockedWarning, setIsUserBlockedWarning] = useState(null);
   const [chatTitleInputText, setChatTitleInputText] = useState("");
 
 
