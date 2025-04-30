@@ -12,6 +12,7 @@
     "@tailwindcss/vite": "^4.1.4",
     "babel-plugin-react-compiler": "^19.1.0-rc.1",
     "browser-image-resizer": "^2.4.1",
+    "crypto": "^1.0.1",
     "dayjs": "^1.11.13",
     "firebase": "^11.6.1",
     "react": "^19.1.0",
