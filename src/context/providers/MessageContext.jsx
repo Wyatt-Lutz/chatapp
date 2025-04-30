@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useReducer, useRef } from "react"
 import { messagesReducer } from "../reducers/messagesReducer";
 import { initialMessageState } from "../initialState";
 import { ChatContext } from "./ChatContext";
-import { MessageListenerService } from "../listenerServices/messageListenerService";
+import { MessageListenerService } from "../listenerServices/MessageListenerService";
 import { updateFirstMessageID } from "../../services/messageDataService";
 import { db } from "../../../firebase";
 

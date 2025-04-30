@@ -2,8 +2,7 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 import { initialMemberState } from "../initialState";
 import { membersReducer } from "../reducers/membersReducer";
 import { useAuth } from "./AuthContext";
-import { MemberListenerService } from "../listenerServices/memberListenerService";
-import { useChatContexts } from "../../hooks/useContexts";
+import { MemberListenerService } from "../listenerServices/MemberListenerService";
 import { ChatContext } from "./ChatContext";
 
 
