@@ -3,7 +3,7 @@ import { createContext, useEffect, useReducer } from "react";
 import { db } from "../../../firebase";
 import { fetchChatRoomData } from "../../services/chatBarDataService";
 import { updateTempTitle } from "../../utils/chatroomUtils";
-import { chatroomReducer } from "../reducers/ChatroomsReducer";
+import { chatroomReducer } from "../reducers/chatroomsReducer";
 import { initialChatroomState } from "../initialState";
 import { useAuth } from "./AuthContext";
 
