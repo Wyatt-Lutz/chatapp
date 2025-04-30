@@ -1,6 +1,7 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
+1. when switching chats after messaging, the messages context didnt reset or someting
 1. There was some issue where I wanted to do something but the import was ref which conflicting with the like firebase ref so I just went with another plan which was probably worse
 2. Add the request system
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.

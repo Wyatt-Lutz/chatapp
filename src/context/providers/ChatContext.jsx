@@ -1,5 +1,5 @@
-import { createContext, useCallback, useEffect, useReducer, useState } from "react";
-import { ref, onChildChanged, onChildRemoved } from "firebase/database";
+import { createContext, useEffect, useReducer, useState } from "react";
+import { ref, onChildChanged } from "firebase/database";
 import { db } from "../../../firebase";
 import { chatReducer } from "../reducers/chatReducer";
 import { initialChatState } from "../initialState";
