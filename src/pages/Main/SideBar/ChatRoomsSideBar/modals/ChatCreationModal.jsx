@@ -33,7 +33,7 @@ const ChatCreationModal = ({changeChatRoomCreationState}) => {
     const usersToAdd = [...addedUsers, transformedCurrUserData];
     console.log(usersToAdd);
 
-    const uids = [...usersToAdd.map(user => user.userUid)];
+    const uids = usersToAdd.map(user => user.userUid);
     const memberUids = uids.sort().join("");
     let title, tempTitle;
     title = tempTitle = "";
