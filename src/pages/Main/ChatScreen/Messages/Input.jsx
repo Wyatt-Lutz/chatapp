@@ -106,7 +106,7 @@ const Input = () => {
           <button type="button" onClick={() => setIsEmojiPickerOpen((prev) => !prev)}><Smile /></button>
           {isEmojiPickerOpen && (
             <div className="absolute bottom-12 right-4 z-10 bg-white border shadow-md rounded">
-              <emoji-picker ref={emojiPickerRef}></emoji-picker>
+              <emoji-picker class='dark' ref={emojiPickerRef}></emoji-picker>
             </div>
 
           )}
