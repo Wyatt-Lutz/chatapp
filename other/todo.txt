@@ -1,16 +1,9 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
-1. when switching chats after messaging, the messages context didnt reset or someting
 1. There was some issue where I wanted to do something but the import was ref which conflicting with the like firebase ref so I just went with another plan which was probably worse
 2. Add the request system
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
-6. When someone leaves a group chat, the membersList isnt updated
-7. Make like the actual pfps and make username and timestamp on same line with pfp
-8. Add image upload implenetations
-9. Problems with memberListener and stuff
-9. Adding a new chatroom when you are already in one doenst change it to the new chatroom
-9. When you are creating a chat and adding the users, add the users profile pictures before their names
 9. Add the like "new messages since x time" if a user is scrolled up
 10. Fix the layout of search messages
 11. Make the Chat and Chatroom listener services

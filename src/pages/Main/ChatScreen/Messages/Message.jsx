@@ -20,9 +20,9 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
     <>
       <div className="hover:bg-gray-600">
         {(messageData.renderTimeAndSender || index === 0) && (
-          <div>
+          <div className="flex items-center gap-2">
             {messageData.sender !== 'server' && (
-              <div className="flex items-center gap-2" onContextMenu={(e) => onMemberContextMenu(e, messageData.sender, memberDataOfSender)}>
+              <div onContextMenu={(e) => onMemberContextMenu(e, messageData.sender, memberDataOfSender)}>
                 {memberDataOfSender && (
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-full overflow-hidden">
@@ -43,9 +43,9 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
 
               </div>
             )}
+            <div className="flex">{calcTime(messageData.timestamp)}</div>
 
 
-            <div>{calcTime(messageData.timestamp)}</div>
           </div>
 
         )}
