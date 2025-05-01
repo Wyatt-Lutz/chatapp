@@ -1,6 +1,6 @@
 import { useForm, useWatch } from "react-hook-form";
 import { db, auth } from "../../../firebase";
-import { createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
 import { useState } from "react";
 import { createUserData, fetchUsernameData } from "../../services/globalDataService";

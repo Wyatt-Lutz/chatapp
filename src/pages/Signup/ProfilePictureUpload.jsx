@@ -4,8 +4,9 @@ import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchProfilePicture, uploadPicture } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
-import { update } from "firebase/database";
+import { update, ref } from "firebase/database";
 import { db } from "../../../firebase";
+  
 
 
 
@@ -45,7 +46,9 @@ const ProfilePictureUpload = ({user}) => {
         photoURL: photoUrl,
       });
 
-      await update(db, `users/${userUid}`, {
+      const userLoc = ref(db, `users/${userUid}`);
+
+      await update(userLoc, {
         profilePictureURL: photoUrl,
       });
 
