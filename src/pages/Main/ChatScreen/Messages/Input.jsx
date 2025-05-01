@@ -5,11 +5,10 @@ import Plus from "../../../../components/ui/Plus";
 import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { compressImage } from "../../../../utils/mediaUtils";
 import CloseFile from "../../../../components/ui/CloseFile";
-
-
+import 'emoji-picker-element';
 
 const Input = () => {
   const { currUser } = useAuth();
@@ -17,6 +16,8 @@ const Input = () => {
   const [imageToUpload, setImageToUpload] = useState(null);
   const [text, setText] = useState("");
   const textInputRef = useRef(null);
+  const emojiPickerRef = useRef(null);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
 
   const handleAddMessage = async(e) => {
@@ -49,6 +50,30 @@ const Input = () => {
     textInputRef.current?.focus();
   }
 
+  useEffect(() => {
+    const emojiPicker = emojiPickerRef.current;
+    if (!isEmojiPickerOpen || !emojiPicker) return;
+
+    const handleEmojiClick = (e) => {
+      const emoji = e.detail.unicode;
+      setText((prev) => prev + emoji);
+    };
+
+    const handleClickOutside = (e) => {
+      if (!emojiPicker.contains(e.target)) {
+        setIsEmojiPickerOpen(false);
+      }
+    };
+
+    emojiPicker.addEventListener('emoji-click', handleEmojiClick);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      emojiPicker.removeEventListener('emoji-click', handleEmojiClick);
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [emojiPickerRef.current, isEmojiPickerOpen])
+
 
 
   return (
@@ -78,8 +103,15 @@ const Input = () => {
         </div>
         <form className="flex-1 flex items-center" onSubmit={handleAddMessage}>
           <input className="flex-1 p-2 outline-none border" value={text} placeholder="Type here..." ref={textInputRef} onChange={(e) => setText(e.target.value)} maxLength={200} />
-          <button><Smile /></button>
+          <button type="button" onClick={() => setIsEmojiPickerOpen((prev) => !prev)}><Smile /></button>
+          {isEmojiPickerOpen && (
+            <div className="absolute bottom-12 right-4 z-10 bg-white border shadow-md rounded">
+              <emoji-picker ref={emojiPickerRef}></emoji-picker>
+            </div>
+
+          )}
         </form>
+
 
 
 

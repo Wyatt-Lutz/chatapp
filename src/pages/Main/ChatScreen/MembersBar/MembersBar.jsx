@@ -3,10 +3,11 @@ import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
 import { useChatContexts } from "../../../../hooks/useContexts";
+import { useAuth } from "../../../../context/providers/AuthContext";
 const MembersBar = () => {
   const { memberState } = useChatContexts();
   const members = memberState.members;
-
+  const { currUser } = useAuth();
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
 
@@ -35,7 +36,7 @@ const MembersBar = () => {
 
 
 
-      {contextMenu.member && (
+      {(contextMenu.member && contextMenuData.memberUid !== currUser.uid) && (
         <MemberContextMenu contextMenuData={contextMenuData} points={points} />
       )}
 

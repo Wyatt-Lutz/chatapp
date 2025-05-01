@@ -7,9 +7,9 @@ export const calcTime = (time) => {
   const yesterdayMidnight = new Date(todayMidnight);
   yesterdayMidnight.setDate(todayMidnight.getDate() - 1);
   if (time - todayMidnight.getTime() > 0) {
-    return 'Today at ' + formattedTime;
+    return formattedTime;
   } else if (time - yesterdayMidnight.getTime() > 0) {
-    return 'Yesterday at' + formattedTime;
+    return 'Yesterday at ' + formattedTime;
   }
   return dayjs(time).format('MM/DD/YYYY h:m A');
 }
