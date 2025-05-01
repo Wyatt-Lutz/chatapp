@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchProfilePicture, uploadPicture } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
 import { update } from "firebase/database";
+import { db } from "../../../firebase";
 
 
 

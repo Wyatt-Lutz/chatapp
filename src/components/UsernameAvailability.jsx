@@ -7,7 +7,7 @@ const UsernameAvailability = ({newUsername, setIsButtonDisabled}) => {
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
 
   useEffect(() => {
-
+    if (!newUsername) return;
     const fetchUsernames = async() => {
 
       if (!newUsername.trim()) {
@@ -21,8 +21,9 @@ const UsernameAvailability = ({newUsername, setIsButtonDisabled}) => {
       if (!usernameData) {
         setIsUsernameAvailable(true);
         setIsButtonDisabled(false);
+        return;
       }
-
+      console.log(usernameData);
       const topUsername = Object.values(usernameData)[0]?.username;
       const isAvailable = topUsername !== newUsername
 
