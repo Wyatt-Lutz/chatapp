@@ -27,11 +27,9 @@ export const fetchUserData = async(db, userUid) => {
 
 export const createUserData = async(db, uid, trimmedUsername, email) => {
   const userRef = ref(db, `users/${uid}`);
-  set((userRef), {
+  await set(userRef, {
     username: trimmedUsername,
     email: email,
-    blocked: [],
-    chatsIn: [],
     lastUsernameChange: 0,
   });
 }
