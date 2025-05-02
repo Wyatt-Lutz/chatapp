@@ -62,7 +62,7 @@ export const MessageContextProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  }, [chatState.chatID, chatState.firstMessageID, messageState.isAtBottom, messageState.numUnread, messageState.endTimestamp, messageState.isFirstMessageRendered]);
+  }, [chatState.chatID, chatState.firstMessageID, messageState.isFirstMessageRendered]);
 
 
   return (

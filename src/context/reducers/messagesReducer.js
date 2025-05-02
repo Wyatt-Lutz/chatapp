@@ -4,12 +4,13 @@ export const messagesReducer = (state, action) => {
   let newMessages = new Map(state?.messages);
   switch (action.type) {
     case "ADD_MESSAGE":
-
+      console.log('addMessageRun')
       const isFirstMessage = state.messages.size === 0;
       let numUnread = state.numUnread;
 
+      console.log(state.isAtBottom);
       if (!state.isAtBottom) {
-        numUnread = state.numUnread + 1;
+        numUnread = numUnread + 1;
       }
 
       newMessages.set(action.payload.key, action.payload.data);

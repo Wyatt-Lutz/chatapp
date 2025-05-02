@@ -7,26 +7,25 @@ import { useChatContexts } from '../../../hooks/useContexts';
 const ChatScreen = () => {
   const { chatState } = useChatContexts();
   return(
-    <section>
+    <div>
       {!chatState.chatID ? (
-        <div>Hello</div>
+        <div className='flex flex-1 items-center justify-center text-xl'>Start chatting</div>
       ) : (
         <>
           <TopBar />
           <div className='flex'>
             <Messages />
-            <>
-              <MembersBar/>
-            </>
 
-            <Search />
+            <MembersBar/>
+
+
 
           </div>
 
         </>
 
       )}
-    </section>
+    </div>
   )
 }
 

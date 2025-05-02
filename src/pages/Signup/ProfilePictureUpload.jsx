@@ -18,26 +18,23 @@ const ProfilePictureUpload = ({user}) => {
 
 
   const onFinish = async() => {
-    if (isChangingPicture) {
+    if (!isChangingPicture) {
       navigate("/");
+      return;
     }
+
     const photoStorageLocation = `users/${userUid}`;
-    try {
-      const photoUrl = await uploadPicture(profilePicture, photoStorageLocation);
-      console.log('photo url: ' + photoUrl);
-      await updateProfile(user.userCredential.user, {
-        photoURL: photoUrl,
-      });
+    const photoUrl = await uploadPicture(profilePicture, photoStorageLocation);
+    console.log('photo url: ' + photoUrl);
+    await updateProfile(user.userCredential.user, {
+      photoURL: photoUrl,
+    });
 
-      const userLoc = ref(db, `users/${userUid}`);
+    const userRef = ref(db, `users/${userUid}`);
 
-      await update(userLoc, {
-        profilePictureURL: photoUrl,
-      });
-
-    } catch (err) {
-      console.error(err);
-    }
+    await update(userRef, {
+      profilePictureURL: photoUrl,
+    });
 
     navigate("/");
   }
@@ -82,7 +79,7 @@ const ProfilePictureUpload = ({user}) => {
       <div>
         <button onClick={onCancel}>Cancel</button>
       </div>
-      
+
     )}
       <button onClick={onFinish}>Save</button>
     </div>

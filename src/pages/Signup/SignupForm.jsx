@@ -33,13 +33,14 @@ const SignupForm = ({ onSubmitForm }) => {
       await createUserData(db, uid, trimmedUsername, email);
 
       const defaultPictureUrl = await fetchProfilePicture('HmKMbb9avVZYYt41TPCSuceWgqT2');
+      console.log("defaultPicture: " + defaultPictureUrl);
       await updateProfile(userCredential.user, {
         displayName: trimmedUsername,
         photoURL: defaultPictureUrl,
       });
 
-      const userLoc = ref(db, `users/${uid}`);
-      await update(userLoc, {
+      const userRef = ref(db, `users/${uid}`);
+      await update(userRef, {
         profilePictureURL: defaultPictureUrl,
       });
 
