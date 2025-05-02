@@ -10,6 +10,22 @@ Priority:
 12. Search for other infinite loop things becaus eof useEffect dependencies
 
 
+
+Big update:
+1. Make pictures bigger
+2. Englarge pictures when clicked
+3. Be able to shift + return for new line
+4. Fix the whole search messages
+5. VIP badges
+6. Ability to send files
+7. Ability to search files/pictures
+8. When clicking on searched message, it takes you to the message, will have to load the messages around it, even when scrolling down
+9. Button that takes you directly to the bottom when scrolled up
+10. Desktop notifications or something, like in the website title and maybe a noise plays
+11. Add rate limiting
+
+
+
 -PasswordReset
   - Optimize it and make it better wiuth change Password, like add
 
