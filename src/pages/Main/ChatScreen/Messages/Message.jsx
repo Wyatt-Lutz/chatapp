@@ -32,7 +32,7 @@ const Message = ({ messageUid, memberDataOfSender, messageData, isEditing, chang
                     {memberDataOfSender.isBlocked ? (
                       <div>Blocked User</div>
                     ) : (
-                      <div>{memberDataOfSender && memberDataOfSender.username}</div>
+                      <div className="font-semibold">{memberDataOfSender && memberDataOfSender.username}</div>
                     )}
                     {memberDataOfSender.hasBeenRemoved && (
                       <div> (Removed user) </div>

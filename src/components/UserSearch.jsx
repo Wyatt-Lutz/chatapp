@@ -25,12 +25,15 @@ const UserSearch = ({addedUsers, setAddedUsers}) => {
                 setUsernameQueryData([]);
                 return;
             }
+
             const transformedData = Object.entries(usernameQueryData).map(([userUid, userData]) => (
                 {userUid, ...userData}
             ));
 
-            console.log(transformedData);
-            setUsernameQueryData(transformedData);
+            const cleanedData = transformedData.filter((user) => (user.userUid !== currUser.uid) && !(addedUsers.some((addedUser) => addedUser.userUid === user.userUid)));
+
+            console.log(cleanedData);
+            setUsernameQueryData(cleanedData);
         }
 
         const timeout = setTimeout(fetchUsernames, 300);
@@ -42,7 +45,9 @@ const UserSearch = ({addedUsers, setAddedUsers}) => {
     }, [addedUsers]);
 
     const addUser = async(user) => {
-      if (addedUsers.some((addedUser) => addedUser.userUid === user.userUid)) return;
+      setAddedUsers((prev) => [...prev, user]);
+      setUsernameQueryData((prev) => prev.filter((queryUser) => queryUser.userUid !== user.userUid));
+
 
       const [currUserBlockData, addedUserBlockData] = await Promise.all([
         getBlockData(db, currUser.uid),
@@ -59,7 +64,12 @@ const UserSearch = ({addedUsers, setAddedUsers}) => {
       }
 
 
-      setAddedUsers((prev) => [...prev, user]);
+
+    }
+
+    const removeFromAddedUsers = (user) => {
+      setAddedUsers((prev) => prev.filter((addedUser) => addedUser.userUid !== user.userUid ))
+      setUsernameQueryData((prev) => [...prev, user]);
     }
 
 
@@ -67,25 +77,32 @@ const UserSearch = ({addedUsers, setAddedUsers}) => {
 
 
     return (
-        <div>
+        <div className="p-4 w-full max-w-lg mx-auto">
           {modal.type === "blockedWarning" && (
             <BlockedUserWarning setModal={setModal} setAddedUsers={setAddedUsers} user={modal.user} />
           )}
 
 
-                <input placeholder="username..." type="text" value={searchedUsername} onChange={(e) => setSearchedUsername(e.target.value)} />
+                <input
+                  placeholder="Search Username..."
+                  type="text"
+                  value={searchedUsername}
+                  onChange={(e) => setSearchedUsername(e.target.value)}
+                  className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
 
 
                 {usernameQueryData && usernameQueryData.length > 0 ? (
-                    <div>
+                    <div className="grid grid-cols-1 gap-4 mb-6">
                         {usernameQueryData.map((user) => (
 
-                            <div key={user.userUid}>
-                                <button onClick={() => addUser(user)}>
-                                    <div className="h-8 w-8 rounded-full overflow-hidden">
-                                        <img className="h-full w-full object-cover" src={user.profilePictureURL} />
-                                    </div>
-                                    <span>{user.username}</span>
+                            <div className="flex items-center p-2 bg-gray-400 rounded-lg hover:bg-gray-200 transition" key={user.userUid}>
+                                <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
+                                  <img className="h-full w-full object-cover" src={user.profilePictureURL} />
+                                </div>
+                                <span className="flex-grow font-medium">{user.username}</span>
+                                <button onClick={() => addUser(user)} className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-blue-600 transition">
+                                  Add
                                 </button>
                             </div>
 
@@ -93,23 +110,30 @@ const UserSearch = ({addedUsers, setAddedUsers}) => {
                         ))}
                     </div>
                 ) : (
-                    <div>No Matching usernames</div>
+                    <div className="text-gray-500 italic mb-6">No Matching usernames</div>
                 )}
 
             {addedUsers && addedUsers.length > 0 && (
             <div>
-              {addedUsers.map((user) => (
-                  <div key={user.userUid}>
-                      <div className="h-8 w-8 rounded-full overflow-hidden">
-                          <img className="h-full w-full object-cover" src={user.profilePictureURL} />
-                      </div>
-                      <span>{user.username}</span>
-                      <button onClick={() => setAddedUsers((prev) => prev.filter((addedUser) => addedUser.userUid !== user.userUid ))}>
-                          <CloseModal />
-                      </button>
+              <h3 className="text-lg font-semibold mb-2">Added Users</h3>
+              <div className="space-y-2">
+                {addedUsers.map((user) => (
+                    <div key={user.userUid} className="flex items-center p-2 bg-gray-400 rounded-lg">
+                        <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
+                            <img className="h-full w-full object-cover" src={user.profilePictureURL} />
+                        </div>
+                        <span className="flex-grow font-medium">{user.username}</span>
+                        <button
+                          onClick={() => removeFromAddedUsers(user)}
+                          className="p-1"
+                        >
+                            <CloseModal />
+                        </button>
 
-                  </div>
-              ))}
+                    </div>
+                ))}
+              </div>
+
             </div>
           )}
 

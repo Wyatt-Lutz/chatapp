@@ -19,7 +19,7 @@ const MembersBar = () => {
   }
   return (
     <div>
-      <div>Members:</div>
+      <div className="font-semibold text-gray-900 border-t text-lg text-center">Members</div>
       <>
         {!members ? (
           <div>Loading members...</div>

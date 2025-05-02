@@ -3,9 +3,10 @@ import { useForm } from "react-hook-form";
 import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { editTitle } from "../../../../services/messageDataService";
-import { addUserToChat } from "../../../../services/memberDataService";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import AddUserModal from "../modals/AddUserModal";
+import SearchSVG from "../../../../components/ui/SearchSVG";
+import Search from "./Search";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { register, handleSubmit, resetField } = useForm();
@@ -14,8 +15,8 @@ const TopBar = () => {
   const title = chatState.title;
   const tempTitle = chatState.tempTitle;
   const { currUser } = useAuth();
-  const [isDisplayAddUser, setIsDisplayAddUser] = useState(null);
-
+  const [isDisplayAddUser, setIsDisplayAddUser] = useState(false);
+  const [isSearchingMessages, setIsSearchingMessages] = useState(false);
 
   const onFinishEditTitle = async({ title }) => {
     resetField('title');
@@ -29,7 +30,7 @@ const TopBar = () => {
 
 
   return (
-    <>
+    <div>
       {isDisplayAddUser && (
         <AddUserModal setIsDisplayAddUser={setIsDisplayAddUser} />
       )}
@@ -45,9 +46,17 @@ const TopBar = () => {
         )}
 
       </div>
+      <div className="flex justify-between items-center">
+        <button onClick={() => setIsDisplayAddUser(true)}>Add User</button>
+        <button onClick={() => setIsSearchingMessages(true)}>
+          <SearchSVG />
+        </button>
+      </div>
+      {isSearchingMessages && (
+        <Search />
+      )}
 
-      <button onClick={() => setIsDisplayAddUser(true)}>Add User</button>
-    </>
+    </div>
 
 
 

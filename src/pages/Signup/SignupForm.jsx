@@ -1,9 +1,11 @@
 import { useForm, useWatch } from "react-hook-form";
 import { db, auth } from "../../../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
 import { useState } from "react";
 import { createUserData, fetchUsernameData } from "../../services/globalDataService";
+import { fetchProfilePicture } from "../../services/storageDataService";
+import { update, ref } from "firebase/database";
 
 
 const SignupForm = ({ onSubmitForm }) => {
@@ -30,9 +32,23 @@ const SignupForm = ({ onSubmitForm }) => {
 
       await createUserData(db, uid, trimmedUsername, email);
 
+      const defaultPictureUrl = await fetchProfilePicture('HmKMbb9avVZYYt41TPCSuceWgqT2');
+      console.log("defaultPicture: " + defaultPictureUrl);
+      await updateProfile(userCredential.user, {
+        displayName: trimmedUsername,
+        photoURL: defaultPictureUrl,
+      });
+
+      const userRef = ref(db, `users/${uid}`);
+      await update(userRef, {
+        profilePictureURL: defaultPictureUrl,
+      });
+
       console.info('registration successful');
 
       onSubmitForm({displayName: trimmedUsername, userCredential: userCredential});
+
+
     } catch(error) {
       switch (error.code) {
         case 'username-already-in-use':

@@ -17,8 +17,8 @@ const ChangeProfilePicture = () => {
       const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
 
       await deleteObject(photoStorageLocation);
-      await uploadPicture(profilePicture, photoStorageLocation);
-      await updateProfile(currUser, {photoURL: profilePicture});
+      const photoURL = await uploadPicture(profilePicture, photoStorageLocation);
+      await updateProfile(currUser, {photoURL: photoURL});
       setIsChangingPicture(false);
       // add successful toast
     }

@@ -25,9 +25,6 @@ const Signup = () => {
       )}
 
 
-
-      <button onClick={() => navigate("/signin")}>Signin</button>
-
     </section>
 
   )
