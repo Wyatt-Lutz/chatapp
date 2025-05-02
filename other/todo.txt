@@ -23,6 +23,8 @@ Big update:
 9. Button that takes you directly to the bottom when scrolled up
 10. Desktop notifications or something, like in the website title and maybe a noise plays
 11. Add rate limiting
+12. Make the enter password in setings confirmation visible
+13. When you change your username, the UsernameAvalaibility still shows up as username is availiele and stuff, and save usename is still there
 
 
 
