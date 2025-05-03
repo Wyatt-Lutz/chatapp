@@ -101,8 +101,26 @@ const Input = () => {
           <label htmlFor="filePicker" className="cursor-pointer p-2 text-gray-500 hover:text-blue-500"><Plus /></label>
           <input type="file" id="filePicker" disabled={imageToUpload} hidden accept="image/*" onChange={handlePickImage}/>
         </div>
-        <form className="flex-1 flex items-center" onSubmit={handleAddMessage}>
-          <input className="flex-1 p-2 outline-none border" value={text} placeholder="Type here..." ref={textInputRef} onChange={(e) => setText(e.target.value)} maxLength={200} />
+        <div className="flex-1 flex items-center">
+          <textarea
+            className="flex-1 p-2 outline-none border resize-none overflow-hidden"
+            value={text}
+            placeholder="Type here..."
+            ref={textInputRef}
+            onChange={(e) => setText(e.target.value)}
+            maxLength={200}
+            rows={1}
+            onInput={(e) => {
+              e.target.style.height = 'auto';
+              e.target.style.height = `${e.target.scrollHeight}px`
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleAddMessage(e);
+              }
+            }}
+          />
           <button type="button" onClick={() => setIsEmojiPickerOpen((prev) => !prev)}><Smile /></button>
           {isEmojiPickerOpen && (
             <div className="absolute bottom-12 right-4 z-10 bg-white border shadow-md rounded">
@@ -110,7 +128,7 @@ const Input = () => {
             </div>
 
           )}
-        </form>
+        </div>
 
 
 

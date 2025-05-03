@@ -6,26 +6,22 @@ import { onAuthStateChanged } from "firebase/auth";
 export const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const [currUser, setCurrUser] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
     const authState = onAuthStateChanged(auth, async(user) => {
       setCurrUser(user);
-      setLoading(false);
+      setLoadingAuth(false);
     });
-
 
     return () => {
       authState();
     };
   }, []);
 
-  if (loading) {
-    return <div>Authenticating...</div>
-  }
 
   return(
-    <AuthContext.Provider value={{ currUser }}>
+    <AuthContext.Provider value={{ currUser, loadingAuth }}>
       {children}
     </AuthContext.Provider>
   )

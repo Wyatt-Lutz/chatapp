@@ -14,6 +14,7 @@ export const uploadPicture = async(image, storageLocation) => {
   return new Promise((resolve) => {
       const metadata = {
         contentType: image.type,
+        cacheControl: 'public,max-age=31536000',
     };
 
     const pictureRef = ref(storage, storageLocation);

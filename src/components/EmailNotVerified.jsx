@@ -1,10 +1,12 @@
 import { sendEmailVerification } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/providers/AuthContext";
+import { useEffect, useState } from "react";
 
-const EmailNotVerified = ({ email }) => {
+const EmailNotVerified = ({ email, setIsVerified }) => {
 
   const { currUser } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const resendEmail = async () => {
@@ -15,6 +17,43 @@ const EmailNotVerified = ({ email }) => {
       console.error(error);
     }
   };
+
+
+  useEffect(() => {
+
+    const checkIfUserVerified = async() => {
+      const verificationCookieId = `verification-${currUser.uid}`
+      const alreadySentVerification = localStorage.getItem(verificationCookieId);
+
+      if (!currUser.emailVerified) {
+
+        if (!alreadySentVerification) {
+          await sendEmailVerification(currUser);
+
+          localStorage.setItem(verificationCookieId, true);
+          console.info("Email Verification sent");
+        }
+      } else if (alreadySentVerification) {
+        localStorage.removeItem(verificationCookieId);
+      }
+      setLoading(false);
+    }
+
+    checkIfUserVerified();
+  }, [currUser]);
+
+  useEffect(() => {
+    if (loading) return;
+    const timeoutID = setInterval(async() => {
+      await currUser.reload();
+      console.log('yo');
+      if (currUser.emailVerified) {
+        setIsVerified(true);
+        clearInterval(timeoutID);
+      }
+    }, 500);
+
+  }, [currUser, loading])
 
   return (
     <div>

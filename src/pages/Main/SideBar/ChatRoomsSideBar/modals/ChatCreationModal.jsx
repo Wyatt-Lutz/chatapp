@@ -15,7 +15,7 @@ import { fetchUserData } from "../../../../../services/globalDataService";
 
 const ChatCreationModal = ({changeChatRoomCreationState}) => {
   const { currUser } = useAuth();
-  const { chatDispatch, resetAllChatContexts } = useChatContexts();
+  const { chatroomsState, chatDispatch, resetAllChatContexts } = useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
   const [chatTitleInputText, setChatTitleInputText] = useState("");
 
@@ -38,7 +38,7 @@ const ChatCreationModal = ({changeChatRoomCreationState}) => {
     let title, tempTitle;
     title = tempTitle = "";
 
-    const isDuplicate = await checkIfDuplicateChat(db, currUserUid, memberUids);
+    const isDuplicate = checkIfDuplicateChat(memberUids, chatroomsState.chatrooms);
     if (isDuplicate) {
       console.log("chat with those members already exists");
       return;

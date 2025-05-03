@@ -36,6 +36,7 @@ export const fetchNumOfMembers = async(db, chatID) => {
 }
 
 
+
 export const removeUserFromChat = async(db, chatID, uidToRemove, usernameOfUserRemoved, currUserUid, numOfMembers, chatDispatch, resetAllChatContexts, memberOptions = {}) => {
   console.log("chatID: " + chatID);
   console.log("uidToRemove: " + uidToRemove);
@@ -113,9 +114,11 @@ export const addUserToChat = async(db, chatID, userUid, username, profilePicture
   const memberRef = ref(db, `members/${chatID}/${userUid}`);
   const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
-  const {tempTitle} = await fetchChatRoomData(db, chatID);
+  const {tempTitle, memberUids} = await fetchChatRoomData(db, chatID);
   const updatedTempTitle = updateTempTitle(tempTitle, "", username);
   console.log(updatedTempTitle);
+  const newUserUidsArr = [...memberUids.match(/.{1,28}/g), userUid];
+  const updatedMemberUids = newUserUidsArr.sort().join("");
 
   await Promise.all([
     set(memberRef, {
@@ -134,6 +137,7 @@ export const addUserToChat = async(db, chatID, userUid, username, profilePicture
     update(chatRef, {
       tempTitle: updatedTempTitle,
       numOfMembers: numOfMembers + 1,
+      memberUids: updatedMemberUids,
     }),
   ]);
 

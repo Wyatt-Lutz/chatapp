@@ -10,6 +10,7 @@ import { useAuth } from "../../../../context/providers/AuthContext";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MessagesContextMenu from "./MessagesContextMenu";
 import MemberContextMenu from "../MembersBar/MemberContextMenu";
+import DownArrow from "../../../../components/ui/DownArrow";
 
 
 const Messages = () => {
@@ -21,6 +22,7 @@ const Messages = () => {
 
   const [scrolled, setScrolled] = useState(false);
   const [editState, setEditState] = useState({});
+  const [jsxNames, setJsxNames] = useState(null);
 
   const [memberContextMenuData, setMemberContextMenuData] = useState({});
   const [messageContextMenuData, setMessageContextMenuData] = useState({});
@@ -37,6 +39,16 @@ const Messages = () => {
     rootMargin: "0px",
     threshold: 1,
   });
+
+  useEffect(() => {
+    const names = tempTitle.split(", ");
+    const newJsxNames = names.length === 3
+    ? `${names[0]}, ${names[1]}, and ${names[2]}`
+    : names.length === 2
+    ? `${names[0]} and ${names[1]}`
+    : names[0];
+    setJsxNames(newJsxNames);
+  }, [tempTitle])
 
 
   useEffect(() => {
@@ -58,7 +70,6 @@ const Messages = () => {
     const handleScroll = () => {
       const scrollTop = messagesContainerRef.current.scrollTop;
       setScrolled(true);
-      console.log(scrollTop);
       if (scrollTop !== 0 && (isAtBottom)) {
         messageDispatch({type: "UPDATE_IS_AT_BOTTOM", payload: false});
       } else if (scrollTop === 0 && (!isAtBottom)) {
@@ -105,18 +116,20 @@ const Messages = () => {
   }, [isVisible, scrolled, messageDispatch, chatID, endTimestamp, isFirstMessageRendered]);
 
 
-  useEffect(() => {
-    if(lastMessageRef.current && isAtBottom) {
-      lastMessageRef.current.scrollIntoView({behavior: 'smooth'});
-    }
-  }, [isAtBottom]);
-
-
-
 
   const changeEditState = (id, state) => {
     setEditState(prev => ({...prev, [id]: state}));
   };
+
+  const scrollToBottom = () => {
+    console.log(lastMessageRef.current);
+    console.log(isAtBottom);
+    if (lastMessageRef.current && !isAtBottom) {
+      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+
 
 
 
@@ -130,12 +143,12 @@ const Messages = () => {
               <>
                 {(isFirstMessageRendered || chatState.firstMessageID === "") && (
                   title ? (
-                    <div className="text-center text-lg mb-2">This is the start of <span className="font-semibold">{title || tempTitle}</span></div>
+                    <div className="text-center text-lg mb-2">This is the start of <span className="font-semibold">{title}</span></div>
                   ) : (
                     chatState.numOfUsers > 3 ? (
-                      <div className="text-center text-lg mb-2">This is the start of your chat with <span className="font-semibold">{tempTitle}</span> and <span className="font-semibold">{chatState.numOfUsers - 3}</span> other users</div>
+                      <div className="text-center text-lg mb-2">This is the start of your chat with <span className="font-semibold">{tempTitle + ", and " + chatState.numOfMembers - 3 + " other users"}</span> </div>
                     ) : (
-                      <div className="text-center text-lg mb-2">This is the start of your chat with <span className="font-semibold">{tempTitle}</span></div>
+                      <div className="text-center text-lg mb-2">This is the start of your chat with <span className="font-semibold">{jsxNames}</span></div>
                     )
 
                   )
@@ -169,7 +182,7 @@ const Messages = () => {
                         />
 
 
-                      {index === messageData.size - 1 && (
+                      {index === messages.size - 1 && (
                         <div ref={lastMessageRef} />
                       )}
 
@@ -179,6 +192,10 @@ const Messages = () => {
                 })}
               </>
             )}
+            {!isAtBottom && (
+              <button className="absolute bottom-40 right-120 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition" onClick={scrollToBottom}><DownArrow /></button>
+            )}
+
 
             <div className="bg-gray-500 rounded-md py-1 px-2">
               <Input />

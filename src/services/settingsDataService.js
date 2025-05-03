@@ -6,8 +6,9 @@ import { queryUsernames } from "./globalDataService";
 import { fetchChatsInData, removeUserFromChat } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
 import { auth } from "../../firebase";
+import { fetchChatRoomData } from "./chatBarDataService";
 
-export const changeUsername = async(db, newUsername, currUser) => {
+export const changeUsername = async(db, newUsername, currUser, chatroomsDispatch) => {
   const userData = await queryUsernames(db, newUsername);
   if (userData) {
     console.log('username already exists');
@@ -26,12 +27,9 @@ export const changeUsername = async(db, newUsername, currUser) => {
   if (chatsInData) {
     const updateChatroomsPromise = Object.keys(chatsInData).map(async (chatID) => {
       const chatroomMemberRef = ref(db, `members/${chatID}/${currUser.uid}`);
-      const chatRoomRef = ref(db, `chats/${chatID}`);
-      const chatRoomDataSnap = await get(chatRoomRef);
-      const chatRoomData = chatRoomDataSnap.val();
-      const tempTitle = chatRoomData.tempTitle;
+      const { tempTitle } = await fetchChatRoomData(db, chatID);
       const updatedTempTitle = tempTitle.split(', ').filter((user) => user !== currUser.displayName).concat(newUsername).join(', ');
-
+      chatroomsDispatch({ type: "UPDATE_TEMP_TITLE", payload: {key: chatID, data: updatedTempTitle} });
       return Promise.all([
         update(chatroomMemberRef, {
           username: newUsername,
@@ -63,7 +61,7 @@ export const changeEmail = async(db, currUser, newEmail) => {
 }
 
 
-export const deleteAccount = async(db, currUser, numOfMembers, chatDispatch, chatRoomsDispatch, navigate, resetAllChatContexts) => {
+export const deleteAccount = async(db, currUser, numOfMembers, chatDispatch, chatroomsDispatch, navigate, resetAllChatContexts) => {
 
   navigate("/");
 
@@ -85,7 +83,7 @@ export const deleteAccount = async(db, currUser, numOfMembers, chatDispatch, cha
 
   await deleteUser(currUser);
 
-  await signUserOut(auth, resetAllChatContexts, chatRoomsDispatch);
+  await signUserOut(auth, resetAllChatContexts, chatroomsDispatch);
 
 
 }

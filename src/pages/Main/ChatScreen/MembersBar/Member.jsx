@@ -3,7 +3,6 @@ import { useChatContexts } from "../../../../hooks/useContexts";
 
 const Member = ({ memberUid, memberData }) => {
   const { chatState } = useChatContexts();
-  console.log(memberData);
 
   return (
     <div className="flex items-center justify-between px-3 py-2 bg-gray-500 rounded-md shadow-sm hover:bg-gray-600 transition-colors">
