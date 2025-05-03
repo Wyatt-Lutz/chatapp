@@ -9,7 +9,7 @@ export const MessageListenerService = {
     const chatsRef = ref(db, `messages/${chatID}/`);
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp), limitToLast(15));
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp));
-    const notificationSound = new Audio("../../../public/notification.mp3");
+    const notificationSound = new Audio("/notification.mp3");
 
     if (action.onMessageAdded) {
 

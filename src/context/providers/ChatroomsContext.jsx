@@ -15,7 +15,7 @@ export const ChatroomsContext = createContext();
 export const ChatroomsContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(chatroomReducer, initialChatroomState);
   const { currUser } = useAuth();
-
+  const notificationSound = new Audio("/notification.mp3");
 
   useEffect(() => {
     if (!currUser) return;
@@ -35,6 +35,8 @@ export const ChatroomsContextProvider = ({ children }) => {
     }
 
     const handleUpdateUnread = (snap) => {
+      notificationSound.play();
+
       dispatch({type: "UPDATE_UNREAD_COUNT", payload: {key: snap.key, data: snap.val()}});
     }
 
