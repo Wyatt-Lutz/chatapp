@@ -1,7 +1,6 @@
 import { limitToLast, onChildAdded, onChildChanged, onChildRemoved, orderByChild, query, ref, startAt } from "firebase/database";
 import { db } from "../../../firebase";
 
-
 export const MessageListenerService = {
 
   setUpMessageListeners(chatID, endTimestamp, action) {
@@ -10,11 +9,16 @@ export const MessageListenerService = {
     const chatsRef = ref(db, `messages/${chatID}/`);
     const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp), limitToLast(15));
     const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp));
+    const notificationSound = new Audio("../../../public/notification.mp3");
 
     if (action.onMessageAdded) {
 
       const handleMessageAdded = (snap) => {
         action.onMessageAdded(snap.key, snap.val());
+
+        if (document.hidden) {
+          notificationSound.play();
+        }
       }
 
 

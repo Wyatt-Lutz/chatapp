@@ -1,10 +1,11 @@
-import { createContext, useEffect, useReducer, useState } from "react";
+import { createContext, useContext, useEffect, useReducer, useState } from "react";
 import { ref, onChildChanged } from "firebase/database";
 import { db } from "../../../firebase";
 import { chatReducer } from "../reducers/chatReducer";
 import { initialChatState } from "../initialState";
 import { updateTempTitle } from "../../utils/chatroomUtils";
 import { useAuth } from "./AuthContext";
+import { ChatroomsContext } from "./ChatroomsContext";
 
 
 export const ChatContext = createContext();
@@ -12,6 +13,7 @@ export const ChatContext = createContext();
 
 export const ChatContextProvider = ({ children }) => {
   const [chatState, chatDispatch] = useReducer(chatReducer, initialChatState);
+  const { chatroomsDispatch } = useContext(ChatroomsContext);
   const { currUser } = useAuth();
 
 
@@ -24,7 +26,12 @@ export const ChatContextProvider = ({ children }) => {
     const onChatroomEdited = (snap) => {
       const prop = snap.key; //property name
       prop === 'title'
-      ? chatDispatch({ type: "UPDATE_TITLE", payload: snap.val() })
+      ? (
+        (() => {
+          chatDispatch({ type: "UPDATE_TITLE", payload: snap.val() })
+          chatroomsDispatch({ type: "UPDATE_TITLE", payload: {key: chatID, data: snap.val()}});
+        })()
+        )
       : prop === 'owner'
       ? chatDispatch({ type: "UPDATE_OWNER", payload: snap.val() })
       : prop === 'tempTitle'
@@ -32,12 +39,19 @@ export const ChatContextProvider = ({ children }) => {
           (() => {
             const newTempTitle = updateTempTitle(snap.val(), currUser.displayName);
             chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: newTempTitle });
+            chatroomsDispatch({ type: "UPDATE_TEMP_TITLE", payload: {key: chatID, data: newTempTitle}});
           })()
         )
       : prop === 'firstMessageID'
       ? chatDispatch({ type: "UPDATE_FIRST_MESSAGE_ID", payload: snap.val() })
       : prop === 'memberUids'
-      ? chatDispatch({ type: "UPDATE_MEMBER_UIDS", payload: snap.val() })
+      ? (
+          (() => {
+            chatDispatch({ type: "UPDATE_MEMBER_UIDS", payload: snap.val() })
+            chatroomsDispatch({ type: "UPDATE_MEMBER_UIDS", payload: {key: chatID, data: snap.val()}});
+          })()
+        )
+
       : prop === 'numOfMembers'
       ? chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: snap.val() })
       : null;

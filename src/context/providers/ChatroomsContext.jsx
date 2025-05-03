@@ -23,10 +23,10 @@ export const ChatroomsContextProvider = ({ children }) => {
 
     const handleChatroomAdded = async(snap) => {
       const newChatID = snap.key;
-      const {title, tempTitle} = await fetchChatRoomData(db, newChatID);
+      const {title, tempTitle, memberUids} = await fetchChatRoomData(db, newChatID);
 
       const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
-      const chatroomObj = {numUnread: snap.val(), title, tempTitle: updatedTempTitle};
+      const chatroomObj = {numUnread: snap.val(), title, tempTitle: updatedTempTitle, memberUids: memberUids};
       dispatch({ type: "ADD_CHATROOM", payload: {key: newChatID, data: chatroomObj}});
     }
 
@@ -51,7 +51,7 @@ export const ChatroomsContextProvider = ({ children }) => {
   }, [currUser]);
 
   return (
-    <ChatroomsContext.Provider value={{ chatRoomsData: state, chatRoomsDispatch: dispatch }}>
+    <ChatroomsContext.Provider value={{ chatroomsState: state, chatroomsDispatch: dispatch }}>
       {children}
     </ChatroomsContext.Provider>
   )

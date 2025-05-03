@@ -1,17 +1,16 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import Plus from "../../../../components/ui/Plus";
 import ChatRoom from "./ChatRoom";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import ChatRoomContextMenu from "./ChatRoomContextMenu";
-import ChatCreation from "./modals/ChatCreationModal";
-import { ChatroomsContext } from "../../../../context/providers/ChatroomsContext";
 import ChatCreationModal from "./modals/ChatCreationModal";
+import { useChatContexts } from "../../../../hooks/useContexts";
 const ChatRoomsSideBar = () => {
-  const { chatRoomsData } = useContext(ChatroomsContext);
+  const { chatroomsState } = useChatContexts();
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
-  const chatrooms = chatRoomsData.chatrooms;
+  const chatrooms = chatroomsState.chatrooms;
 
   const changeChatRoomCreationState = (state) => {
     setIsCreatingChat(state);

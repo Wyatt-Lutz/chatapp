@@ -42,15 +42,13 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
 }
 
 
-export const checkIfDuplicateChat = async(db, currUserUid, newChatMemberUids) => {
-  const chatsInData = await fetchChatsInData(db, currUserUid);
-  if (!chatsInData) return; //should be error
-  const chatIDs = Object.keys(chatsInData);
-  for (const chatID of chatIDs) {
-    const chatMetadataRef = ref(db, `chats/${chatID}`);
-    const metadataSnap = await get(chatMetadataRef);
-    return (metadataSnap.val().memberUids === newChatMemberUids);
+export const checkIfDuplicateChat = (newChatMemberUids, chatrooms) => {
+  for (const chatroom of chatrooms.values()) {
+    if (chatroom.memberUids === newChatMemberUids) {
+      return true;
+    }
   }
+  return false;
 }
 
 
