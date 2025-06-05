@@ -42,6 +42,7 @@ export const ChatroomsContextProvider = ({ children }) => {
 
     const chatroomAddedListener = onChildAdded(chatsInRef, handleChatroomAdded);
     const chatroomRemovedListener = onChildRemoved(chatsInRef, handleChatroomRemoved);
+
     const chatroomUnreadCountListener = onChildChanged(chatsInRef, handleUpdateUnread);
 
 

@@ -1,11 +1,15 @@
 import MembersBar from './MembersBar/MembersBar';
 import TopBar from './Ancillary/TopBar';
 import Messages from './Messages/Messages';
-import Search from './Ancillary/Search';
 import { useChatContexts } from '../../../hooks/useContexts';
+import { useChatroomPresence } from '../../../hooks/useChatroomPresence';
+import { useAuth } from '../../../context/providers/AuthContext';
 
 const ChatScreen = () => {
   const { chatState } = useChatContexts();
+  const { currUser } = useAuth();
+
+  useChatroomPresence(chatState.chatID, currUser.uid);
   return(
     <div>
       {!chatState.chatID ? (

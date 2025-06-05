@@ -79,6 +79,8 @@ export const updateFirstMessageID = async(db, chatID, messageID) => {
  */
 const updateUnreadCount = async(db, chatID) => {
   const offlineMembers = await fetchChatUsersByStatus(db, chatID, false);
+
+  console.log(offlineMembers);
   for (const userUid of offlineMembers) {
     const userDataRef = ref(db, `users/${userUid}/chatsIn`);
 
@@ -88,30 +90,6 @@ const updateUnreadCount = async(db, chatID) => {
     await update(userDataRef, updates);
   }
 }
-
-
-
-
-
-export const updateUserOnlineStatus = async(newOnlineStatus, db, chatID, uid) => {
-
-  const memberSnap = await get(ref(db, `members/${chatID}`));
-  if (!memberSnap.exists()) {
-    return;
-  }
-  const dataRef = ref(db, `members/${chatID}/${uid}`);
-
-  await update(dataRef, {
-    "isOnline": newOnlineStatus,
-  });
-
-  if (newOnlineStatus) {
-    const userDataRef = ref(db, `users/${uid}/chatsIn`);
-    await update(userDataRef, {[chatID]: 0});
-  }
-
-}
-
 
 
 

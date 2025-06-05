@@ -2,27 +2,29 @@ import { initialMessageState } from "../initialState";
 
 export const messagesReducer = (state, action) => {
   let newMessages = new Map(state?.messages);
+  const { key, data } = action?.payload || {};
+
   switch (action.type) {
+
     case "ADD_MESSAGE":
-      console.log('addMessageRun')
+
       const isFirstMessage = state.messages.size === 0;
       let numUnread = state.numUnread;
 
-      console.log(state.isAtBottom);
       if (!state.isAtBottom) {
         numUnread = numUnread + 1;
       }
 
-      newMessages.set(action.payload.key, action.payload.data);
+      newMessages.set(key, data);
       return { ...state, messages: newMessages, numUnread, endTimestamp: isFirstMessage ? action.payload.data.timestamp: state.endTimestamp };
 
     case "EDIT_MESSAGE":
-      newMessages.set(action.payload.key, action.payload.data);
+      const currMessage = newMessages.get(key);
+      newMessages.set(key, {...currMessage, ...data});
       return { ...state, messages: newMessages };
 
     case "ADD_OLDER_MESSAGES":
       const combinedMessages = new Map([...action.payload, ...state.messages]);
-      console.log(combinedMessages);
       return {
         ...state,
         messages: combinedMessages,

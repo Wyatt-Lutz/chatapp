@@ -7,11 +7,13 @@ export const MessageListenerService = {
     console.log(endTimestamp);
     const unsubscribers = [];
     const chatsRef = ref(db, `messages/${chatID}/`);
-    const addedListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp), limitToLast(15));
-    const otherListenersQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp));
+    const baseListenerQuery = query(chatsRef, orderByChild("timestamp"), startAt(endTimestamp));
+
     const notificationSound = new Audio("/notification.mp3");
 
     if (action.onMessageAdded) {
+
+      const addedListenerQuery = query(baseListenerQuery, limitToLast(15));
 
       const handleMessageAdded = (snap) => {
         action.onMessageAdded(snap.key, snap.val());
@@ -32,7 +34,7 @@ export const MessageListenerService = {
         action.onMessageEdited(snap.key, snap.val());
       }
 
-      const messageEditedListener = onChildChanged(otherListenersQuery, handleMessageEdited);
+      const messageEditedListener = onChildChanged(baseListenerQuery, handleMessageEdited);
       unsubscribers.push(messageEditedListener);
     }
 
@@ -41,7 +43,7 @@ export const MessageListenerService = {
         action.onMessageDeleted(snap.key);
       }
 
-       const messageRemovedListener = onChildRemoved(otherListenersQuery, handleMessageDeleted);
+       const messageRemovedListener = onChildRemoved(baseListenerQuery, handleMessageDeleted);
        unsubscribers.push(messageRemovedListener);
     }
 

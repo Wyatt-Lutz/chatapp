@@ -15,11 +15,10 @@ export const MessageContextProvider = ({ children }) => {
   const [messageState, messageDispatch] = useReducer(messagesReducer, initialMessageState);
   const { chatState, chatDispatch } = useContext(ChatContext);
 
-  const messages = useRef(messageState.messages);
+  const messagesRef = useRef(messageState.messages);
 
   useEffect(() => {
-    messages.current = messageState.messages;
-    console.log(messageState.messages);
+    messagesRef.current = messageState.messages;
   }, [messageState.messages]);
 
 
@@ -39,19 +38,12 @@ export const MessageContextProvider = ({ children }) => {
       },
 
       onMessageEdited: (messageID, messageData) => {
-        const message = messages.current.get(messageID);
-        if (!message) return;
-
-        for (const property in messageData) {
-          message[property] = messageData[property];
-        }
-
-        messageDispatch({type: "EDIT_MESSAGE", payload: {key: messageID, data: message}});
+        messageDispatch({type: "EDIT_MESSAGE", payload: {key: messageID, data: messageData}});
       },
 
       onMessageDeleted: async(messageID) => {
         if (messageID === chatState.firstMessageID) {
-          const messageKeys = Array.from(messages.current.keys());
+          const messageKeys = Array.from(messagesRef.current.keys());
           const nextMessageID = messageKeys.length > 1 ? messageKeys[1] : "";
           await updateFirstMessageID(db, chatState.chatID, nextMessageID);
           chatDispatch({ type: "UPDATE_FIRST_MESSAGE_ID", payload: nextMessageID });

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef} from "react";
 import { db } from "../../../../../firebase";
 import { debounce } from 'lodash';
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
-import { fetchOlderChats, updateUserOnlineStatus } from "../../../../services/messageDataService";
+import { fetchOlderChats } from "../../../../services/messageDataService";
 import Message from "./Message"
 import Input from "./Input";
 import { useChatContexts } from "../../../../hooks/useContexts";
@@ -52,20 +52,10 @@ const Messages = () => {
 
 
   useEffect(() => {
-    const handleUpdateUserOnlineStatus = async() => {
-      await updateUserOnlineStatus(true, db, chatID, currUser.uid);
-    }
-
     if (!chatID) {
       console.info("chatID undefined");
       return;
     }
-
-    handleUpdateUserOnlineStatus();
-
-    const handleUserOffline = () => {
-      updateUserOnlineStatus(false, db, chatID, currUser.uid);
-    };
 
     const handleScroll = () => {
       const scrollTop = messagesContainerRef.current.scrollTop;
@@ -79,14 +69,11 @@ const Messages = () => {
 
     };
 
-
     const container = messagesContainerRef.current;
 
     container.addEventListener("scroll", handleScroll);
-    window.addEventListener("beforeunload", handleUserOffline);
     return () => {
       container.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("beforeunload", handleUserOffline);
     }
   }, [chatID, currUser.uid, messageDispatch, isAtBottom, isFirstMessageRendered]);
 

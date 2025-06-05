@@ -224,16 +224,11 @@ export const fetchChatUsersByStatus = async(db, chatID, status) => {
 
   const membersData = await fetchMembersFromChat(db, chatID);
 
-  const onlineMembers = [];
-
-  for (const userUid in membersData) {
-    const userData = membersData[userUid];
-    if (userData.isOnline === status) {
-      onlineMembers.push(userUid);
-    }
-  }
-
-  return onlineMembers;
-
-
+  return Object.entries(membersData)
+    .filter(([_, user]) => {
+      if (status === true) return user?.isOnline === true;
+      if (status === false) return user?.isOnline == null;
+      return false;
+    })
+    .map(([userUid, _]) => userUid);
 }
