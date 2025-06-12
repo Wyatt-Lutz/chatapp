@@ -4,7 +4,6 @@ import { useAuth } from "../context/providers/AuthContext";
 import { useEffect, useState } from "react";
 
 const EmailNotVerified = ({ email, setIsVerified }) => {
-
   const { currUser } = useAuth();
   const [loading, setLoading] = useState(true);
 
@@ -18,15 +17,13 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
     }
   };
 
-
   useEffect(() => {
-
-    const checkIfUserVerified = async() => {
-      const verificationCookieId = `verification-${currUser.uid}`
-      const alreadySentVerification = localStorage.getItem(verificationCookieId);
+    const checkIfUserVerified = async () => {
+      const verificationCookieId = `verification-${currUser.uid}`;
+      const alreadySentVerification =
+        localStorage.getItem(verificationCookieId);
 
       if (!currUser.emailVerified) {
-
         if (!alreadySentVerification) {
           await sendEmailVerification(currUser);
 
@@ -37,23 +34,22 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
         localStorage.removeItem(verificationCookieId);
       }
       setLoading(false);
-    }
+    };
 
     checkIfUserVerified();
   }, [currUser]);
 
   useEffect(() => {
     if (loading) return;
-    const timeoutID = setInterval(async() => {
+    const timeoutID = setInterval(async () => {
       await currUser.reload();
-      console.log('yo');
+      console.log("yo");
       if (currUser.emailVerified) {
         setIsVerified(true);
         clearInterval(timeoutID);
       }
     }, 500);
-
-  }, [currUser, loading])
+  }, [currUser, loading]);
 
   return (
     <div>
@@ -65,7 +61,12 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
       >
         Resend Email
       </button>
-      <button onClick={() => navigate("/settings")} className="border rounded-md bg-zinc-500 m-2 p-1">Change Email</button>
+      <button
+        onClick={() => navigate("/settings")}
+        className="border rounded-md bg-zinc-500 m-2 p-1"
+      >
+        Change Email
+      </button>
     </div>
   );
 };

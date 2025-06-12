@@ -18,18 +18,20 @@ const ChatRoomsSideBar = () => {
 
   const handleContextMenu = (e, chatID, numOfMembers) => {
     e.preventDefault();
-    setContextMenu({'chatroom': true});
-    setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({chatID: chatID, numOfMembers: numOfMembers});
-  }
+    setContextMenu({ chatroom: true });
+    setPoints({ x: e.pageX, y: e.pageY });
+    setContextMenuData({ chatID: chatID, numOfMembers: numOfMembers });
+  };
 
-
-  return(
+  return (
     <section>
-
-      <button className="m-2 ring" onClick={() => setIsCreatingChat(true)}><Plus /></button>
+      <button className="m-2 ring" onClick={() => setIsCreatingChat(true)}>
+        <Plus />
+      </button>
       {isCreatingChat && (
-        <ChatCreationModal changeChatRoomCreationState={changeChatRoomCreationState} />
+        <ChatCreationModal
+          changeChatRoomCreationState={changeChatRoomCreationState}
+        />
       )}
 
       {!chatrooms ? (
@@ -39,24 +41,26 @@ const ChatRoomsSideBar = () => {
       ) : (
         <div className="flex flex-col">
           {[...chatrooms].map(([chatID, chatroomData]) => (
-            <div key={chatID} onContextMenu={(e) => handleContextMenu(e, chatID, chatroomData.numOfMembers)}>
-              <ChatRoom chatID={chatID} chatroomData={chatroomData}/>
+            <div
+              key={chatID}
+              onContextMenu={(e) =>
+                handleContextMenu(e, chatID, chatroomData.numOfMembers)
+              }
+            >
+              <ChatRoom chatID={chatID} chatroomData={chatroomData} />
             </div>
           ))}
         </div>
       )}
 
-
-
-
       {contextMenu.chatroom && (
-        <ChatRoomContextMenu contextMenuData={contextMenuData} setContextMenu={setContextMenu} points={points}/>
+        <ChatRoomContextMenu
+          contextMenuData={contextMenuData}
+          setContextMenu={setContextMenu}
+          points={points}
+        />
       )}
-
-
-
     </section>
-
-  )
-}
+  );
+};
 export default ChatRoomsSideBar;

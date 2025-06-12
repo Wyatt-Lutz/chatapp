@@ -6,44 +6,55 @@ import { fetchLastUsernameChangeTime } from "../../../services/userDataService";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { db } from "../../../../firebase";
 
-const ChangeUsername = ({displayPassModal, passwordModalHeader, passwordModalText}) => {
+const ChangeUsername = ({
+  displayPassModal,
+  passwordModalHeader,
+  passwordModalText,
+}) => {
   const { currUser } = useAuth();
-    const {register, control} = useForm({
-        defaultValues: {
-            newUsername: currUser.displayName,
-        }
-    });
+  const { register, control } = useForm({
+    defaultValues: {
+      newUsername: currUser.displayName,
+    },
+  });
 
-    const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
-    const newUsername = useWatch({ name: 'newUsername', control });
+  const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
+  const newUsername = useWatch({ name: "newUsername", control });
 
-    const editUsername = async() => {
-        if (isEditUsernameDisabled) return;
-        const lastUsernameChange = await fetchLastUsernameChangeTime(db, currUser.uid);
-        if ((Date.now() - lastUsernameChange) < 864000000) { //10 days
-            return;
-        }
-
-        await displayPassModal(passwordModalHeader, passwordModalText);
-
-        await changeUsername(db, newUsername, currUser);
-
-
+  const editUsername = async () => {
+    if (isEditUsernameDisabled) return;
+    const lastUsernameChange = await fetchLastUsernameChangeTime(
+      db,
+      currUser.uid,
+    );
+    if (Date.now() - lastUsernameChange < 864000000) {
+      //10 days
+      return;
     }
-    return (
-        <>
-            <div className="flex">
-                <label>Username</label>
-                <input type="text" {...register('newUsername')} />
 
-                {newUsername !== currUser.displayName && (
-                    <div>
-                        <UsernameAvailability newUsername={newUsername} setIsButtonDisabled={setIsEditUsernameDisabled} />
-                        <button disabled={isEditUsernameDisabled} onClick={editUsername}>Save Username</button>
-                    </div>
-                )}
-            </div>
-        </>
-    )
-}
+    await displayPassModal(passwordModalHeader, passwordModalText);
+
+    await changeUsername(db, newUsername, currUser);
+  };
+  return (
+    <>
+      <div className="flex">
+        <label>Username</label>
+        <input type="text" {...register("newUsername")} />
+
+        {newUsername !== currUser.displayName && (
+          <div>
+            <UsernameAvailability
+              newUsername={newUsername}
+              setIsButtonDisabled={setIsEditUsernameDisabled}
+            />
+            <button disabled={isEditUsernameDisabled} onClick={editUsername}>
+              Save Username
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
 export default ChangeUsername;

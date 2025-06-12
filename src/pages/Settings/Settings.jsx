@@ -14,16 +14,13 @@ const Settings = () => {
   const { currUser } = useAuth();
   const navigate = useNavigate();
 
-
   const [modal, setModal] = useState({ type: null, props: {} });
 
-
-  const passwordModalHeader = "Confirm Current Password"
-  const passwordModalText = "Please enter your current password to confirm these changes."
-
+  const passwordModalHeader = "Confirm Current Password";
+  const passwordModalText =
+    "Please enter your current password to confirm these changes.";
 
   const displayPassModal = (header, text, isDeleteAccount = false) => {
-
     return new Promise((resolve) => {
       setModal({
         type: "ConfirmPassModal",
@@ -33,40 +30,65 @@ const Settings = () => {
           modalHeader: header,
           modalText: text,
           isDeleteAccount: isDeleteAccount,
-        }
+        },
       });
     });
-  }
+  };
 
   return (
-        <>
-          <h1>Settings</h1>
+    <>
+      <h1>Settings</h1>
 
-          <h2>My Account</h2>
+      <h2>My Account</h2>
 
-          <div className="flex">
-            <ChangeProfilePicture />
-            <div>{currUser.displayName}</div>
-          </div>
+      <div className="flex">
+        <ChangeProfilePicture />
+        <div>{currUser.displayName}</div>
+      </div>
 
+      <ChangeUsername
+        displayPassModal={displayPassModal}
+        passwordModalHeader={passwordModalHeader}
+        passwordModalText={passwordModalText}
+      />
+      <ChangeEmail
+        displayPassModal={displayPassModal}
+        passwordModalHeader={passwordModalHeader}
+        passwordModalText={passwordModalText}
+      />
+      <ChangePassword
+        displayPassModal={displayPassModal}
+        passwordModalHeader={passwordModalHeader}
+        passwordModalText={passwordModalText}
+      />
+      <DeleteAccount displayPassModal={displayPassModal} />
 
-          <ChangeUsername displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
-          <ChangeEmail displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText} />
-          <ChangePassword displayPassModal={displayPassModal} passwordModalHeader={passwordModalHeader} passwordModalText={passwordModalText}/>
-          <DeleteAccount displayPassModal={displayPassModal} />
+      <button
+        onClick={() =>
+          setModal({
+            type: "BlockedUsersModal",
+            props: {
+              changeDisplayment: () => setModal({ type: null, props: {} }),
+            },
+          })
+        }
+        className="bg-gray-500"
+      >
+        Blocked Users
+      </button>
 
+      <button onClick={() => navigate("/")}>Go Home</button>
 
-          <button onClick={() => setModal({ type: "BlockedUsersModal", props: {changeDisplayment: () => setModal({ type: null, props: {} }) }})} className="bg-gray-500">Blocked Users</button>
-
-
-
-          <button onClick={() => navigate("/")}>Go Home</button>
-
-
-          {modal.type === "ConfirmPassModal" && <ConfirmPassModal {...modal.props} />}
-          {modal.type === "EmailNotVerified" && <EmailNotVerified {...modal.props} />}
-          {modal.type === "BlockedUsersModal" && <BlockedUsersModal {...modal.props} />}
-        </>
-  )
-}
+      {modal.type === "ConfirmPassModal" && (
+        <ConfirmPassModal {...modal.props} />
+      )}
+      {modal.type === "EmailNotVerified" && (
+        <EmailNotVerified {...modal.props} />
+      )}
+      {modal.type === "BlockedUsersModal" && (
+        <BlockedUsersModal {...modal.props} />
+      )}
+    </>
+  );
+};
 export default Settings;

@@ -8,7 +8,7 @@ import { useAuth } from "../../../../context/providers/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import { compressImage } from "../../../../utils/mediaUtils";
 import CloseFile from "../../../../components/ui/CloseFile";
-import 'emoji-picker-element';
+import "emoji-picker-element";
 
 const Input = () => {
   const { currUser } = useAuth();
@@ -19,8 +19,7 @@ const Input = () => {
   const emojiPickerRef = useRef(null);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
-
-  const handleAddMessage = async(e) => {
+  const handleAddMessage = async (e) => {
     e.preventDefault();
     setText("");
     const trimmedText = text.trim();
@@ -30,25 +29,40 @@ const Input = () => {
       URL.revokeObjectURL(imageToUpload);
     }
     const messageKeys = Array.from(messageState.messages.keys());
-    const lastMessage = messageKeys.length > 0 ? messageState.messages.get(messageKeys[messageKeys.length - 1]) : null;
-    const willRenderTimeAndSender = calculateRenderTimeAndSender(lastMessage, currUser.uid);
-    await addMessage(trimmedText, chatState.chatID, currUser.uid, db, willRenderTimeAndSender, chatState.firstMessageID, chatDispatch, imageToUpload);
+    const lastMessage =
+      messageKeys.length > 0
+        ? messageState.messages.get(messageKeys[messageKeys.length - 1])
+        : null;
+    const willRenderTimeAndSender = calculateRenderTimeAndSender(
+      lastMessage,
+      currUser.uid,
+    );
+    await addMessage(
+      trimmedText,
+      chatState.chatID,
+      currUser.uid,
+      db,
+      willRenderTimeAndSender,
+      chatState.firstMessageID,
+      chatDispatch,
+      imageToUpload,
+    );
   };
 
-  const handlePickImage = async(e) => {
+  const handlePickImage = async (e) => {
     const file = e.target.files[0];
     e.target.value = null; //Allows the onChange to trigger again if the user tries to add the same picture to a different message
     if (!file) return;
     const compressedImage = await compressImage(file);
     setImageToUpload(compressedImage);
     textInputRef.current?.focus(); //Will refocus the text input so the user doesn't have to reclick the input to send the message
-  }
+  };
 
   const handleRemoveImage = () => {
     setImageToUpload(null);
     URL.revokeObjectURL(imageToUpload);
     textInputRef.current?.focus();
-  }
+  };
 
   useEffect(() => {
     const emojiPicker = emojiPickerRef.current;
@@ -65,22 +79,28 @@ const Input = () => {
       }
     };
 
-    emojiPicker.addEventListener('emoji-click', handleEmojiClick);
-    document.addEventListener('mousedown', handleClickOutside);
+    emojiPicker.addEventListener("emoji-click", handleEmojiClick);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      emojiPicker.removeEventListener('emoji-click', handleEmojiClick);
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [emojiPickerRef.current, isEmojiPickerOpen])
-
-
+      emojiPicker.removeEventListener("emoji-click", handleEmojiClick);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [emojiPickerRef.current, isEmojiPickerOpen]);
 
   return (
     <div>
       {imageToUpload && (
         <div className="relative w-20 h-20 mb-2 ml-2 rounded-md overflow-hidden group">
-          <img src={imageToUpload instanceof Blob ? URL.createObjectURL(imageToUpload) : null} alt="hi" className="w-full h-full object-cover"/>
+          <img
+            src={
+              imageToUpload instanceof Blob
+                ? URL.createObjectURL(imageToUpload)
+                : null
+            }
+            alt="hi"
+            className="w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
             <button
               onClick={handleRemoveImage}
@@ -90,16 +110,24 @@ const Input = () => {
             </button>
           </div>
         </div>
-
       )}
-
-
-
 
       <div className="flex items-center">
         <div>
-          <label htmlFor="filePicker" className="cursor-pointer p-2 text-gray-500 hover:text-blue-500"><Plus /></label>
-          <input type="file" id="filePicker" disabled={imageToUpload} hidden accept="image/*" onChange={handlePickImage}/>
+          <label
+            htmlFor="filePicker"
+            className="cursor-pointer p-2 text-gray-500 hover:text-blue-500"
+          >
+            <Plus />
+          </label>
+          <input
+            type="file"
+            id="filePicker"
+            disabled={imageToUpload}
+            hidden
+            accept="image/*"
+            onChange={handlePickImage}
+          />
         </div>
         <div className="flex-1 flex items-center">
           <textarea
@@ -111,8 +139,8 @@ const Input = () => {
             maxLength={200}
             rows={1}
             onInput={(e) => {
-              e.target.style.height = 'auto';
-              e.target.style.height = `${e.target.scrollHeight}px`
+              e.target.style.height = "auto";
+              e.target.style.height = `${e.target.scrollHeight}px`;
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -121,22 +149,20 @@ const Input = () => {
               }
             }}
           />
-          <button type="button" onClick={() => setIsEmojiPickerOpen((prev) => !prev)}><Smile /></button>
+          <button
+            type="button"
+            onClick={() => setIsEmojiPickerOpen((prev) => !prev)}
+          >
+            <Smile />
+          </button>
           {isEmojiPickerOpen && (
             <div className="absolute bottom-12 right-4 z-10 bg-white border shadow-md rounded">
-              <emoji-picker class='dark' ref={emojiPickerRef}></emoji-picker>
+              <emoji-picker class="dark" ref={emojiPickerRef}></emoji-picker>
             </div>
-
           )}
         </div>
-
-
-
-
       </div>
-
     </div>
-
-  )
-}
+  );
+};
 export default Input;

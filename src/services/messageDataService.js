@@ -1,24 +1,49 @@
-import { ref, query, set, get, endBefore, runTransaction, push, orderByChild, remove, serverTimestamp, limitToFirst, increment, update, limitToLast } from 'firebase/database';
+import {
+  ref,
+  query,
+  set,
+  get,
+  endBefore,
+  runTransaction,
+  push,
+  orderByChild,
+  remove,
+  serverTimestamp,
+  limitToFirst,
+  increment,
+  update,
+  limitToLast,
+} from "firebase/database";
 import { fetchChatUsersByStatus } from "./memberDataService";
-import { storage } from '../../firebase';
-import { ref as storageRef } from 'firebase/storage';
-import { uploadPicture } from './storageDataService';
+import { storage } from "../../firebase";
+import { ref as storageRef } from "firebase/storage";
+import { uploadPicture } from "./storageDataService";
 
-
-export const fetchOlderChats = async(db, chatID, endTimestamp) => {
+export const fetchOlderChats = async (db, chatID, endTimestamp) => {
   const chatsRef = ref(db, `messages/${chatID}/`);
-  const messageQuery = query(chatsRef, orderByChild("timestamp"), endBefore(endTimestamp), limitToLast(10));
+  const messageQuery = query(
+    chatsRef,
+    orderByChild("timestamp"),
+    endBefore(endTimestamp),
+    limitToLast(10),
+  );
   const messageSnap = await get(messageQuery);
   console.log(messageSnap.val());
   return messageSnap.val();
-}
+};
 
-
-
-export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, firstMessageID, chatDispatch, imageToUpload = null) => {
+export const addMessage = async (
+  text,
+  chatID,
+  userUID,
+  db,
+  renderTimeAndSender,
+  firstMessageID,
+  chatDispatch,
+  imageToUpload = null,
+) => {
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
-
 
   const timestamp = serverTimestamp();
   const newMessage = {
@@ -27,23 +52,23 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
     sender: userUID,
     renderTimeAndSender,
     hasBeenEdited: false,
-    imageRef: imageToUpload ? 'uploading': null,
-  }
+    imageRef: imageToUpload ? "uploading" : null,
+  };
   await set(newMessageRef, newMessage);
 
-
   if (imageToUpload) {
-    const imageStorageLocation = storageRef(storage, `chats/${chatID}/${newMessageRef.key}`)
+    const imageStorageLocation = storageRef(
+      storage,
+      `chats/${chatID}/${newMessageRef.key}`,
+    );
     const imageRef = await uploadPicture(imageToUpload, imageStorageLocation);
     await update(newMessageRef, {
       imageRef: imageRef,
     });
   }
 
-
-   //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
+  //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
   if (!firstMessageID) {
-
     const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
     await runTransaction(firstMessageIdRef, (currID) => {
       if (!currID) {
@@ -51,25 +76,21 @@ export const addMessage = async(text, chatID, userUID, db, renderTimeAndSender, 
       }
       return currID;
     });
-    chatDispatch({type: "UPDATE_FIRST_MESSAGE_ID", payload: newMessageRef.key});
+    chatDispatch({
+      type: "UPDATE_FIRST_MESSAGE_ID",
+      payload: newMessageRef.key,
+    });
   }
 
   await updateUnreadCount(db, chatID);
-
-
-
-
-
 };
 
-
-export const updateFirstMessageID = async(db, chatID, messageID) => {
+export const updateFirstMessageID = async (db, chatID, messageID) => {
   const chatRef = ref(db, `chats/${chatID}`);
   await update(chatRef, {
     firstMessageID: messageID,
   });
-}
-
+};
 
 /**
  * Updates the number of unread messages for each offline user in a chatroom.
@@ -77,7 +98,7 @@ export const updateFirstMessageID = async(db, chatID, messageID) => {
  * @param {Database} db - Firebase Realtime Database Reference
  * @param {String} chatID - ID of the chatroom
  */
-const updateUnreadCount = async(db, chatID) => {
+const updateUnreadCount = async (db, chatID) => {
   const offlineMembers = await fetchChatUsersByStatus(db, chatID, false);
 
   console.log(offlineMembers);
@@ -89,32 +110,33 @@ const updateUnreadCount = async(db, chatID) => {
     };
     await update(userDataRef, updates);
   }
-}
+};
 
-
-
-
-export const editMessage = async(messageUid, text, chatID, db) => {
-  const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
+export const editMessage = async (messageUid, text, chatID, db) => {
+  const chatRef = ref(db, `messages/${chatID}/${messageUid}`);
   await update(chatRef, {
     text: text,
-    hasBeenEdited: true
+    hasBeenEdited: true,
   });
-}
+};
 
-export const deleteMessage = async(db, chatID, messageUid, firstMessageID) => {
-  const chatRef = ref(db, `messages/${chatID}/${messageUid}`)
+export const deleteMessage = async (db, chatID, messageUid, firstMessageID) => {
+  const chatRef = ref(db, `messages/${chatID}/${messageUid}`);
   await remove(chatRef);
+};
 
-
-}
-
-
-export const editTitle = async(newTitle, chatID, db, displayName, chatDispatch) => {
+export const editTitle = async (
+  newTitle,
+  chatID,
+  db,
+  displayName,
+  chatDispatch,
+) => {
   const titleRef = ref(db, `chats/${chatID}`);
   await update(titleRef, {
     title: newTitle,
   });
-  const changedTitleText = displayName + " has changed the chat name to " + newTitle;
+  const changedTitleText =
+    displayName + " has changed the chat name to " + newTitle;
   await addMessage(changedTitleText, chatID, "server", db, true, chatDispatch);
-}
+};

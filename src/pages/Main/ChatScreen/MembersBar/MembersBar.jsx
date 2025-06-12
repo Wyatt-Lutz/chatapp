@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useState } from "react";
 import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
 import MemberContextMenu from "./MemberContextMenu";
@@ -13,35 +13,41 @@ const MembersBar = () => {
 
   const handleContextMenu = (e, memberUid, memberData) => {
     e.preventDefault();
-    setContextMenu({'member': true});
-    setPoints({x: e.pageX, y: e.pageY});
-    setContextMenuData({memberUid: memberUid, memberData: memberData});
-  }
+    setContextMenu({ member: true });
+    setPoints({ x: e.pageX, y: e.pageY });
+    setContextMenuData({ memberUid: memberUid, memberData: memberData });
+  };
   return (
     <div>
-      <div className="font-semibold text-gray-900 border-t text-lg text-center">Members</div>
+      <div className="font-semibold text-gray-900 border-t text-lg text-center">
+        Members
+      </div>
       <>
         {!members ? (
           <div>Loading members...</div>
         ) : (
           <>
-            {[...members].filter(([_, memberData]) => !memberData.hasBeenRemoved).map(([memberUid, memberData]) => (
-              <div key={memberUid} onContextMenu={(e) => handleContextMenu(e, memberUid, memberData)} className="hover:bg-gray-600">
-                <Member memberUid={memberUid} memberData={memberData} />
-              </div>
-            ))}
+            {[...members]
+              .filter(([_, memberData]) => !memberData.hasBeenRemoved)
+              .map(([memberUid, memberData]) => (
+                <div
+                  key={memberUid}
+                  onContextMenu={(e) =>
+                    handleContextMenu(e, memberUid, memberData)
+                  }
+                  className="hover:bg-gray-600"
+                >
+                  <Member memberUid={memberUid} memberData={memberData} />
+                </div>
+              ))}
           </>
         )}
       </>
 
-
-
-      {(contextMenu.member && contextMenuData.memberUid !== currUser.uid) && (
+      {contextMenu.member && contextMenuData.memberUid !== currUser.uid && (
         <MemberContextMenu contextMenuData={contextMenuData} points={points} />
       )}
-
-
     </div>
-  )
-}
+  );
+};
 export default MembersBar;
