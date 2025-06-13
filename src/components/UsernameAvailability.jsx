@@ -6,7 +6,11 @@ const UsernameAvailability = ({ newUsername, setIsButtonDisabled }) => {
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
 
   useEffect(() => {
-    if (!newUsername) return;
+    if (!newUsername) {
+      setIsUsernameAvailable(null);
+      setIsButtonDisabled(true);
+      return;
+    }
     const fetchUsernames = async () => {
       if (!newUsername.trim()) {
         setIsUsernameAvailable(null);

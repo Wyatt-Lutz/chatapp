@@ -5,9 +5,8 @@ import UsernameAvailability from "../../components/UsernameAvailability";
 import { useState } from "react";
 import {
   createUserData,
-  fetchUsernameData,
+  queryUsernames,
 } from "../../services/globalDataService";
-import { fetchProfilePicture } from "../../services/storageDataService";
 import { update, ref } from "firebase/database";
 
 const SignupForm = ({ onSubmitForm }) => {
@@ -16,18 +15,17 @@ const SignupForm = ({ onSubmitForm }) => {
     formState: { errors },
     handleSubmit,
     control,
+    getValues,
+    setFocus,
   } = useForm();
   const newUsername = useWatch({ name: "username", control });
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const onSubmit = async ({ email, password, username }) => {
-    console.log(email);
-    console.log(password);
-    console.log(username);
     if (isButtonDisabled) return;
     try {
-      const usernames = await fetchUsernameData(db);
-      if (usernames?.includes(username)) {
+      const usernameQueryData = await queryUsernames(db, username);
+      if (usernameQueryData) {
         throw new Error("username-already-in-use");
       }
 
@@ -43,18 +41,14 @@ const SignupForm = ({ onSubmitForm }) => {
 
       await createUserData(db, uid, trimmedUsername, email);
 
-      const defaultPictureUrl = await fetchProfilePicture(
-        "HmKMbb9avVZYYt41TPCSuceWgqT2",
-      );
-      console.log("defaultPicture: " + defaultPictureUrl);
       await updateProfile(userCredential.user, {
         displayName: trimmedUsername,
-        photoURL: defaultPictureUrl,
+        photoURL: "/default-profile.jpg",
       });
 
       const userRef = ref(db, `users/${uid}`);
       await update(userRef, {
-        profilePictureURL: defaultPictureUrl,
+        profilePictureURL: "/default-profile.jpg",
       });
 
       console.info("registration successful");
@@ -64,28 +58,28 @@ const SignupForm = ({ onSubmitForm }) => {
         userCredential: userCredential,
       });
     } catch (error) {
-      switch (error.code) {
-        case "username-already-in-use":
-          console.log("Username is already taken");
-          break;
-        case "auth/email-already-in-use":
-          console.log(`Email address ${email} already in use.`);
-          break;
-        case "auth/invalid-email":
-          console.log(`Email address ${email} is invalid.`);
-          break;
-        case "auth/operation-not-allowed":
-          console.log(`Error during sign up.`);
-          break;
-        case "auth/weak-password":
-          console.log(
-            "Password is not strong enough. Add additional characters including special characters and numbers.",
-          );
-          break;
-        default:
-          console.log(error);
-          break;
-      }
+      const errorMap = {
+        "username-already-in-use": "Username is already taken",
+        "auth/email-already-in-use": `Email address ${email} already in use.`,
+        "auth/invalid-email": `Email address ${email} is invalid.`,
+        "auth/operation-not-allowed": `Error during sign up.`,
+        "auth/weak-password":
+          "Password is not strong enough. Add additional characters including special characters and numbers.",
+      };
+      console.error(errorMap[error.code] || error.message);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key != "Enter") return;
+    const { username, email, password } = getValues();
+    if (!username || !email || !password) {
+      e.preventDefault();
+    }
+    if (e.target.name === "username" && !email) {
+      setFocus("email");
+    } else if (e.target.name === "email" && !password) {
+      setFocus("password");
     }
   };
   return (
@@ -98,6 +92,7 @@ const SignupForm = ({ onSubmitForm }) => {
       <input
         type="text"
         placeholder="Username"
+        onKeyDown={handleKeyDown}
         {...register("username", {
           required: { value: true, message: "Usernames are required." },
           maxLength: {
@@ -119,6 +114,7 @@ const SignupForm = ({ onSubmitForm }) => {
       <input
         type="email"
         placeholder="Email"
+        onKeyDown={handleKeyDown}
         {...register("email", {
           required: { value: true, message: "Emails are required." },
           maxLength: {

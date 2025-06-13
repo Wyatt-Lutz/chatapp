@@ -13,9 +13,13 @@ import PasswordReset from "./PasswordReset";
 const Signin = () => {
   const {
     register,
-    formState: { errors },
+    formState: { errors, isSubmitted },
     handleSubmit,
-  } = useForm();
+    getValues,
+    setFocus,
+  } = useForm({
+    mode: "onSubmit",
+  });
   const [passReset, setPassReset] = useState(false);
   const checkboxRef = useRef(false);
   const navigate = useNavigate();
@@ -70,6 +74,13 @@ const Signin = () => {
                   message: "Not valid email.",
                 },
               })}
+              onKeyDown={(e) => {
+                const { password } = getValues();
+                if (e.key === "Enter" && !password) {
+                  e.preventDefault();
+                  setFocus("password");
+                }
+              }}
             />
             <input
               type="password"
@@ -79,7 +90,7 @@ const Signin = () => {
                 maxLength: 128,
                 minLength: {
                   value: 6,
-                  message: "Passwords are at least 6 characters.",
+                  message: "Passwords must be at least 6 characters.",
                 },
                 pattern: {
                   value: /^[A-Za-z0-9$!@#%^&*()_\-+=\[\]{};:'",.<>/?`~\\|]+$/,
@@ -87,12 +98,13 @@ const Signin = () => {
                 },
               })}
             />
+
             <button type="submit" className="border rounded-md bg-zinc-500">
               Signin
             </button>
           </form>
-          {errors.email?.message}
-          {errors.password?.message}
+          {isSubmitted && errors.email?.message}
+          {isSubmitted && errors.password?.message}
           <button onClick={() => setPassReset(true)}>Forgot Password?</button>
           <input type="checkbox" ref={checkboxRef} />
           <span>Remember Me</span>
