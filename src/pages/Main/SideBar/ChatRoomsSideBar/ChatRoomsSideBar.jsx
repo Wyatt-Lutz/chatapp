@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { lazy, useState } from "react";
+import { useContextMenu } from "../../../../hooks/useContextMenu";
+import { useChatContexts } from "../../../../hooks/useContexts";
 import Plus from "../../../../components/ui/Plus";
 import ChatRoom from "./ChatRoom";
-import { useContextMenu } from "../../../../hooks/useContextMenu";
-import ChatRoomContextMenu from "./ChatRoomContextMenu";
-import ChatCreationModal from "./modals/ChatCreationModal";
-import { useChatContexts } from "../../../../hooks/useContexts";
+
+const ChatRoomContextMenu = lazy(() => import("./ChatRoomContextMenu"));
+const ChatCreationModal = lazy(() => import("./modals/ChatCreationModal"));
+
 const ChatRoomsSideBar = () => {
   const { chatroomsState } = useChatContexts();
   const [isCreatingChat, setIsCreatingChat] = useState(false);

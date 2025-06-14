@@ -1,5 +1,7 @@
-import Crown from "../../../../components/ui/Crown";
+import { lazy } from "react";
 import { useChatContexts } from "../../../../hooks/useContexts";
+
+const Crown = lazy(() => import("../../../../components/ui/Crown"));
 
 const Member = ({ memberUid, memberData }) => {
   const { chatState } = useChatContexts();

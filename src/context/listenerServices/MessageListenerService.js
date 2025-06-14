@@ -12,7 +12,6 @@ import { db } from "../../../firebase";
 
 export const MessageListenerService = {
   setUpMessageListeners(chatID, endTimestamp, action) {
-    console.log(endTimestamp);
     const unsubscribers = [];
     const chatsRef = ref(db, `messages/${chatID}/`);
     const baseListenerQuery = query(

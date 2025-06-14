@@ -6,7 +6,6 @@ Priority:
 3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
 9. Add the like "new messages since x time" if a user is scrolled up
 10. Fix the layout of search messages
-11. Make the Chat and Chatroom listener services
 12. Search for other infinite loop things becaus eof useEffect dependencies
 
 
@@ -19,7 +18,6 @@ Big update:
 6. Ability to send files
 7. Ability to search files/pictures
 8. When clicking on searched message, it takes you to the message, will have to load the messages around it, even when scrolling down
-9. Button that takes you directly to the bottom when scrolled up
 11. Add rate limiting
 13. When you change your username, the UsernameAvalaibility still shows up as username is availiele and stuff, and save usename is still there
 

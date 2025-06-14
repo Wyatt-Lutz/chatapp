@@ -1,14 +1,15 @@
 import { db } from "../../../../../firebase";
 import { addMessage } from "../../../../services/messageDataService";
-import Smile from "../../../../components/ui/Smile";
-import Plus from "../../../../components/ui/Plus";
 import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
-import { useEffect, useRef, useState } from "react";
+import { lazy, useEffect, useRef, useState } from "react";
 import { compressImage } from "../../../../utils/mediaUtils";
-import CloseFile from "../../../../components/ui/CloseFile";
 import "emoji-picker-element";
+
+const Smile = lazy(() => import("../../../../components/ui/Smile"));
+const Plus = lazy(() => import("../../../../components/ui/Plus"));
+const CloseFile = lazy(() => import("../../../../components/ui/CloseFile"));
 
 const Input = () => {
   const { currUser } = useAuth();
@@ -37,6 +38,7 @@ const Input = () => {
       lastMessage,
       currUser.uid,
     );
+
     await addMessage(
       trimmedText,
       chatState.chatID,

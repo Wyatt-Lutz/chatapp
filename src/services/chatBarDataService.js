@@ -62,5 +62,9 @@ export const checkIfDuplicateChat = (newChatMemberUids, chatrooms) => {
 export const fetchChatRoomData = async (db, chatID) => {
   const chatroomRef = ref(db, `chats/${chatID}`);
   const chatroomDataSnap = await get(chatroomRef);
+  if (!chatroomDataSnap.val()) {
+    console.error("Chatroom doesn\nt exist");
+    return null;
+  }
   return chatroomDataSnap.val();
 };

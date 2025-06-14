@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom";
 import SignupForm from "./SignupForm";
-import ProfilePictureUpload from "./ProfilePictureUpload";
-import { useState } from "react";
+import { lazy, useState } from "react";
+
+const ProfilePictureUpload = lazy(() => import("./ProfilePictureUpload"));
 
 const Signup = () => {
   const [userData, setUserdata] = useState(null);

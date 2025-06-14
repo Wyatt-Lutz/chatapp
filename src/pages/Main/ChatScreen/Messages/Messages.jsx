@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy } from "react";
 import { db } from "../../../../../firebase";
 import { debounce } from "lodash";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
 import { fetchOlderChats } from "../../../../services/messageDataService";
-import Message from "./Message";
-import Input from "./Input";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
-import MessagesContextMenu from "./MessagesContextMenu";
-import MemberContextMenu from "../MembersBar/MemberContextMenu";
-import DownArrow from "../../../../components/ui/DownArrow";
+
+const Message = lazy(() => import("./Message"));
+const Input = lazy(() => import("./Input"));
+const MessagesContextMenu = lazy(() => import("./MessagesContextMenu"));
+const MemberContextMenu = lazy(() => import("../MembersBar/MemberContextMenu"));
+const DownArrow = lazy(() => import("../../../../components/ui/DownArrow"));
 
 const Messages = () => {
   const { chatState, memberState, messageState, messageDispatch } =

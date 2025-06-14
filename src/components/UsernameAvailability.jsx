@@ -2,23 +2,23 @@ import { useEffect, useState } from "react";
 import { queryUsernames } from "../services/globalDataService";
 import { db } from "../../firebase";
 
-const UsernameAvailability = ({ newUsername, setIsButtonDisabled }) => {
+const UsernameAvailability = ({ username, setIsButtonDisabled }) => {
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
 
   useEffect(() => {
-    if (!newUsername) {
+    if (!username) {
       setIsUsernameAvailable(null);
       setIsButtonDisabled(true);
       return;
     }
     const fetchUsernames = async () => {
-      if (!newUsername.trim()) {
+      if (!username.trim()) {
         setIsUsernameAvailable(null);
         setIsButtonDisabled(true);
         return;
       }
 
-      const usernameData = await queryUsernames(db, newUsername);
+      const usernameData = await queryUsernames(db, username);
 
       if (!usernameData) {
         setIsUsernameAvailable(true);
@@ -27,14 +27,14 @@ const UsernameAvailability = ({ newUsername, setIsButtonDisabled }) => {
       }
       console.log(usernameData);
       const topUsername = Object.values(usernameData)[0]?.username;
-      const isAvailable = topUsername !== newUsername;
+      const isAvailable = topUsername !== username;
 
       setIsUsernameAvailable(isAvailable);
       setIsButtonDisabled(!isAvailable);
     };
     const timeout = setTimeout(fetchUsernames, 500);
     return () => clearTimeout(timeout);
-  }, [newUsername]);
+  }, [username]);
 
   return (
     <>

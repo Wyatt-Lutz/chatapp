@@ -75,11 +75,7 @@ export const MessageContextProvider = ({ children }) => {
     );
 
     return unsubscribe;
-  }, [
-    chatState.chatID,
-    chatState.firstMessageID,
-    messageState.isFirstMessageRendered,
-  ]);
+  }, [chatState.chatID, messageState.isFirstMessageRendered]);
 
   return (
     <MessageContext.Provider value={{ messageState, messageDispatch }}>

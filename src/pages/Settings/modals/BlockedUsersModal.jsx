@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import {
   getBlockData,
   getUsernameFromUid,
   updateBlockedStatus,
 } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";
-import Minus from "../../../components/ui/Minus";
 import { useAuth } from "../../../context/providers/AuthContext";
-import CloseModal from "../../../components/ui/CloseModal";
+
+const Minus = lazy(() => import("../../../components/ui/Minus"));
+const CloseModal = lazy(() => import("../../../components/ui/CloseModal"));
 
 const BlockedUsersModal = ({ changeDisplayment }) => {
   const { currUser } = useAuth();

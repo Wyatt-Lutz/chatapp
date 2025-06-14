@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { useAuth } from "../../../../../context/providers/AuthContext";
 import { db } from "../../../../../../firebase";
 import {
   checkIfDuplicateChat,
   createChat,
 } from "../../../../../services/chatBarDataService";
-import { getBlockData } from "../../../../../services/memberDataService";
-import { fetchProfilePicture } from "../../../../../services/storageDataService";
 import { useChatContexts } from "../../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../../utils/chatroomUtils";
-import CloseModal from "../../../../../components/ui/CloseModal";
-import UserSearch from "../../../../../components/UserSearch";
 import { fetchUserData } from "../../../../../services/globalDataService";
+
+const CloseModal = lazy(
+  () => import("../../../../../components/ui/CloseModal"),
+);
+const UserSearch = lazy(() => import("../../../../../components/UserSearch"));
 
 const ChatCreationModal = ({ changeChatRoomCreationState }) => {
   const { currUser } = useAuth();

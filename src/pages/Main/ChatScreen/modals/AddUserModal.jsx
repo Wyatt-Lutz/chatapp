@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { db } from "../../../../../firebase";
-import UserSearch from "../../../../components/UserSearch";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { addUserToChat } from "../../../../services/memberDataService";
-import CloseModal from "../../../../components/ui/CloseModal";
 import { addMessage } from "../../../../services/messageDataService";
+
+const UserSearch = lazy(() => import("../../../../components/UserSearch"));
+const CloseModal = lazy(() => import("../../../../components/ui/CloseModal"));
 
 const AddUserModal = ({ setIsDisplayAddUser }) => {
   const [addedUsers, setAddedUsers] = useState([]);

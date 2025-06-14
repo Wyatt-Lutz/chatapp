@@ -4,7 +4,7 @@ import { db } from "../../../firebase";
 export const ChatListenerService = {
   setUpChatListeners(chatID, action) {
     if (!chatID) {
-      return () => {};
+      return;
     }
 
     const propHandler = {

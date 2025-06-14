@@ -4,9 +4,7 @@ import { getBlockData } from "../../services/memberDataService";
 
 export const MemberListenerService = {
   setUpMemberListeners(chatID, currUserUid, action) {
-    if (!chatID) {
-      return {};
-    }
+    if (!chatID) return;
 
     const unsubscribers = [];
     const membersRef = ref(db, `members/${chatID}`);

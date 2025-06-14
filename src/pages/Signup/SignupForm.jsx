@@ -18,7 +18,7 @@ const SignupForm = ({ onSubmitForm }) => {
     getValues,
     setFocus,
   } = useForm();
-  const newUsername = useWatch({ name: "username", control });
+  const username = useWatch({ name: "username", control });
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const onSubmit = async ({ email, password, username }) => {
@@ -107,7 +107,7 @@ const SignupForm = ({ onSubmitForm }) => {
         })}
       />
       <UsernameAvailability
-        newUsername={newUsername}
+        username={username}
         setIsButtonDisabled={setIsButtonDisabled}
       />
       <label>Email</label>

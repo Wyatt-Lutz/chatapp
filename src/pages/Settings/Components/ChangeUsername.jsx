@@ -12,14 +12,11 @@ const ChangeUsername = ({
   passwordModalText,
 }) => {
   const { currUser } = useAuth();
-  const { register, control } = useForm({
-    defaultValues: {
-      newUsername: currUser.displayName,
-    },
-  });
 
   const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
-  const newUsername = useWatch({ name: "newUsername", control });
+  const [username, setUsername] = useState(currUser.displayName);
+  const [isDisplayUsernameConfirmation, setIsDisplayUsernameConfirmation] =
+    useState(false);
 
   const editUsername = async () => {
     if (isEditUsernameDisabled) return;
@@ -34,18 +31,26 @@ const ChangeUsername = ({
 
     await displayPassModal(passwordModalHeader, passwordModalText);
 
-    await changeUsername(db, newUsername, currUser);
+    setIsDisplayUsernameConfirmation(false);
+    await changeUsername(db, username, currUser);
   };
   return (
     <>
       <div className="flex">
         <label>Username</label>
-        <input type="text" {...register("newUsername")} />
+        <input
+          onChange={(e) => {
+            setUsername(e.target.value);
+            setIsDisplayUsernameConfirmation(true);
+          }}
+          value={username}
+          type="text"
+        />
 
-        {newUsername !== currUser.displayName && (
+        {isDisplayUsernameConfirmation && (
           <div>
             <UsernameAvailability
-              newUsername={newUsername}
+              username={username}
               setIsButtonDisabled={setIsEditUsernameDisabled}
             />
             <button disabled={isEditUsernameDisabled} onClick={editUsername}>

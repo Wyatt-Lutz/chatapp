@@ -19,7 +19,10 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
     }
 
     const fetchUsernames = async () => {
-      const usernameQueryData = await queryUsernames(db, searchedUsername);
+      const usernameQueryData = await queryUsernames(
+        db,
+        searchedUsername.trim(),
+      );
       if (!usernameQueryData) {
         setUsernameQueryData([]);
         return;
