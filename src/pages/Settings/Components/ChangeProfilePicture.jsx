@@ -1,12 +1,11 @@
-import { lazy, useState } from "react";
+import { useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { deleteObject, ref } from "firebase/storage";
 import { storage } from "../../../../firebase";
 import { uploadPicture } from "../../../services/storageDataService";
 import { compressImage } from "../../../utils/mediaUtils";
 import { useAuth } from "../../../context/providers/AuthContext";
-
-const Camera = lazy(() => import("../../../components/ui/Camera"));
+import Camera from "../../../components/ui/Camera";
 
 const ChangeProfilePicture = () => {
   const { currUser } = useAuth();

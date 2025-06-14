@@ -1,13 +1,13 @@
-import { lazy, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { editTitle } from "../../../../services/messageDataService";
 import { useChatContexts } from "../../../../hooks/useContexts";
 
-const Search = lazy(() => import("./Search"));
-const AddUserModal = lazy(() => import("../modals/AddUserModal"));
-const SearchSVG = lazy(() => import("../../../../components/ui/SearchSVG"));
+import Search from "./Search";
+import SearchSVG from "../../../../components/ui/SearchSVG";
+import AddUserModal from "../modals/AddUserModal";
 
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);

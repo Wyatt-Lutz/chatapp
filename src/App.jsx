@@ -3,6 +3,7 @@ import Signin from "./pages/Signin/Signin";
 import { Navigate } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { useAuth } from "./context/providers/AuthContext";
+
 const EmailNotVerified = lazy(() => import("./components/EmailNotVerified"));
 const Signup = lazy(() => import("./pages/Signup/Signup"));
 const Main = lazy(() => import("./pages/Main/Main"));

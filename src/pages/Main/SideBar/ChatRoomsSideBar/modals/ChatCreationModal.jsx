@@ -1,4 +1,4 @@
-import { lazy, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../../../../context/providers/AuthContext";
 import { db } from "../../../../../../firebase";
 import {
@@ -9,10 +9,8 @@ import { useChatContexts } from "../../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../../utils/chatroomUtils";
 import { fetchUserData } from "../../../../../services/globalDataService";
 
-const CloseModal = lazy(
-  () => import("../../../../../components/ui/CloseModal"),
-);
-const UserSearch = lazy(() => import("../../../../../components/UserSearch"));
+import UserSearch from "../../../../../components/UserSearch";
+import CloseModal from "../../../../../components/ui/CloseModal";
 
 const ChatCreationModal = ({ changeChatRoomCreationState }) => {
   const { currUser } = useAuth();

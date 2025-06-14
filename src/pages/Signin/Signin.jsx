@@ -8,7 +8,9 @@ import {
   browserSessionPersistence,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import PasswordReset from "./PasswordReset";
+import { lazy } from "react";
+
+const PasswordReset = lazy(() => import("./PasswordReset"));
 
 const Signin = () => {
   const {

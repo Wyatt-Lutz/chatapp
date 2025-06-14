@@ -3,8 +3,9 @@ import { queryUsernames } from "../services/globalDataService";
 import { db } from "../../firebase";
 import CloseModal from "./ui/CloseModal";
 import { useAuth } from "../context/providers/AuthContext";
-import BlockedUserWarning from "./BlockedUserWarning";
 import { getBlockData } from "../services/memberDataService";
+
+import BlockedUserWarning from "./BlockedUserWarning";
 
 const UserSearch = ({ addedUsers, setAddedUsers }) => {
   const [usernameQueryData, setUsernameQueryData] = useState([]);

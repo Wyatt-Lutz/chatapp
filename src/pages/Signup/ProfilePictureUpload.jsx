@@ -1,4 +1,4 @@
-import { lazy, useState } from "react";
+import { useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { uploadPicture } from "../../services/storageDataService";
@@ -6,7 +6,7 @@ import { compressImage } from "../../utils/mediaUtils";
 import { update, ref } from "firebase/database";
 import { db } from "../../../firebase";
 
-const Camera = lazy(() => import("../../components/ui/Camera"));
+import Camera from "../../components/ui/Camera";
 
 const ProfilePictureUpload = ({ user }) => {
   const navigate = useNavigate();

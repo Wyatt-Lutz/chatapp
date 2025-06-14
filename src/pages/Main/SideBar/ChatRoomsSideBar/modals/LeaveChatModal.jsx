@@ -1,12 +1,9 @@
-import { lazy } from "react";
 import { db } from "../../../../../../firebase";
 import { useAuth } from "../../../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../../../hooks/useContexts";
 import { removeUserFromChat } from "../../../../../services/memberDataService";
 
-const CloseModal = lazy(
-  () => import("../../../../../components/ui/CloseModal"),
-);
+import CloseModal from "../../../../../components/ui/CloseModal";
 
 const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
   const { currUser } = useAuth();

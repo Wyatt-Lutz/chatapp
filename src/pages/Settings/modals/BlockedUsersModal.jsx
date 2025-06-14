@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getBlockData,
   getUsernameFromUid,
@@ -7,8 +7,8 @@ import {
 import { db } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 
-const Minus = lazy(() => import("../../../components/ui/Minus"));
-const CloseModal = lazy(() => import("../../../components/ui/CloseModal"));
+import Minus from "../../../components/ui/Minus";
+import CloseModal from "../../../components/ui/CloseModal";
 
 const BlockedUsersModal = ({ changeDisplayment }) => {
   const { currUser } = useAuth();

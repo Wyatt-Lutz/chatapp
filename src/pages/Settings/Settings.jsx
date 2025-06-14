@@ -1,7 +1,4 @@
 import { useState } from "react";
-import ConfirmPassModal from "./modals/ConfirmPassModal";
-import EmailNotVerified from "../../components/EmailNotVerified";
-import BlockedUsersModal from "./modals/BlockedUsersModal";
 import { useNavigate } from "react-router-dom";
 import DeleteAccount from "./Components/DeleteAccount";
 import ChangePassword from "./Components/ChangePassword";
@@ -9,6 +6,14 @@ import ChangeEmail from "./Components/ChangeEmail";
 import ChangeUsername from "./Components/ChangeUsername";
 import ChangeProfilePicture from "./Components/ChangeProfilePicture";
 import { useAuth } from "../../context/providers/AuthContext";
+import { lazy } from "react";
+
+const EmailNotVerified = lazy(
+  () => import("../../components/EmailNotVerified"),
+);
+
+import ConfirmPassModal from "./modals/ConfirmPassModal";
+import BlockedUsersModal from "./modals/BlockedUsersModal";
 
 const Settings = () => {
   const { currUser } = useAuth();

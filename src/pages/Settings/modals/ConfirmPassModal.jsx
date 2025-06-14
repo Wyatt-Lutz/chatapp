@@ -2,9 +2,8 @@ import { useForm } from "react-hook-form";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
 import { useAuth } from "../../../context/providers/AuthContext";
-import { lazy } from "react";
 
-const CloseModal = lazy(() => import("../../../components/ui/CloseModal"));
+import CloseModal from "../../../components/ui/CloseModal";
 
 const ConfirmPassModal = ({
   changeDisplayment,

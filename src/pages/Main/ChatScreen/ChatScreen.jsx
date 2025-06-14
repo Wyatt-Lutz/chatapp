@@ -1,9 +1,10 @@
-import MembersBar from "./MembersBar/MembersBar";
-import TopBar from "./Ancillary/TopBar";
-import Messages from "./Messages/Messages";
 import { useChatContexts } from "../../../hooks/useContexts";
 import { useChatroomPresence } from "../../../hooks/useChatroomPresence";
 import { useAuth } from "../../../context/providers/AuthContext";
+
+import TopBar from "./Ancillary/TopBar";
+import Messages from "./Messages/Messages";
+import MembersBar from "./MembersBar/MembersBar";
 
 const ChatScreen = () => {
   const { chatState } = useChatContexts();
