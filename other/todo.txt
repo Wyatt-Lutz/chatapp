@@ -19,7 +19,6 @@ Big update:
 7. Ability to search files/pictures
 8. When clicking on searched message, it takes you to the message, will have to load the messages around it, even when scrolling down
 11. Add rate limiting
-13. When you change your username, the UsernameAvalaibility still shows up as username is availiele and stuff, and save usename is still there
 
 
 
