@@ -1,6 +1,6 @@
 import { deleteUser, updateProfile } from "firebase/auth";
 
-import { get, update, ref, remove } from "firebase/database";
+import { update, ref, remove } from "firebase/database";
 import { queryUsernames } from "./globalDataService";
 import { fetchChatsInData, removeUserFromChat } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";

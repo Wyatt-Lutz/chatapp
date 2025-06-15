@@ -1,5 +1,4 @@
 import { push, ref, set, update, get } from "firebase/database";
-import { fetchChatsInData } from "./memberDataService";
 
 export const createChat = async (
   db,

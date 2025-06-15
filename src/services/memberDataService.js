@@ -1,12 +1,4 @@
-import {
-  get,
-  increment,
-  ref,
-  remove,
-  runTransaction,
-  set,
-  update,
-} from "firebase/database";
+import { get, increment, ref, remove, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
@@ -241,10 +233,8 @@ export const getUsernameFromUid = async (db, userUid) => {
   return username;
 };
 
-export const fetchChatUsersByStatus = async (db, chatID, status) => {
-  const membersData = await fetchMembersFromChat(db, chatID);
-
-  return Object.entries(membersData)
+export const fetchChatUsersByStatus = async (memberData, status) => {
+  return [...memberData]
     .filter(([_, user]) => {
       if (status === true) return user?.isOnline === true;
       if (status === false) return user?.isOnline == null;

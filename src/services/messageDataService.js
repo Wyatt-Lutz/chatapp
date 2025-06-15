@@ -41,6 +41,7 @@ export const addMessage = async (
   firstMessageID,
   chatDispatch,
   imageToUpload = null,
+  memberData,
 ) => {
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
@@ -82,7 +83,7 @@ export const addMessage = async (
     });
   }
 
-  await updateUnreadCount(db, chatID);
+  await updateUnreadCount(db, chatID, memberData);
 };
 
 export const updateFirstMessageID = async (db, chatID, messageID) => {
@@ -98,10 +99,9 @@ export const updateFirstMessageID = async (db, chatID, messageID) => {
  * @param {Database} db - Firebase Realtime Database Reference
  * @param {String} chatID - ID of the chatroom
  */
-const updateUnreadCount = async (db, chatID) => {
-  const offlineMembers = await fetchChatUsersByStatus(db, chatID, false);
+const updateUnreadCount = async (db, chatID, memberData) => {
+  const offlineMembers = await fetchChatUsersByStatus(memberData, false);
 
-  console.log(offlineMembers);
   for (const userUid of offlineMembers) {
     const userDataRef = ref(db, `users/${userUid}/chatsIn`);
 
@@ -120,7 +120,7 @@ export const editMessage = async (messageUid, text, chatID, db) => {
   });
 };
 
-export const deleteMessage = async (db, chatID, messageUid, firstMessageID) => {
+export const deleteMessage = async (db, chatID, messageUid) => {
   const chatRef = ref(db, `messages/${chatID}/${messageUid}`);
   await remove(chatRef);
 };

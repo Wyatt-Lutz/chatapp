@@ -20,17 +20,11 @@ export const MessageListenerService = {
       startAt(endTimestamp),
     );
 
-    const notificationSound = new Audio("/notification.mp3");
-
     if (action.onMessageAdded) {
       const addedListenerQuery = query(baseListenerQuery, limitToLast(15));
 
       const handleMessageAdded = (snap) => {
         action.onMessageAdded(snap.key, snap.val());
-
-        if (document.hidden) {
-          notificationSound.play();
-        }
       };
 
       const chatAddedListener = onChildAdded(

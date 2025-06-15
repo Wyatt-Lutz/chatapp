@@ -3,7 +3,6 @@ import {
   get,
   query,
   orderByChild,
-  equalTo,
   set,
   startAt,
   endAt,
