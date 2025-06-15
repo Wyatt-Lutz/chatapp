@@ -1,4 +1,3 @@
-import { onChildAdded, onChildChanged, onChildRemoved, ref } from "firebase/database";
 import { createContext, useEffect, useReducer } from "react";
 import { db } from "../../../firebase";
 import { fetchChatRoomData } from "../../services/chatBarDataService";
@@ -6,55 +5,69 @@ import { updateTempTitle } from "../../utils/chatroomUtils";
 import { chatroomReducer } from "../reducers/chatroomsReducer";
 import { initialChatroomState } from "../initialState";
 import { useAuth } from "./AuthContext";
-
+import { ChatroomsListenerService } from "../listenerServices/ChatroomsListenerService";
+import { useAudioNotifications } from "../../hooks/useAudioNotifications";
 
 export const ChatroomsContext = createContext();
-
-
 
 export const ChatroomsContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(chatroomReducer, initialChatroomState);
   const { currUser } = useAuth();
-  const notificationSound = new Audio("/notification.mp3");
+  const { playNotification } = useAudioNotifications();
 
   useEffect(() => {
     if (!currUser) return;
-    const chatsInRef = ref(db, `users/${currUser.uid}/chatsIn`);
 
-    const handleChatroomAdded = async(snap) => {
-      const newChatID = snap.key;
-      const {title, tempTitle, memberUids} = await fetchChatRoomData(db, newChatID);
+    const unsubscribe = ChatroomsListenerService.setUpChatroomsListeners(
+      currUser.uid,
+      {
+        onChatroomAdded: async (newChatID, numUnread) => {
+          const chatRoomData = await fetchChatRoomData(db, newChatID);
+          if (!chatRoomData) {
+            console.error("yes");
+            return;
+          }
+          const { title, tempTitle, memberUids } = await fetchChatRoomData(
+            db,
+            newChatID,
+          );
 
-      const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
-      const chatroomObj = {numUnread: snap.val(), title, tempTitle: updatedTempTitle, memberUids: memberUids};
-      dispatch({ type: "ADD_CHATROOM", payload: {key: newChatID, data: chatroomObj}});
-    }
+          const updatedTempTitle = updateTempTitle(
+            tempTitle,
+            currUser.displayName,
+          );
+          const chatroomObj = {
+            numUnread: numUnread,
+            title,
+            tempTitle: updatedTempTitle,
+            memberUids: memberUids,
+          };
+          dispatch({
+            type: "ADD_CHATROOM",
+            payload: { key: newChatID, data: chatroomObj },
+          });
+        },
+        onChatroomRemoved: (chatID) => {
+          dispatch({ type: "REMOVE_CHATROOM", payload: chatID });
+        },
+        onUpdateUnread: (chatID, newUnreadCount) => {
+          dispatch({
+            type: "UPDATE_UNREAD_COUNT",
+            payload: { key: chatID, data: newUnreadCount },
+          });
+          playNotification();
+        },
+      },
+    );
 
-    const handleChatroomRemoved = (snap) => {
-      dispatch({type: "REMOVE_CHATROOM", payload: snap.key });
-    }
-
-    const handleUpdateUnread = (snap) => {
-      notificationSound.play();
-
-      dispatch({type: "UPDATE_UNREAD_COUNT", payload: {key: snap.key, data: snap.val()}});
-    }
-
-    const chatroomAddedListener = onChildAdded(chatsInRef, handleChatroomAdded);
-    const chatroomRemovedListener = onChildRemoved(chatsInRef, handleChatroomRemoved);
-    const chatroomUnreadCountListener = onChildChanged(chatsInRef, handleUpdateUnread);
-
-
-    return () => {
-      chatroomAddedListener();
-      chatroomRemovedListener();
-      chatroomUnreadCountListener();
-    }
+    return unsubscribe;
   }, [currUser]);
 
   return (
-    <ChatroomsContext.Provider value={{ chatroomsState: state, chatroomsDispatch: dispatch }}>
+    <ChatroomsContext.Provider
+      value={{ chatroomsState: state, chatroomsDispatch: dispatch }}
+    >
       {children}
     </ChatroomsContext.Provider>
-  )
-}
+  );
+};

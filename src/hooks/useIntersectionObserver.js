@@ -7,7 +7,7 @@ export const useElementOnScreen = (options) => {
   const callbackFunction = (entries) => {
     const [entry] = entries;
     setIsVisible(entry.isIntersecting);
-  }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(callbackFunction, options);
@@ -20,8 +20,8 @@ export const useElementOnScreen = (options) => {
       if (container) {
         observer.unobserve(container);
       }
-    }
+    };
   }, [options]);
 
   return [containerRef, isVisible];
-}
+};

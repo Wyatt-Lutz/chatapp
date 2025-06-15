@@ -1,72 +1,61 @@
-import { createContext, useContext, useEffect, useReducer, useState } from "react";
-import { ref, onChildChanged } from "firebase/database";
-import { db } from "../../../firebase";
+import { createContext, useContext, useEffect, useReducer } from "react";
 import { chatReducer } from "../reducers/chatReducer";
 import { initialChatState } from "../initialState";
 import { updateTempTitle } from "../../utils/chatroomUtils";
 import { useAuth } from "./AuthContext";
 import { ChatroomsContext } from "./ChatroomsContext";
-
+import { ChatListenerService } from "../listenerServices/ChatListenerService";
 
 export const ChatContext = createContext();
-
 
 export const ChatContextProvider = ({ children }) => {
   const [chatState, chatDispatch] = useReducer(chatReducer, initialChatState);
   const { chatroomsDispatch } = useContext(ChatroomsContext);
   const { currUser } = useAuth();
-
-
-  const chatID = chatState.chatID;
-
+  const { chatID } = chatState;
 
   useEffect(() => {
     if (!chatID) return;
 
-    const onChatroomEdited = (snap) => {
-      const prop = snap.key; //property name
-      prop === 'title'
-      ? (
-        (() => {
-          chatDispatch({ type: "UPDATE_TITLE", payload: snap.val() })
-          chatroomsDispatch({ type: "UPDATE_TITLE", payload: {key: chatID, data: snap.val()}});
-        })()
-        )
-      : prop === 'owner'
-      ? chatDispatch({ type: "UPDATE_OWNER", payload: snap.val() })
-      : prop === 'tempTitle'
-      ? (
-          (() => {
-            const newTempTitle = updateTempTitle(snap.val(), currUser.displayName);
-            chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: newTempTitle });
-            chatroomsDispatch({ type: "UPDATE_TEMP_TITLE", payload: {key: chatID, data: newTempTitle}});
-          })()
-        )
-      : prop === 'firstMessageID'
-      ? chatDispatch({ type: "UPDATE_FIRST_MESSAGE_ID", payload: snap.val() })
-      : prop === 'memberUids'
-      ? (
-          (() => {
-            chatDispatch({ type: "UPDATE_MEMBER_UIDS", payload: snap.val() })
-            chatroomsDispatch({ type: "UPDATE_MEMBER_UIDS", payload: {key: chatID, data: snap.val()}});
-          })()
-        )
+    const unsubscribe = ChatListenerService.setUpChatListeners(chatID, {
+      onTitleChanged: (title) => {
+        chatDispatch({ type: "UPDATE_TITLE", payload: title });
+        chatroomsDispatch({
+          type: "UPDATE_TITLE",
+          payload: { key: chatID, data: title },
+        });
+      },
+      onOwnerChanged: (ownerUid) => {
+        chatDispatch({ type: "UPDATE_OWNER", payload: ownerUid });
+      },
+      onTempTitleChanged: (tempTitle) => {
+        const newTempTitle = updateTempTitle(tempTitle, currUser.displayName);
+        chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: newTempTitle });
+        chatroomsDispatch({
+          type: "UPDATE_TEMP_TITLE",
+          payload: { key: chatID, data: newTempTitle },
+        });
+      },
+      onFirstMessageIDChanged: (firstMessageID) => {
+        chatDispatch({
+          type: "UPDATE_FIRST_MESSAGE_ID",
+          payload: firstMessageID,
+        });
+      },
+      onMemberUidsChanged: (memberUids) => {
+        chatDispatch({ type: "UPDATE_MEMBER_UIDS", payload: memberUids });
+        chatroomsDispatch({
+          type: "UPDATE_MEMBER_UIDS",
+          payload: { key: chatID, data: memberUids },
+        });
+      },
+      onNumOfMembersChanged: (numOfMembers) => {
+        chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: numOfMembers });
+      },
+    });
 
-      : prop === 'numOfMembers'
-      ? chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: snap.val() })
-      : null;
-    }
-
-    const chatroomRef = ref(db, `chats/${chatID}`);
-    const chatRoomEditedListener = onChildChanged(chatroomRef, onChatroomEdited);
-    //const chatroomRemovedListener = onChildRemoved(chatroomRef, onChatroomRemoved);
-
-    return () => {
-      chatRoomEditedListener();
-      //chatroomRemovedListener();
-    }
-  }, [chatID]);
-
+    return unsubscribe;
+  }, [chatID, currUser, chatDispatch, chatroomsDispatch]);
 
   return (
     <ChatContext.Provider value={{ chatState, chatDispatch }}>

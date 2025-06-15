@@ -12,13 +12,12 @@ const Search = () => {
   const [searchedMessages, setSearchedMessages] = useState(new Map());
 
   useEffect(() => {
-
     if (!searchQuery.trim()) {
       setSearchedMessages(new Map());
       return;
     }
 
-    const fetchMessages = async() => {
+    const fetchMessages = async () => {
       const messagesObject = await queryMessages(db, chatID, searchQuery);
       if (!messagesObject) {
         setSearchedMessages(new Map());
@@ -28,26 +27,34 @@ const Search = () => {
       const messagesArray = Object.entries(messagesObject);
       console.log(messagesArray);
       setSearchedMessages(new Map(messagesArray));
-
-    }
+    };
 
     const timeout = setTimeout(() => {
       fetchMessages();
     }, 300);
 
     return () => clearTimeout(timeout);
-    
-
   }, [searchQuery, chatID]);
 
   return (
     <>
-      <input type="text" placeholder="Search messages..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
-      {(searchedMessages && searchedMessages.size > 0) ? (
+      <input
+        type="text"
+        placeholder="Search messages..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      {searchedMessages && searchedMessages.size > 0 ? (
         <div>
           {[...searchedMessages].map(([messageID, messageData], index) => (
             <div key={messageID} className="">
-              <Message messageUid={messageID} memberDataOfSender={memberState.members.get(messageData.sender)} messageData={messageData} isEditing={false} changeEditState={() => {}}/>
+              <Message
+                messageUid={messageID}
+                memberDataOfSender={memberState.members.get(messageData.sender)}
+                messageData={messageData}
+                isEditing={false}
+                changeEditState={() => {}}
+              />
             </div>
           ))}
         </div>
@@ -55,8 +62,7 @@ const Search = () => {
         <div>No Results</div>
       )}
     </>
-  )
-}
-
+  );
+};
 
 export default Search;

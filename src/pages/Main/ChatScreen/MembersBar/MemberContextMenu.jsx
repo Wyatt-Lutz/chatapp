@@ -1,33 +1,52 @@
-import { removeUserFromChat, transferOwnership, updateBlockedStatus } from "../../../../services/memberDataService";
+import {
+  removeUserFromChat,
+  transferOwnership,
+  updateBlockedStatus,
+} from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
-
-
-const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) => {
-  const { chatState, memberDispatch, chatDispatch, resetAllChatContexts } = useChatContexts();
+const MemberContextMenu = ({
+  contextMenuData: { memberUid, memberData },
+  points,
+}) => {
+  const { chatState, memberDispatch, chatDispatch, resetAllChatContexts } =
+    useChatContexts();
   const { currUser } = useAuth();
 
-
-  const onChangeBlockStatus = async(newBlockStatus) => {
+  const onChangeBlockStatus = async (newBlockStatus) => {
     await updateBlockedStatus(db, currUser.uid, memberUid, newBlockStatus);
-    const newMemberObj = {...memberData, isBlocked: newBlockStatus}
+    const newMemberObj = { ...memberData, isBlocked: newBlockStatus };
     console.log(newMemberObj);
-    memberDispatch({type: "UPDATE_MEMBER_DATA", payload: { userUid: memberUid, data: newMemberObj }});
-  }
+    memberDispatch({
+      type: "UPDATE_MEMBER_DATA",
+      payload: { userUid: memberUid, data: newMemberObj },
+    });
+  };
 
-  const onRemoveMemberFromChat = async() => {
-    await removeUserFromChat(db, chatState.chatID, memberUid, memberData.username, currUser.uid, chatState.numOfMembers, chatDispatch, resetAllChatContexts);
-  }
+  const onRemoveMemberFromChat = async () => {
+    await removeUserFromChat(
+      db,
+      chatState.chatID,
+      memberUid,
+      memberData.username,
+      currUser.uid,
+      chatState.numOfMembers,
+      chatDispatch,
+      resetAllChatContexts,
+    );
+  };
 
-
-  const onTransferOwnership = async() => {
+  const onTransferOwnership = async () => {
     await transferOwnership(db, chatState.chatID, memberUid, chatDispatch);
-  }
+  };
 
   return (
-    <div className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col" style={{top: points.y, left: points.x}}>
+    <div
+      className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col"
+      style={{ top: points.y, left: points.x }}
+    >
       {memberData.isBlocked ? (
         <button onClick={() => onChangeBlockStatus(false)}>Unblock User</button>
       ) : (
@@ -41,8 +60,6 @@ const MemberContextMenu = ({contextMenuData: {memberUid, memberData}, points}) =
         </>
       )}
     </div>
-
-
-  )
-}
+  );
+};
 export default MemberContextMenu;

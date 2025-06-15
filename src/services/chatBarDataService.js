@@ -1,8 +1,15 @@
 import { push, ref, set, update, get } from "firebase/database";
-import { fetchChatsInData } from "./memberDataService";
 
-
-export const createChat = async(db, memberUids, title, tempTitle, membersList, uids, numOfMembers, currUserUid) => {
+export const createChat = async (
+  db,
+  memberUids,
+  title,
+  tempTitle,
+  membersList,
+  uids,
+  numOfMembers,
+  currUserUid,
+) => {
   try {
     const chatsRef = ref(db, "chats/");
     const newChatRef = push(chatsRef);
@@ -16,31 +23,25 @@ export const createChat = async(db, memberUids, title, tempTitle, membersList, u
       memberUids: memberUids,
       firstMessageID: "",
       numOfMembers: numOfMembers,
-    }
+    };
 
     await Promise.all([
       set(newChatRef, newChatData),
       set(membersRef, membersList),
 
-
-      ...uids.map(uid => {
+      ...uids.map((uid) => {
         const userChatDataRef = ref(db, `users/${uid}/chatsIn`);
-        const chatData = {[chatID]: 0};
-        update(userChatDataRef, chatData)
+        const chatData = { [chatID]: 0 };
+        update(userChatDataRef, chatData);
       }),
     ]);
 
-
-    console.info('created chat');
-    return chatID
+    console.info("created chat");
+    return chatID;
   } catch (error) {
     console.error(error);
   }
-
-
-
-}
-
+};
 
 export const checkIfDuplicateChat = (newChatMemberUids, chatrooms) => {
   for (const chatroom of chatrooms.values()) {
@@ -49,8 +50,7 @@ export const checkIfDuplicateChat = (newChatMemberUids, chatrooms) => {
     }
   }
   return false;
-}
-
+};
 
 /**
  * Fetches metadata for a specified chatroom.
@@ -58,8 +58,12 @@ export const checkIfDuplicateChat = (newChatMemberUids, chatrooms) => {
  * @param {*} chatID
  * @returns
  */
-export const fetchChatRoomData = async(db, chatID) => {
+export const fetchChatRoomData = async (db, chatID) => {
   const chatroomRef = ref(db, `chats/${chatID}`);
   const chatroomDataSnap = await get(chatroomRef);
+  if (!chatroomDataSnap.val()) {
+    console.error("Chatroom doesn\nt exist");
+    return null;
+  }
   return chatroomDataSnap.val();
-}
+};
