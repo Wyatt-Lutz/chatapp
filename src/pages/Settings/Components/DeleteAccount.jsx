@@ -17,8 +17,12 @@ const DeleteAccount = ({ displayPassModal }) => {
       "To delete your account, please enter your current password.";
 
     await displayPassModal(deleteAccountHeader, deleteAccountText, true);
-    const profilePictureRef = ref(storage, `users/${currUser.uid}`);
-    await deleteObject(profilePictureRef);
+
+    if (currUser.photoURL !== "/default-profile.jpg") {
+      const profilePictureRef = ref(storage, `users/${currUser.uid}`);
+      await deleteObject(profilePictureRef);
+    }
+
     await deleteAccount(
       db,
       currUser,

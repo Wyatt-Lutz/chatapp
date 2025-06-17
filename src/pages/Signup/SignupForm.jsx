@@ -1,6 +1,12 @@
 import { useForm, useWatch } from "react-hook-form";
 import { db, auth } from "../../../firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  browserSessionPersistence,
+  createUserWithEmailAndPassword,
+  setPersistence,
+  updateProfile,
+} from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
 import { useState } from "react";
 import {
@@ -8,6 +14,7 @@ import {
   queryUsernames,
 } from "../../services/globalDataService";
 import { update, ref } from "firebase/database";
+import { useRef } from "react";
 
 const SignupForm = ({ onSubmitForm }) => {
   const {
@@ -20,6 +27,7 @@ const SignupForm = ({ onSubmitForm }) => {
   } = useForm();
   const username = useWatch({ name: "username", control });
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const checkboxRef = useRef(false);
 
   const onSubmit = async ({ email, password, username }) => {
     if (isButtonDisabled) return;
@@ -33,6 +41,13 @@ const SignupForm = ({ onSubmitForm }) => {
         auth,
         email,
         password,
+      );
+
+      await setPersistence(
+        auth,
+        checkboxRef.current.checked
+          ? browserSessionPersistence
+          : browserLocalPersistence,
       );
       console.log(userCredential);
       const trimmedUsername = username.trim();
@@ -155,6 +170,9 @@ const SignupForm = ({ onSubmitForm }) => {
       >
         Next
       </button>
+
+      <input type="checkbox" ref={checkboxRef} />
+      <span>Don't Remember Login</span>
 
       {errors.username?.message}
       {errors.email?.message}

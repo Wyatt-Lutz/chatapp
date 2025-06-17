@@ -1,4 +1,3 @@
-import { useForm, useWatch } from "react-hook-form";
 import UsernameAvailability from "../../../components/UsernameAvailability";
 import { changeUsername } from "../../../services/settingsDataService";
 import { useState } from "react";

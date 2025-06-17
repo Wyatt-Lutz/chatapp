@@ -6,11 +6,6 @@ import ChangeEmail from "./Components/ChangeEmail";
 import ChangeUsername from "./Components/ChangeUsername";
 import ChangeProfilePicture from "./Components/ChangeProfilePicture";
 import { useAuth } from "../../context/providers/AuthContext";
-import { lazy } from "react";
-
-const EmailNotVerified = lazy(
-  () => import("../../components/EmailNotVerified"),
-);
 
 import ConfirmPassModal from "./modals/ConfirmPassModal";
 import BlockedUsersModal from "./modals/BlockedUsersModal";
@@ -86,9 +81,6 @@ const Settings = () => {
 
       {modal.type === "ConfirmPassModal" && (
         <ConfirmPassModal {...modal.props} />
-      )}
-      {modal.type === "EmailNotVerified" && (
-        <EmailNotVerified {...modal.props} />
       )}
       {modal.type === "BlockedUsersModal" && (
         <BlockedUsersModal {...modal.props} />

@@ -1,16 +1,10 @@
 import { useForm } from "react-hook-form";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { auth } from "../../../firebase";
-import {
-  signInWithEmailAndPassword,
-  setPersistence,
-  browserLocalPersistence,
-  browserSessionPersistence,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { lazy } from "react";
-
-const PasswordReset = lazy(() => import("./PasswordReset"));
+import PasswordReset from "./PasswordReset/PasswordReset";
 
 const Signin = () => {
   const {
@@ -23,7 +17,6 @@ const Signin = () => {
     mode: "onSubmit",
   });
   const [passReset, setPassReset] = useState(false);
-  const checkboxRef = useRef(false);
   const navigate = useNavigate();
 
   const handlePassChange = (state) => {
@@ -32,12 +25,6 @@ const Signin = () => {
 
   const signUserIn = async ({ email, password }) => {
     try {
-      await setPersistence(
-        auth,
-        checkboxRef.current.checked
-          ? browserLocalPersistence
-          : browserSessionPersistence,
-      );
       await signInWithEmailAndPassword(auth, email, password);
 
       navigate("/");
@@ -108,8 +95,6 @@ const Signin = () => {
           {isSubmitted && errors.email?.message}
           {isSubmitted && errors.password?.message}
           <button onClick={() => setPassReset(true)}>Forgot Password?</button>
-          <input type="checkbox" ref={checkboxRef} />
-          <span>Remember Me</span>
           <button onClick={() => navigate("/signup")}> Signup </button>
         </div>
       )}

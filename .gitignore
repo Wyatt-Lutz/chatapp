@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+other
 dist
 dist-ssr
 *.local
@@ -26,4 +27,3 @@ eslint.config.js
 *.njsproj
 *.sln
 *.sw?
-/other

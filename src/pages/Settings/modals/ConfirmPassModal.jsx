@@ -1,9 +1,8 @@
-import { useForm } from "react-hook-form";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
 import { useAuth } from "../../../context/providers/AuthContext";
-
 import CloseModal from "../../../components/ui/CloseModal";
+import { useState } from "react";
 
 const ConfirmPassModal = ({
   changeDisplayment,
@@ -13,19 +12,10 @@ const ConfirmPassModal = ({
   isDeleteAccount,
 }) => {
   const { currUser } = useAuth();
-
-  const {
-    register,
-    getValues,
-    formState: { errors },
-  } = useForm();
+  const [password, setPassword] = useState("");
 
   const onCurrPassSubmit = async () => {
-    const providedPass = getValues("currPassword");
-    const credential = EmailAuthProvider.credential(
-      currUser.email,
-      providedPass,
-    );
+    const credential = EmailAuthProvider.credential(currUser.email, password);
     await reauthenticateWithCredential(currUser, credential)
       .then(() => {
         changeConfirmation(true);
@@ -52,7 +42,8 @@ const ConfirmPassModal = ({
         <input
           className="border"
           type="password"
-          {...register("currPassword")}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
         <div className="flex justify-end space-x-2">

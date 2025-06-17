@@ -4,20 +4,17 @@ import { useAuth } from "../context/providers/AuthContext";
 import { useEffect, useState } from "react";
 
 const EmailNotVerified = ({ email, setIsVerified }) => {
-  const { currUser } = useAuth();
+  const { currUser, refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const resendEmail = async () => {
-    try {
-      await sendEmailVerification(currUser);
-      console.info("Email Verification resent");
-    } catch (error) {
-      console.error(error);
-    }
+    await sendEmailVerification(currUser);
+    console.info("Email Verification resent");
   };
 
   useEffect(() => {
+    console.log("useEffect run");
     const checkIfUserVerified = async () => {
       const verificationCookieId = `verification-${currUser.uid}`;
       const alreadySentVerification =
@@ -42,21 +39,24 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
   useEffect(() => {
     if (loading) return;
     const timeoutID = setInterval(async () => {
-      await currUser.reload();
-      console.log("yo");
+      await refreshUser();
       if (currUser.emailVerified) {
         setIsVerified(true);
         clearInterval(timeoutID);
       }
     }, 500);
-  }, [currUser, loading]);
+
+    return () => {
+      clearInterval(timeoutID);
+    };
+  }, [loading]);
 
   return (
     <div>
       <div>Before you continue, please verify your email.</div>
       <div>We have sent a email verification link to {email}.</div>
       <button
-        onClick={() => resendEmail()}
+        onClick={resendEmail}
         className="border rounded-md bg-zinc-500 m-2 p-1"
       >
         Resend Email
