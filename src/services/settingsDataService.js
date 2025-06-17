@@ -31,6 +31,7 @@ export const changeUsername = async (
     const updateChatroomsPromise = Object.keys(chatsInData).map(
       async (chatID) => {
         const chatroomMemberRef = ref(db, `members/${chatID}/${currUser.uid}`);
+        const chatroomDataRef = ref(db, `chats/${chatID}`);
         const { tempTitle } = await fetchChatRoomData(db, chatID);
         const updatedTempTitle = tempTitle
           .split(", ")
@@ -46,7 +47,7 @@ export const changeUsername = async (
             username: newUsername,
           }),
 
-          update(chatRoomRef, {
+          update(chatroomDataRef, {
             tempTitle: updatedTempTitle,
           }),
         ]);

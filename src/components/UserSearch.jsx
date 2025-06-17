@@ -45,11 +45,7 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
 
     const timeout = setTimeout(fetchUsernames, 300);
     return () => clearTimeout(timeout);
-  }, [searchedUsername]);
-
-  useEffect(() => {
-    console.log(addedUsers);
-  }, [addedUsers]);
+  }, [searchedUsername, addedUsers, currUser.uid]);
 
   const addUser = async (user) => {
     setAddedUsers((prev) => [...prev, user]);

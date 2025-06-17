@@ -234,11 +234,13 @@ export const getUsernameFromUid = async (db, userUid) => {
 };
 
 export const fetchChatUsersByStatus = async (memberData, status) => {
+  console.log(memberData);
+  console.log([...memberData]);
   return [...memberData]
-    .filter(([_, user]) => {
+    .filter(([, user]) => {
       if (status === true) return user?.isOnline === true;
       if (status === false) return user?.isOnline == null;
       return false;
     })
-    .map(([userUid, _]) => userUid);
+    .map(([userUid]) => userUid);
 };

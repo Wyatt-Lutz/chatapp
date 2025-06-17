@@ -4,6 +4,7 @@ import { useState } from "react";
 import { fetchLastUsernameChangeTime } from "../../../services/userDataService";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { db } from "../../../../firebase";
+import { useChatContexts } from "../../../hooks/useContexts";
 
 const ChangeUsername = ({
   displayPassModal,
@@ -11,6 +12,7 @@ const ChangeUsername = ({
   passwordModalText,
 }) => {
   const { currUser } = useAuth();
+  const { chatroomsDispatch } = useChatContexts();
 
   const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
   const [username, setUsername] = useState(currUser.displayName);
@@ -31,7 +33,7 @@ const ChangeUsername = ({
     await displayPassModal(passwordModalHeader, passwordModalText);
 
     setIsDisplayUsernameConfirmation(false);
-    await changeUsername(db, username, currUser);
+    await changeUsername(db, username, currUser, chatroomsDispatch);
   };
   return (
     <>

@@ -14,7 +14,6 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
   };
 
   useEffect(() => {
-    console.log("useEffect run");
     const checkIfUserVerified = async () => {
       const verificationCookieId = `verification-${currUser.uid}`;
       const alreadySentVerification =
@@ -39,6 +38,7 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
   useEffect(() => {
     if (loading) return;
     const timeoutID = setInterval(async () => {
+      console.log("yo");
       await refreshUser();
       if (currUser.emailVerified) {
         setIsVerified(true);
@@ -49,7 +49,7 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
     return () => {
       clearInterval(timeoutID);
     };
-  }, [loading]);
+  }, [loading, currUser.emailVerified, refreshUser, setIsVerified]);
 
   return (
     <div>

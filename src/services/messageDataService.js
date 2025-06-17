@@ -9,7 +9,6 @@ import {
   orderByChild,
   remove,
   serverTimestamp,
-  limitToFirst,
   increment,
   update,
   limitToLast,

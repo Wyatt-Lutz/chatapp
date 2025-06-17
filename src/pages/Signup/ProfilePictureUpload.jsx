@@ -51,9 +51,9 @@ const ProfilePictureUpload = ({ user }) => {
   };
 
   const onCancel = () => {
-    setProfilePicture(currUser.photoURL);
+    setProfilePicture(user.userCredential.user.photoURL);
     setIsChangingPicture(false);
-    URL.revokeObjectURL(imageToUpload);
+    URL.revokeObjectURL(profilePicture);
   };
 
   return (

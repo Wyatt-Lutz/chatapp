@@ -90,7 +90,7 @@ const Input = () => {
       emojiPicker.removeEventListener("emoji-click", handleEmojiClick);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [emojiPickerRef.current, isEmojiPickerOpen]);
+  }, [isEmojiPickerOpen]);
 
   return (
     <div>
