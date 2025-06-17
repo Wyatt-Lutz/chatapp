@@ -8,15 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+other
 dist
 dist-ssr
 *.local
 FIREBASE_CONFIG.js
 eslint.config.js
 .env
-todo.txt
-a.txt
-plan.txt
 
 
 # Editor directories and files
@@ -29,4 +27,3 @@ plan.txt
 *.njsproj
 *.sln
 *.sw?
-other
