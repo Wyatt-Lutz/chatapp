@@ -4,7 +4,7 @@ import { useAuth } from "../context/providers/AuthContext";
 import { useEffect, useState } from "react";
 
 const EmailNotVerified = ({ email, setIsVerified }) => {
-  const { currUser } = useAuth();
+  const { currUser, refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -42,14 +42,17 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
   useEffect(() => {
     if (loading) return;
     const timeoutID = setInterval(async () => {
-      await currUser.reload();
-      console.log("yo");
+      await refreshUser();
       if (currUser.emailVerified) {
         setIsVerified(true);
         clearInterval(timeoutID);
       }
     }, 500);
-  }, [currUser, loading]);
+
+    return () => {
+      clearInterval(timeoutID);
+    };
+  }, [loading]);
 
   return (
     <div>

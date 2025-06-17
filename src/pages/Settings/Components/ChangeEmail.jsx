@@ -1,7 +1,7 @@
 import { sendEmailVerification, updateEmail } from "firebase/auth";
 import { useForm, useWatch } from "react-hook-form";
 import { changeEmail } from "../../../services/settingsDataService";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { db } from "../../../../firebase";
 
@@ -10,14 +10,14 @@ const ChangeEmail = ({
   passwordModalHeader,
   passwordModalText,
 }) => {
-  const { currUser } = useAuth();
+  const { currUser, refreshUser } = useAuth();
   const { register, control } = useForm({
     defaultValues: {
       newEmail: currUser.email,
     },
   });
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const newEmail = useWatch({ name: "newEmail", control });
   const editEmail = async () => {
     await displayPassModal(passwordModalHeader, passwordModalText);
@@ -29,7 +29,7 @@ const ChangeEmail = ({
 
     await changeEmail(db, currUser, newEmail);
 
-    navigate("/");
+    await refreshUser();
   };
 
   return (
