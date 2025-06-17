@@ -14,6 +14,9 @@ dist-ssr
 FIREBASE_CONFIG.js
 eslint.config.js
 .env
+todo.txt
+a.txt
+plan.txt
 
 
 # Editor directories and files
