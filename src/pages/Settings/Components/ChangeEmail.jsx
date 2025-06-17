@@ -1,9 +1,8 @@
 import { sendEmailVerification, updateEmail } from "firebase/auth";
-import { useForm, useWatch } from "react-hook-form";
 import { changeEmail } from "../../../services/settingsDataService";
-//import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { db } from "../../../../firebase";
+import { useState } from "react";
 
 const ChangeEmail = ({
   displayPassModal,
@@ -11,37 +10,33 @@ const ChangeEmail = ({
   passwordModalText,
 }) => {
   const { currUser, refreshUser } = useAuth();
-  const { register, control } = useForm({
-    defaultValues: {
-      newEmail: currUser.email,
-    },
-  });
+  const [email, setEmail] = useState(currUser.email);
 
-  //const navigate = useNavigate();
-  const newEmail = useWatch({ name: "newEmail", control });
-  const editEmail = async () => {
+  const handleSaveEmail = async () => {
     await displayPassModal(passwordModalHeader, passwordModalText);
 
-    await updateEmail(currUser, newEmail);
+    await updateEmail(currUser, email);
     await sendEmailVerification(currUser);
     const verificationCookieId = `verification-${currUser.uid}`;
     localStorage.setItem(verificationCookieId, true);
 
-    await changeEmail(db, currUser, newEmail);
+    await changeEmail(db, currUser, email);
 
     await refreshUser();
   };
 
   return (
-    <>
-      <div className="flex">
-        <label>Email</label>
-        <input type="email" {...register("newEmail")} />
-        {newEmail !== currUser.email && (
-          <button onClick={editEmail}>Save Email</button>
-        )}
-      </div>
-    </>
+    <div className="flex">
+      <label>Email</label>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      {email !== currUser.email && (
+        <button onClick={handleSaveEmail}>Save Email</button>
+      )}
+    </div>
   );
 };
 export default ChangeEmail;

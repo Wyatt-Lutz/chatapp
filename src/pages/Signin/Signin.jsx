@@ -1,11 +1,10 @@
 import { useForm } from "react-hook-form";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { lazy } from "react";
-
-const PasswordReset = lazy(() => import("./PasswordReset"));
+import PasswordReset from "./PasswordReset/PasswordReset";
 
 const Signin = () => {
   const {

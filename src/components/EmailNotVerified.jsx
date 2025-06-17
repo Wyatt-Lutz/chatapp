@@ -9,15 +9,12 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
 
   const navigate = useNavigate();
   const resendEmail = async () => {
-    try {
-      await sendEmailVerification(currUser);
-      console.info("Email Verification resent");
-    } catch (error) {
-      console.error(error);
-    }
+    await sendEmailVerification(currUser);
+    console.info("Email Verification resent");
   };
 
   useEffect(() => {
+    console.log("useEffect run");
     const checkIfUserVerified = async () => {
       const verificationCookieId = `verification-${currUser.uid}`;
       const alreadySentVerification =
@@ -59,7 +56,7 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
       <div>Before you continue, please verify your email.</div>
       <div>We have sent a email verification link to {email}.</div>
       <button
-        onClick={() => resendEmail()}
+        onClick={resendEmail}
         className="border rounded-md bg-zinc-500 m-2 p-1"
       >
         Resend Email

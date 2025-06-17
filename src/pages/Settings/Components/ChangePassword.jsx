@@ -1,30 +1,24 @@
 import { updatePassword } from "firebase/auth";
-import { useForm, useWatch } from "react-hook-form";
 import { useAuth } from "../../../context/providers/AuthContext";
+import { useState } from "react";
 
 const ChangePassword = ({
   displayPassModal,
   passwordModalHeader,
   passwordModalText,
 }) => {
-  const { register, resetField, control } = useForm({
-    defaultValues: {
-      newPassword: "",
-      confirmNewPassword: "",
-    },
-  });
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const { currUser } = useAuth();
-  const newPassword = useWatch({ name: "newPassword", control });
-  const confirmNewPassword = useWatch({ name: "confirmNewPassword", control });
 
   const editPassword = async () => {
-    if (newPassword !== confirmNewPassword) return;
+    if (password !== confirmPassword) return;
 
     await displayPassModal(passwordModalHeader, passwordModalText);
 
-    await updatePassword(currUser, newPassword);
-    resetField("newPassword");
-    resetField("confirmNewPassword");
+    await updatePassword(currUser, password);
+    setPassword("");
+    setConfirmPassword("");
   };
   return (
     <>
@@ -33,16 +27,18 @@ const ChangePassword = ({
         <input
           type="password"
           placeholder="New password"
-          {...register("newPassword")}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <input
           type="password"
           placeholder="Confirm new password "
-          {...register("confirmNewPassword")}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        {newPassword.length > 0 && confirmNewPassword.length > 0 && (
+        {password.length > 0 && confirmPassword.length > 0 && (
           <button
-            disabled={newPassword !== confirmNewPassword}
+            disabled={password !== confirmPassword}
             onClick={editPassword}
           >
             Save Password

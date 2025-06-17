@@ -82,9 +82,6 @@ const Settings = () => {
       {modal.type === "ConfirmPassModal" && (
         <ConfirmPassModal {...modal.props} />
       )}
-      {modal.type === "EmailNotVerified" && (
-        <EmailNotVerified {...modal.props} />
-      )}
       {modal.type === "BlockedUsersModal" && (
         <BlockedUsersModal {...modal.props} />
       )}
