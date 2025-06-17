@@ -1,24 +1,19 @@
     <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>
 
 Priority:
-1. There was some issue where I wanted to do something but the import was ref which conflicting with the like firebase ref so I just went with another plan which was probably worse
-2. Add the request system
-3. When creating a group chat that matches one already, prompt the user if they are sure they want to create it.
-9. Add the like "new messages since x time" if a user is scrolled up
-10. Fix the layout of search messages
-12. Search for other infinite loop things becaus eof useEffect dependencies
-
-
-
-Big update:
-1. Browser side notificaitons?
-2. Dont play notification sound after like 3 times and user hasnt clicked on website or on chat -> will have to make like a notification system
-4. Fix the whole search messages
-5. VIP badges
+1. Fix the layout of search messages
+2. Search for other infinite loop things becaus eof useEffect dependencies
+3. Check if remember me works
+4. Fix codefactor bugs
+5. Find other places where I dont need to use react-hook-form
 6. Ability to send files
-7. Ability to search files/pictures
-8. When clicking on searched message, it takes you to the message, will have to load the messages around it, even when scrolling down
-11. Add rate limiting
+7. Ability to search files and pictures
+8. Rate limiting?
+9. Look at the bugs I have all below ( alot of them may be fixed )
+10. FInalize all code code
+11. Do error handling (includes error toasts)
+12. Learn and do tailwindcss
+
 
 
 

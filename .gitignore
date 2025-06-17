@@ -26,4 +26,4 @@ eslint.config.js
 *.njsproj
 *.sln
 *.sw?
-/other
+other
