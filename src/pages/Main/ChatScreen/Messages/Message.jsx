@@ -26,11 +26,68 @@ const Message = ({
     await changeEditState(messageUid, false);
   };
 
+  const renderMedia = () => {
+    const { fileRef, fileType, fileName } = messageData;
+    if (!fileRef) return null;
+
+    if (fileRef === "uploading") {
+      return (
+        <div className="rounded-md p-3 bg-gray-600 text-white text-center">
+          Uploading
+        </div>
+      );
+    }
+    if (fileType?.startsWith("image/")) {
+      return (
+        <div onClick={() => setIsPictureEnlarged(true)}>
+          <img className="rounded-md max-w-full h-80" src={fileRef} />
+        </div>
+      );
+    }
+    if (fileType?.startsWith("audio/")) {
+      return (
+        <div className="w-full max-w-md">
+          <audio controls className="w-full mt-2 rounded-md">
+            <source src={fileRef} />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      );
+    }
+    if (fileType?.startsWith("video/")) {
+      return <video controls src={fileRef} className="w-full mt-2" />;
+    }
+    if (fileType === "application/pdf") {
+      return (
+        <a
+          href={fileRef}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-blue-300"
+        >
+          View PDF: {fileName}
+        </a>
+      );
+    }
+    if (fileType?.startsWith("text/")) {
+      return (
+        <a
+          href={fileRef}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-blue-300"
+        >
+          View Text File: {fileName}
+        </a>
+      );
+    }
+  };
+
   return (
     <>
       {isPictureEnlarged && (
         <EnlargedImage
-          imageSrc={messageData.imageRef}
+          imageSrc={messageData.fileRef}
           setIsPictureEnlarged={setIsPictureEnlarged}
         />
       )}
@@ -99,20 +156,7 @@ const Message = ({
                     <div className="text-xs italic text-gray-800 ">Edited</div>
                   )}
                 </div>
-
-                {messageData.imageRef &&
-                  (messageData.imageRef === "uploading" ? (
-                    <div className="rounded-md p-3 bg-gray-600 text-white text-center">
-                      Uploading
-                    </div>
-                  ) : (
-                    <div onClick={() => setIsPictureEnlarged(true)}>
-                      <img
-                        className="rounded-md max-w-full h-80"
-                        src={messageData.imageRef}
-                      />
-                    </div>
-                  ))}
+                {renderMedia()}
               </div>
             )}
           </div>

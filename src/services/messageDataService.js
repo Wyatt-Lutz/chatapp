@@ -13,10 +13,13 @@ import {
   update,
   limitToLast,
 } from "firebase/database";
-import { fetchChatUsersByStatus } from "./memberDataService";
+import {
+  fetchChatUsersByStatus,
+  fetchMembersFromChat,
+} from "./memberDataService";
 import { storage } from "../../firebase";
 import { ref as storageRef } from "firebase/storage";
-import { uploadPicture } from "./storageDataService";
+import { uploadFile } from "./storageDataService";
 
 export const fetchOlderChats = async (db, chatID, endTimestamp) => {
   const chatsRef = ref(db, `messages/${chatID}/`);
@@ -37,10 +40,9 @@ export const addMessage = async (
   userUID,
   db,
   renderTimeAndSender,
-  firstMessageID,
   chatDispatch,
-  imageToUpload = null,
   memberData,
+  fileToUpload = null,
 ) => {
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
@@ -52,36 +54,36 @@ export const addMessage = async (
     sender: userUID,
     renderTimeAndSender,
     hasBeenEdited: false,
-    imageRef: imageToUpload ? "uploading" : null,
+    fileRef: fileToUpload ? "uploading" : null,
+    fileType: fileToUpload?.type || null,
+    fileName: fileToUpload?.name || null,
   };
   await set(newMessageRef, newMessage);
 
-  if (imageToUpload) {
-    const imageStorageLocation = storageRef(
+  if (fileToUpload) {
+    const fileStorageLocation = storageRef(
       storage,
       `chats/${chatID}/${newMessageRef.key}`,
     );
-    const imageRef = await uploadPicture(imageToUpload, imageStorageLocation);
+    const fileRef = await uploadFile(fileToUpload, fileStorageLocation);
     await update(newMessageRef, {
-      imageRef: imageRef,
+      fileRef: fileRef,
     });
   }
 
-  //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
-  if (!firstMessageID) {
-    const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
-    await runTransaction(firstMessageIdRef, (currID) => {
-      if (!currID) {
-        return newMessageRef.key; //the message ID
-      }
-      return currID;
-    });
-    chatDispatch({
-      type: "UPDATE_FIRST_MESSAGE_ID",
-      payload: newMessageRef.key,
-    });
-  }
+  const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
+  await runTransaction(firstMessageIdRef, (currID) => {
+    if (!currID) {
+      chatDispatch({
+        type: "UPDATE_FIRST_MESSAGE_ID",
+        payload: newMessageRef.key,
+      });
+      return newMessageRef.key; //the message ID
+    }
+    return currID;
+  });
 
+  console.log(memberData);
   await updateUnreadCount(db, chatID, memberData);
 };
 
@@ -99,6 +101,12 @@ export const updateFirstMessageID = async (db, chatID, messageID) => {
  * @param {String} chatID - ID of the chatroom
  */
 const updateUnreadCount = async (db, chatID, memberData) => {
+  console.log(memberData);
+  if (!memberData) {
+    memberData = Object.entries(await fetchMembersFromChat(db, chatID));
+  } else {
+    memberData = [...memberData.entries()];
+  }
   const offlineMembers = await fetchChatUsersByStatus(memberData, false);
 
   for (const userUid of offlineMembers) {
@@ -130,6 +138,7 @@ export const editTitle = async (
   db,
   displayName,
   chatDispatch,
+  memberData,
 ) => {
   const titleRef = ref(db, `chats/${chatID}`);
   await update(titleRef, {
@@ -137,5 +146,13 @@ export const editTitle = async (
   });
   const changedTitleText =
     displayName + " has changed the chat name to " + newTitle;
-  await addMessage(changedTitleText, chatID, "server", db, true, chatDispatch);
+  await addMessage(
+    changedTitleText,
+    chatID,
+    "server",
+    db,
+    true,
+    chatDispatch,
+    memberData,
+  );
 };

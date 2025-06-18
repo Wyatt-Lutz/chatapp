@@ -76,6 +76,7 @@ export const deleteAccount = async (
   chatroomsDispatch,
   navigate,
   resetAllChatContexts,
+  memberData,
 ) => {
   navigate("/");
 
@@ -98,6 +99,7 @@ export const deleteAccount = async (
       numOfMembers,
       chatDispatch,
       resetAllChatContexts,
+      memberData,
       memberOptions,
     );
   }

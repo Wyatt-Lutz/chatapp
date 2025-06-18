@@ -47,6 +47,7 @@ export const removeUserFromChat = async (
   numOfMembers,
   chatDispatch,
   resetAllChatContexts,
+  memberData,
   memberOptions = {},
 ) => {
   console.log("chatID: " + chatID);
@@ -98,6 +99,7 @@ export const removeUserFromChat = async (
     db,
     true,
     chatDispatch,
+    memberData,
   );
 
   await updateNumOfMembers(db, chatID, false);
@@ -234,13 +236,12 @@ export const getUsernameFromUid = async (db, userUid) => {
 };
 
 export const fetchChatUsersByStatus = async (memberData, status) => {
-  console.log(memberData);
-  console.log([...memberData]);
-  return [...memberData]
-    .filter(([, user]) => {
+  return memberData
+    .map(([userUid, userData]) => ({ userUid, ...userData }))
+    .filter((user) => {
       if (status === true) return user?.isOnline === true;
       if (status === false) return user?.isOnline == null;
       return false;
     })
-    .map(([userUid]) => userUid);
+    .map((user) => user.userUid);
 };

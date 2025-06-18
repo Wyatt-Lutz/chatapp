@@ -11,8 +11,8 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
   const [usernameQueryData, setUsernameQueryData] = useState([]);
   const [searchedUsername, setSearchedUsername] = useState("");
   const [modal, setModal] = useState({ type: "", user: null });
-
   const { currUser } = useAuth();
+
   useEffect(() => {
     if (!searchedUsername.trim()) {
       setUsernameQueryData([]);
@@ -28,6 +28,7 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
         setUsernameQueryData([]);
         return;
       }
+      console.log(usernameQueryData);
 
       const transformedData = Object.entries(usernameQueryData).map(
         ([userUid, userData]) => ({ userUid, ...userData }),
@@ -48,6 +49,7 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
   }, [searchedUsername, addedUsers, currUser.uid]);
 
   const addUser = async (user) => {
+    console.log(user);
     setAddedUsers((prev) => [...prev, user]);
     setUsernameQueryData((prev) =>
       prev.filter((queryUser) => queryUser.userUid !== user.userUid),

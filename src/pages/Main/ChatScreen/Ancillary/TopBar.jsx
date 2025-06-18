@@ -28,6 +28,7 @@ const TopBar = () => {
       db,
       currUser.displayName,
       chatDispatch,
+      memberState.members,
     );
   };
 

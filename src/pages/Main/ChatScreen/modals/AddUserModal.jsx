@@ -6,11 +6,21 @@ import { addMessage } from "../../../../services/messageDataService";
 
 import UserSearch from "../../../../components/UserSearch";
 import CloseModal from "../../../../components/ui/CloseModal";
+import { useEffect } from "react";
 
 const AddUserModal = ({ setIsDisplayAddUser }) => {
+  const { chatState, chatDispatch, memberState } = useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
 
-  const { chatState, chatDispatch } = useChatContexts();
+  useEffect(() => {
+    const currMemberData = [...memberState.members.entries()]
+      .map(([userUid, userData]) => ({
+        userUid,
+        ...userData,
+      }))
+      .filter((member) => !member.hasBeenRemoved);
+    setAddedUsers(currMemberData);
+  }, []);
 
   const onFinishAddingUsers = async () => {
     if (addedUsers.length === 0) {
@@ -41,8 +51,8 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
       "server",
       db,
       true,
-      chatState.firstMessageID,
       chatDispatch,
+      memberState.members,
     );
     setIsDisplayAddUser(null);
   };

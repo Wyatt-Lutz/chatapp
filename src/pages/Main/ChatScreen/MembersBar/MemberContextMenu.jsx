@@ -11,8 +11,13 @@ const MemberContextMenu = ({
   contextMenuData: { memberUid, memberData },
   points,
 }) => {
-  const { chatState, memberDispatch, chatDispatch, resetAllChatContexts } =
-    useChatContexts();
+  const {
+    chatState,
+    memberDispatch,
+    memberState,
+    chatDispatch,
+    resetAllChatContexts,
+  } = useChatContexts();
   const { currUser } = useAuth();
 
   const onChangeBlockStatus = async (newBlockStatus) => {
@@ -35,6 +40,7 @@ const MemberContextMenu = ({
       chatState.numOfMembers,
       chatDispatch,
       resetAllChatContexts,
+      memberState.members,
     );
   };
 

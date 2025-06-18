@@ -13,9 +13,8 @@ import CloseFile from "../../../../components/ui/CloseFile";
 
 const Input = () => {
   const { currUser } = useAuth();
-  const { chatState, messageState, chatDispatch, memberState } =
-    useChatContexts();
-  const [imageToUpload, setImageToUpload] = useState(null);
+  const { chatState, messageState, chatDispatch } = useChatContexts();
+  const [fileToUpload, setFileToUpload] = useState(null);
   const [text, setText] = useState("");
   const textInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
@@ -25,10 +24,10 @@ const Input = () => {
     e.preventDefault();
     setText("");
     const trimmedText = text.trim();
-    if (!trimmedText && !imageToUpload) return;
-    if (imageToUpload) {
-      setImageToUpload(null);
-      URL.revokeObjectURL(imageToUpload);
+    if (!trimmedText && !fileToUpload) return;
+    if (fileToUpload) {
+      setFileToUpload(null);
+      URL.revokeObjectURL(fileToUpload);
     }
     const messageKeys = Array.from(messageState.messages.keys());
     const lastMessage =
@@ -46,10 +45,9 @@ const Input = () => {
       currUser.uid,
       db,
       willRenderTimeAndSender,
-      chatState.firstMessageID,
       chatDispatch,
-      imageToUpload,
-      memberState.members,
+      null,
+      fileToUpload,
     );
   };
 
@@ -57,14 +55,20 @@ const Input = () => {
     const file = e.target.files[0];
     e.target.value = null; //Allows the onChange to trigger again if the user tries to add the same picture to a different message
     if (!file) return;
-    const compressedImage = await compressImage(file);
-    setImageToUpload(compressedImage);
+    console.log(file.type);
+    if (file.type.startsWith("image/")) {
+      const compressedImage = await compressImage(file);
+      setFileToUpload(compressedImage);
+    } else {
+      setFileToUpload(file);
+    }
+
     textInputRef.current?.focus(); //Will refocus the text input so the user doesn't have to reclick the input to send the message
   };
 
   const handleRemoveImage = () => {
-    setImageToUpload(null);
-    URL.revokeObjectURL(imageToUpload);
+    setFileToUpload(null);
+    URL.revokeObjectURL(fileToUpload);
     textInputRef.current?.focus();
   };
 
@@ -94,17 +98,24 @@ const Input = () => {
 
   return (
     <div>
-      {imageToUpload && (
+      {fileToUpload && (
         <div className="relative w-20 h-20 mb-2 ml-2 rounded-md overflow-hidden group">
-          <img
-            src={
-              imageToUpload instanceof Blob
-                ? URL.createObjectURL(imageToUpload)
-                : null
-            }
-            alt="hi"
-            className="w-full h-full object-cover"
-          />
+          {fileToUpload.type.startsWith("image/") ? (
+            <img
+              src={
+                fileToUpload instanceof Blob
+                  ? URL.createObjectURL(fileToUpload)
+                  : null
+              }
+              alt="hi"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="bg-gray-200 px-4 py-2 rounded">
+              <div className="text-sm">{fileToUpload.name}</div>
+            </div>
+          )}
+
           <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
             <button
               onClick={handleRemoveImage}
@@ -127,9 +138,8 @@ const Input = () => {
           <input
             type="file"
             id="filePicker"
-            disabled={imageToUpload}
+            disabled={fileToUpload}
             hidden
-            accept="image/*"
             onChange={handlePickImage}
           />
         </div>
