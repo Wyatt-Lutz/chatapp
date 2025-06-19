@@ -40,28 +40,35 @@ export const fetchNumOfMembers = async (db, chatID) => {
 
 export const removeUserFromChat = async (
   db,
-  chatID,
+  chatState,
   uidToRemove,
   usernameOfUserRemoved,
   currUserUid,
-  numOfMembers,
   chatDispatch,
   resetAllChatContexts,
   memberData,
   memberOptions = {},
+  isBanned = false,
 ) => {
-  console.log("chatID: " + chatID);
-  console.log("uidToRemove: " + uidToRemove);
-  if (uidToRemove === currUserUid) {
-    resetAllChatContexts();
-  }
-  const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
-  const chatDataRef = ref(db, `chats/${chatID}`);
+  const { chatID, numOfMembers, tempTitle, ownerUid, memberUids } = chatState;
 
-  const userRemovedServerMessage =
-    uidToRemove === currUserUid
+  if (uidToRemove === currUserUid) {
+    if (!isBanned) {
+      resetAllChatContexts();
+    } else {
+      console.error("Can't ban yourself");
+      return;
+    }
+  }
+
+  const userRemovedServerMessage = isBanned
+    ? `${usernameOfUserRemoved} has been banned.`
+    : uidToRemove === currUserUid
       ? `${usernameOfUserRemoved} has left the chat.`
       : `${usernameOfUserRemoved} has been removed from the chat.`;
+
+  const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
+  const chatDataRef = ref(db, `chats/${chatID}`);
 
   console.log(chatID);
   console.log(numOfMembers);
@@ -76,11 +83,6 @@ export const removeUserFromChat = async (
     return;
   }
 
-  const { tempTitle, ownerUid, memberUids } = await fetchChatRoomData(
-    db,
-    chatID,
-  );
-
   const newMemberUids = memberUids.replace(uidToRemove, "");
   const newTempTitle = updateTempTitle(tempTitle, usernameOfUserRemoved);
 
@@ -88,7 +90,11 @@ export const removeUserFromChat = async (
   console.log("newTempTitle: " + newTempTitle);
 
   await Promise.all([
-    update(memberToRemoveRef, { hasBeenRemoved: true, ...memberOptions }),
+    update(memberToRemoveRef, {
+      isRemoved: true,
+      ...memberOptions,
+      isBanned: isBanned,
+    }),
     update(chatDataRef, { memberUids: newMemberUids, tempTitle: newTempTitle }),
   ]);
 
@@ -144,7 +150,8 @@ export const addUserToChat = async (
 
   await Promise.all([
     set(memberRef, {
-      hasBeenRemoved: false,
+      isRemoved: false,
+      isBanned: false,
       isOnline: false,
       username: username,
       profilePictureURL: profilePictureURL,
@@ -244,4 +251,9 @@ export const fetchChatUsersByStatus = async (memberData, status) => {
       return false;
     })
     .map((user) => user.userUid);
+};
+
+export const unBanUser = async (db, chatID, userUid) => {
+  const memberRef = ref(db, `members/${chatID}/${userUid}`);
+  await update(memberRef, { isBanned: false });
 };

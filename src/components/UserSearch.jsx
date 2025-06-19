@@ -7,7 +7,7 @@ import { getBlockData } from "../services/memberDataService";
 
 import BlockedUserWarning from "./BlockedUserWarning";
 
-const UserSearch = ({ addedUsers, setAddedUsers }) => {
+const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
   const [usernameQueryData, setUsernameQueryData] = useState([]);
   const [searchedUsername, setSearchedUsername] = useState("");
   const [modal, setModal] = useState({ type: "", user: null });
@@ -34,10 +34,13 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
         ([userUid, userData]) => ({ userUid, ...userData }),
       );
 
+      const combinedUsers = [...addedUsers, ...previousUsers];
       const cleanedData = transformedData.filter(
         (user) =>
           user.userUid !== currUser.uid &&
-          !addedUsers.some((addedUser) => addedUser.userUid === user.userUid),
+          !combinedUsers.some(
+            (addedUser) => addedUser.userUid === user.userUid,
+          ),
       );
 
       console.log(cleanedData);
@@ -46,7 +49,7 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
 
     const timeout = setTimeout(fetchUsernames, 300);
     return () => clearTimeout(timeout);
-  }, [searchedUsername, addedUsers, currUser.uid]);
+  }, [searchedUsername, addedUsers, previousUsers, currUser.uid]);
 
   const addUser = async (user) => {
     console.log(user);
@@ -149,6 +152,27 @@ const UserSearch = ({ addedUsers, setAddedUsers }) => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+      {previousUsers && (
+        <div>
+          <div>Current Members</div>
+          {previousUsers
+            .filter((user) => !user.isBanned)
+            .map((user) => (
+              <div
+                key={user.userUid}
+                className="flex items-center p-2 bg-gray-400 rounded-lg"
+              >
+                <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
+                  <img
+                    className="h-full w-full object-cover"
+                    src={user.profilePictureURL}
+                  />
+                </div>
+                <span className="flex-grow font-medium">{user.username}</span>
+              </div>
+            ))}
         </div>
       )}
     </div>

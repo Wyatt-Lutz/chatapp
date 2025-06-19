@@ -1,6 +1,7 @@
 import {
   removeUserFromChat,
   transferOwnership,
+  unBanUser,
   updateBlockedStatus,
 } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
@@ -33,11 +34,10 @@ const MemberContextMenu = ({
   const onRemoveMemberFromChat = async () => {
     await removeUserFromChat(
       db,
-      chatState.chatID,
+      chatState,
       memberUid,
       memberData.username,
       currUser.uid,
-      chatState.numOfMembers,
       chatDispatch,
       resetAllChatContexts,
       memberState.members,
@@ -46,6 +46,25 @@ const MemberContextMenu = ({
 
   const onTransferOwnership = async () => {
     await transferOwnership(db, chatState.chatID, memberUid, chatDispatch);
+  };
+
+  const onBanMemberFromChat = async () => {
+    await removeUserFromChat(
+      db,
+      chatState,
+      memberUid,
+      memberData.username,
+      currUser.uid,
+      chatDispatch,
+      resetAllChatContexts,
+      memberState.members,
+      {}, //memberOptions
+      true, //isBanned
+    );
+  };
+
+  const onUnbanUser = async () => {
+    await unBanUser(db, chatState.chatID, memberUid);
   };
 
   return (
@@ -60,10 +79,25 @@ const MemberContextMenu = ({
       )}
 
       {currUser.uid === chatState.owner && (
-        <>
-          <button onClick={onRemoveMemberFromChat}>Remove User</button>
-          <button onClick={onTransferOwnership}>Transfer Ownership</button>
-        </>
+        <div>
+          {!memberData.isRemoved && (
+            <div>
+              {" "}
+              <button onClick={onRemoveMemberFromChat}>Remove User</button>
+              <button onClick={onTransferOwnership}>Transfer Ownership</button>
+            </div>
+          )}
+
+          {memberData.isBanned ? (
+            <button className="text-red-700" onClick={onUnbanUser}>
+              Unban User
+            </button>
+          ) : (
+            <button className="text-red-700" onClick={onBanMemberFromChat}>
+              Ban User
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

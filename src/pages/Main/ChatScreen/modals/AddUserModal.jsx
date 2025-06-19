@@ -7,10 +7,13 @@ import { addMessage } from "../../../../services/messageDataService";
 import UserSearch from "../../../../components/UserSearch";
 import CloseModal from "../../../../components/ui/CloseModal";
 import { useEffect } from "react";
+import { useAuth } from "../../../../context/providers/AuthContext";
 
 const AddUserModal = ({ setIsDisplayAddUser }) => {
   const { chatState, chatDispatch, memberState } = useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
+  const [previousUsers, setPreviousUsers] = useState([]);
+  const { currUser } = useAuth();
 
   useEffect(() => {
     const currMemberData = [...memberState.members.entries()]
@@ -18,8 +21,12 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
         userUid,
         ...userData,
       }))
-      .filter((member) => !member.hasBeenRemoved);
-    setAddedUsers(currMemberData);
+      .filter(
+        (member) =>
+          (!member.isRemoved || (member.isRemoved && member.isBanned)) && // keep users who are not removed but not banned or banned (which means they have been removed)
+          member.userUid !== currUser.uid,
+      );
+    setPreviousUsers(currMemberData);
   }, []);
 
   const onFinishAddingUsers = async () => {
@@ -58,7 +65,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50">
       <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
         <button
           onClick={() => setIsDisplayAddUser(null)}
@@ -69,7 +76,11 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
         <h2 className="mb-4 text-lg font-semibold">Add User</h2>
 
         <p>Enter username:</p>
-        <UserSearch addedUsers={addedUsers} setAddedUsers={setAddedUsers} />
+        <UserSearch
+          addedUsers={addedUsers}
+          setAddedUsers={setAddedUsers}
+          previousUsers={previousUsers}
+        />
 
         <div className="flex justify-end space-x-2">
           <button

@@ -117,7 +117,7 @@ const Message = ({
                         {memberDataOfSender && memberDataOfSender.username}
                       </div>
                     )}
-                    {memberDataOfSender.hasBeenRemoved && (
+                    {memberDataOfSender.isRemoved && (
                       <div> (Removed user) </div>
                     )}
                   </div>
@@ -151,7 +151,9 @@ const Message = ({
             ) : (
               <div>
                 <div className="flex w-max font-bold">
-                  <div className="text-xl">{messageData.text}</div>
+                  <div className="text-xl whitespace-pre-wrap">
+                    {messageData.text}
+                  </div>
                   {messageData.hasBeenEdited && (
                     <div className="text-xs italic text-gray-800 ">Edited</div>
                   )}

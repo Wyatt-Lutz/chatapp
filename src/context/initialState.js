@@ -7,6 +7,7 @@ export const initialChatState = {
   owner: "",
   firstMessageID: "",
   numOfMembers: null,
+  memberUids: "",
 };
 
 export const initialMemberState = { members: new Map() };

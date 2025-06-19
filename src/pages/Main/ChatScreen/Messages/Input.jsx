@@ -23,7 +23,7 @@ const Input = () => {
   const handleAddMessage = async (e) => {
     e.preventDefault();
     setText("");
-    const trimmedText = text.trim();
+    const trimmedText = text.trimEnd();
     if (!trimmedText && !fileToUpload) return;
     if (fileToUpload) {
       setFileToUpload(null);

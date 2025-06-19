@@ -28,7 +28,7 @@ const MembersBar = () => {
         ) : (
           <>
             {[...members]
-              .filter(([_, memberData]) => !memberData.hasBeenRemoved)
+              .filter(([_, memberData]) => !memberData.isRemoved)
               .map(([memberUid, memberData]) => (
                 <div
                   key={memberUid}

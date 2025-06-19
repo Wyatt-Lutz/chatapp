@@ -2,7 +2,11 @@ import { deleteUser, updateProfile } from "firebase/auth";
 
 import { update, ref, remove } from "firebase/database";
 import { queryUsernames } from "./globalDataService";
-import { fetchChatsInData, removeUserFromChat } from "./memberDataService";
+import {
+  fetchChatsInData,
+  fetchMembersFromChat,
+  removeUserFromChat,
+} from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
 import { auth } from "../../firebase";
 import { fetchChatRoomData } from "./chatBarDataService";
@@ -71,12 +75,10 @@ export const changeEmail = async (db, currUser, newEmail) => {
 export const deleteAccount = async (
   db,
   currUser,
-  numOfMembers,
   chatDispatch,
   chatroomsDispatch,
   navigate,
   resetAllChatContexts,
-  memberData,
 ) => {
   navigate("/");
 
@@ -90,13 +92,15 @@ export const deleteAccount = async (
     isOnline: false,
   };
   for (const chatID in chatsInData) {
+    const chatroomData = await fetchChatRoomData(db, chatID);
+    const memberData = Object.entries(await fetchMembersFromChat(db, chatID));
+
     await removeUserFromChat(
       db,
-      chatID,
+      { ...chatroomData, chatID },
       currUser.uid,
       currUser.displayName,
       currUser.uid,
-      numOfMembers,
       chatDispatch,
       resetAllChatContexts,
       memberData,

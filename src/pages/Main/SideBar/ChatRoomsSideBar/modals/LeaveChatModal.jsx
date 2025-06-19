@@ -1,10 +1,7 @@
 import { db } from "../../../../../../firebase";
 import { useAuth } from "../../../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../../../hooks/useContexts";
-import {
-  fetchMembersFromChat,
-  removeUserFromChat,
-} from "../../../../../services/memberDataService";
+import { removeUserFromChat } from "../../../../../services/memberDataService";
 
 import CloseModal from "../../../../../components/ui/CloseModal";
 
@@ -18,11 +15,10 @@ const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
 
     await removeUserFromChat(
       db,
-      contextMenuData.chatID,
+      contextMenuData,
       currUser.uid,
       currUser.displayName,
       currUser.uid,
-      contextMenuData.numOfMembers,
       chatDispatch,
       resetAllChatContexts,
       memberState.members,

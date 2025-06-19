@@ -49,7 +49,8 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
       membersList[member.userUid] = {
         isOnline: false,
         username: member.username,
-        hasBeenRemoved: false,
+        isRemoved: false,
+        isBanned: false,
         profilePictureURL: member.profilePictureURL,
       };
     }
