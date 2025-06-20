@@ -51,7 +51,7 @@ export const removeUserFromChat = async (
   isBanned = false,
 ) => {
   const { chatID, numOfMembers, tempTitle, ownerUid, memberUids } = chatState;
-
+  console.log(chatState);
   if (uidToRemove === currUserUid) {
     if (!isBanned) {
       resetAllChatContexts();
@@ -72,10 +72,6 @@ export const removeUserFromChat = async (
 
   console.log(chatID);
   console.log(numOfMembers);
-
-  if (!numOfMembers) {
-    numOfMembers = await fetchNumOfMembers(db, chatID);
-  }
 
   if (numOfMembers && numOfMembers <= 2) {
     await deleteChatRoom(db, chatID);
@@ -253,7 +249,35 @@ export const fetchChatUsersByStatus = async (memberData, status) => {
     .map((user) => user.userUid);
 };
 
-export const unBanUser = async (db, chatID, userUid) => {
+export const unBanUser = async (
+  db,
+  chatID,
+  userUid,
+  username,
+  chatDispatch,
+  memberData,
+) => {
   const memberRef = ref(db, `members/${chatID}/${userUid}`);
   await update(memberRef, { isBanned: false });
+  const unBanMessageText = `${username} has been unbanned!`;
+  await addMessage(
+    unBanMessageText,
+    chatID,
+    "server",
+    db,
+    true,
+    chatDispatch,
+    memberData,
+  );
+};
+
+export const fetchBannedUsers = async (db, chatID) => {
+  const membersRef = ref(db, `members/${chatID}`);
+  const memberData = (await get(membersRef)).val();
+
+  const bannedUsers = Object.entries(memberData)
+    .filter(([, userData]) => userData.isBanned)
+    .map(([uid, user]) => ({ uid, ...user }));
+
+  return bannedUsers;
 };

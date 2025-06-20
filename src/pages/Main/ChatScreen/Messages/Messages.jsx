@@ -89,8 +89,12 @@ const Messages = () => {
 
   useEffect(() => {
     const handleFetchMore = debounce(async () => {
+      console.log("handleFetchMoreRun");
       const messageData = await fetchOlderChats(db, chatID, endTimestamp);
       if (!messageData) return;
+
+      const newMessageMap = new Map(Object.entries(messageData));
+      messageDispatch({ type: "ADD_OLDER_MESSAGES", payload: newMessageMap });
       const keysOfMessages = Object.keys(messageData);
       if (keysOfMessages.length > 0) {
         const timestampOfOldestMessage =
@@ -99,10 +103,15 @@ const Messages = () => {
           type: "UPDATE_END_TIMESTAMP",
           payload: timestampOfOldestMessage,
         });
-
-        const newMessageMap = new Map(Object.entries(messageData));
-        messageDispatch({ type: "ADD_OLDER_MESSAGES", payload: newMessageMap });
       }
+      if (keysOfMessages.some((key) => key === chatState.firstMessageID)) {
+        messageDispatch({
+          type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
+          payload: true,
+        });
+      }
+
+      console.log();
     }, 300);
 
     if (!isFirstMessageRendered && isVisible && scrolled) {

@@ -64,7 +64,13 @@ const MemberContextMenu = ({
   };
 
   const onUnbanUser = async () => {
-    await unBanUser(db, chatState.chatID, memberUid);
+    await unBanUser(
+      db,
+      chatState.chatID,
+      memberUid,
+      memberData.username,
+      memberState.members,
+    );
   };
 
   return (

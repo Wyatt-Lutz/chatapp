@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { uploadPicture } from "../../services/storageDataService";
+import { uploadFile } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
 import { update, ref } from "firebase/database";
 import { db } from "../../../firebase";
@@ -23,7 +23,7 @@ const ProfilePictureUpload = ({ user }) => {
     }
 
     const photoStorageLocation = `users/${userUid}`;
-    const photoUrl = await uploadPicture(profilePicture, photoStorageLocation);
+    const photoUrl = await uploadFile(profilePicture, photoStorageLocation);
     console.log("photo url: " + photoUrl);
     await updateProfile(user.userCredential.user, {
       photoURL: photoUrl,

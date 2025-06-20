@@ -34,7 +34,9 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
         ([userUid, userData]) => ({ userUid, ...userData }),
       );
 
-      const combinedUsers = [...addedUsers, ...previousUsers];
+      const combinedUsers = previousUsers
+        ? [...addedUsers, ...previousUsers]
+        : addedUsers;
       const cleanedData = transformedData.filter(
         (user) =>
           user.userUid !== currUser.uid &&

@@ -8,7 +8,6 @@ const ChatRoom = ({ chatID, chatroomData }) => {
   const { chatroomsDispatch, chatState, chatDispatch, resetAllChatContexts } =
     useChatContexts();
   const { currUser } = useAuth();
-  console.log(chatroomData);
   const handleChangeChat = async () => {
     resetAllChatContexts();
 

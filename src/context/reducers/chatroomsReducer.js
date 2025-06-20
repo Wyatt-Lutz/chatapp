@@ -4,7 +4,6 @@ export const chatroomReducer = (state, action) => {
   let newChatrooms = new Map(state?.chatrooms);
   switch (action.type) {
     case "ADD_CHATROOM":
-      console.log(action.payload.data);
       newChatrooms.set(action.payload.key, action.payload.data);
       return { chatrooms: newChatrooms };
     case "UPDATE_TEMP_TITLE":

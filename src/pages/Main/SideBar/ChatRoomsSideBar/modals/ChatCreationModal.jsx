@@ -97,7 +97,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
 
   return (
     <>
-      <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
+      <div className="fixed z-50 inset-0 flex items-center justify-center p-6 bg-black/50">
         <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
           <button
             onClick={() => changeChatRoomCreationState(false)}

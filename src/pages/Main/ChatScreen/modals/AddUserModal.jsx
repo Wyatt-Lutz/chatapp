@@ -68,7 +68,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50">
       <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
         <button
-          onClick={() => setIsDisplayAddUser(null)}
+          onClick={() => setIsDisplayAddUser(false)}
           className="absolute top-4 right-4"
         >
           <CloseModal />
@@ -90,9 +90,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
             Finish
           </button>
           <button
-            onClick={() => {
-              setIsDisplayAddUser(null);
-            }}
+            onClick={() => setIsDisplayAddUser(false)}
             className="px-4 py-2 text-white"
           >
             Cancel

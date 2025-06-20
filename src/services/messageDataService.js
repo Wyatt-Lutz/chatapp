@@ -83,7 +83,6 @@ export const addMessage = async (
     return currID;
   });
 
-  console.log(memberData);
   await updateUnreadCount(db, chatID, memberData);
 };
 
@@ -101,13 +100,12 @@ export const updateFirstMessageID = async (db, chatID, messageID) => {
  * @param {String} chatID - ID of the chatroom
  */
 const updateUnreadCount = async (db, chatID, memberData) => {
-  console.log(memberData);
-  if (!memberData) {
-    memberData = Object.entries(await fetchMembersFromChat(db, chatID));
-  } else {
-    memberData = [...memberData.entries()];
-  }
-  const offlineMembers = await fetchChatUsersByStatus(memberData, false);
+  const transformedMemberData = [...memberData.entries()];
+  console.log(transformedMemberData);
+  const offlineMembers = await fetchChatUsersByStatus(
+    transformedMemberData,
+    false,
+  );
 
   for (const userUid of offlineMembers) {
     const userDataRef = ref(db, `users/${userUid}/chatsIn`);

@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import LeaveChatModal from "./modals/LeaveChatModal";
-const ChatRoomContextMenu = ({ contextMenuData, setContextMenu, points }) => {
+const ChatRoomContextMenu = ({
+  contextMenuData,
+  setContextMenu,
+  points,
+  setContextMenuData,
+}) => {
   const [modal, setModal] = useState({ type: "" });
 
   const onLeaveGroupChat = async (e) => {
@@ -23,6 +28,7 @@ const ChatRoomContextMenu = ({ contextMenuData, setContextMenu, points }) => {
             setModal={setModal}
             contextMenuData={contextMenuData}
             setContextMenu={setContextMenu}
+            setContextMenuData={setContextMenuData}
           />
         </div>
       )}
