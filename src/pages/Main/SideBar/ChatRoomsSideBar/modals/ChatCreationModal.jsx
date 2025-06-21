@@ -25,12 +25,12 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
 
     const currUserUid = currUser.uid;
     const currUserData = await fetchUserData(db, currUserUid);
-    const transformedCurrUserData = { userUid: currUserUid, ...currUserData };
+    const transformedCurrUserData = { uid: currUserUid, ...currUserData };
 
     const usersToAdd = [...addedUsers, transformedCurrUserData];
     console.log(usersToAdd);
 
-    const uids = usersToAdd.map((user) => user.userUid);
+    const uids = usersToAdd.map((user) => user.uid);
     const memberUids = uids.sort().join("");
     let title, tempTitle;
     title = tempTitle = "";
@@ -46,7 +46,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
     const membersList = {};
 
     for (const member of usersToAdd) {
-      membersList[member.userUid] = {
+      membersList[member.uid] = {
         isOnline: false,
         username: member.username,
         isRemoved: false,

@@ -17,6 +17,7 @@ const MemberContextMenu = ({
     memberDispatch,
     memberState,
     chatDispatch,
+    messageDispatch,
     resetAllChatContexts,
   } = useChatContexts();
   const { currUser } = useAuth();
@@ -27,7 +28,7 @@ const MemberContextMenu = ({
     console.log(newMemberObj);
     memberDispatch({
       type: "UPDATE_MEMBER_DATA",
-      payload: { userUid: memberUid, data: newMemberObj },
+      payload: { uid: memberUid, data: newMemberObj },
     });
   };
 
@@ -41,6 +42,7 @@ const MemberContextMenu = ({
       chatDispatch,
       resetAllChatContexts,
       memberState.members,
+      messageDispatch,
     );
   };
 
@@ -58,6 +60,7 @@ const MemberContextMenu = ({
       chatDispatch,
       resetAllChatContexts,
       memberState.members,
+      messageDispatch,
       {}, //memberOptions
       true, //isBanned
     );
@@ -70,6 +73,7 @@ const MemberContextMenu = ({
       memberUid,
       memberData.username,
       memberState.members,
+      messageDispatch,
     );
   };
 
@@ -87,7 +91,7 @@ const MemberContextMenu = ({
       {currUser.uid === chatState.owner && (
         <div>
           {!memberData.isRemoved && (
-            <div>
+            <div className="flex flex-col">
               {" "}
               <button onClick={onRemoveMemberFromChat}>Remove User</button>
               <button onClick={onTransferOwnership}>Transfer Ownership</button>

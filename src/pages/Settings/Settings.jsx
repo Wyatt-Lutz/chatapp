@@ -26,7 +26,7 @@ const Settings = () => {
         type: "ConfirmPassModal",
         props: {
           changeDisplayment: () => setModal({ type: null, props: {} }),
-          changeConfirmation: (confirmed) => confirmed && resolve(),
+          changeConfirmation: (confirmed) => resolve(confirmed),
           modalHeader: header,
           modalText: text,
           isDeleteAccount: isDeleteAccount,

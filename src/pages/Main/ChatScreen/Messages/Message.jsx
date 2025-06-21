@@ -145,7 +145,7 @@ const Message = ({
             className="mt-1"
           >
             {memberDataOfSender && memberDataOfSender.isBlocked ? (
-              <div className="italic text-xl font-bold py-2 w-max">
+              <div className="italic text-xl font-bold w-max">
                 Blocked Message
               </div>
             ) : (
@@ -155,7 +155,7 @@ const Message = ({
                     {messageData.text}
                   </div>
                   {messageData.hasBeenEdited && (
-                    <div className="text-xs italic text-gray-800 ">Edited</div>
+                    <div className="text-xs italic text-gray-800">Edited</div>
                   )}
                 </div>
                 {renderMedia()}

@@ -1,8 +1,8 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../../firebase";
 
-export const fetchProfilePicture = async (userUid) => {
-  const pictureRef = ref(storage, `users/${userUid}`);
+export const fetchProfilePicture = async (uid) => {
+  const pictureRef = ref(storage, `users/${uid}`);
   const pictureUrl = await getDownloadURL(pictureRef);
   return pictureUrl;
 };

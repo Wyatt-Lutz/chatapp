@@ -8,8 +8,13 @@ import { fetchChatRoomData } from "../../../../../services/chatBarDataService";
 
 const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
   const { currUser } = useAuth();
-  const { chatDispatch, resetAllChatContexts, memberState, chatState } =
-    useChatContexts();
+  const {
+    chatDispatch,
+    resetAllChatContexts,
+    memberState,
+    chatState,
+    messageDispatch,
+  } = useChatContexts();
 
   const onLeaveChat = async () => {
     setContextMenu({});
@@ -37,6 +42,7 @@ const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
       chatDispatch,
       resetAllChatContexts,
       memberState.members,
+      messageDispatch,
     );
   };
 

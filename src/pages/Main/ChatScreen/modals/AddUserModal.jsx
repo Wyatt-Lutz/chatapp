@@ -10,24 +10,29 @@ import { useEffect } from "react";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
 const AddUserModal = ({ setIsDisplayAddUser }) => {
-  const { chatState, chatDispatch, memberState } = useChatContexts();
+  const { chatState, chatDispatch, memberState, messageDispatch } =
+    useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
   const [previousUsers, setPreviousUsers] = useState([]);
   const { currUser } = useAuth();
 
   useEffect(() => {
-    const currMemberData = [...memberState.members.entries()]
-      .map(([userUid, userData]) => ({
-        userUid,
-        ...userData,
-      }))
-      .filter(
-        (member) =>
-          (!member.isRemoved || (member.isRemoved && member.isBanned)) && // keep users who are not removed but not banned or banned (which means they have been removed)
-          member.userUid !== currUser.uid,
-      );
+    const currMemberData = [...memberState.members.entries()].reduce(
+      (acc, [uid, data]) => {
+        const shouldIncludeUser =
+          (!data.isRemoved || (data.isRemoved && data.isBanned)) && // keep users who are not removed but not banned or banned (which means they have been removed)
+          uid !== currUser.uid;
+
+        if (shouldIncludeUser) {
+          acc.push({ uid, ...data });
+        }
+        return acc;
+      },
+      [],
+    );
+
     setPreviousUsers(currMemberData);
-  }, []);
+  }, [memberState.members, currUser.uid]);
 
   const onFinishAddingUsers = async () => {
     if (addedUsers.length === 0) {
@@ -39,7 +44,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
       await addUserToChat(
         db,
         chatState.chatID,
-        user.userUid,
+        user.uid,
         user.username,
         user.profilePictureURL,
         chatState.numOfMembers,
@@ -60,6 +65,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
       true,
       chatDispatch,
       memberState.members,
+      messageDispatch,
     );
     setIsDisplayAddUser(null);
   };

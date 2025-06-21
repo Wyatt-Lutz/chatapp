@@ -10,7 +10,8 @@ import {
 import UpwardArrow from "../../../../components/ui/UpwardArrow";
 
 const ChatSettings = ({ setIsSettingsOpen }) => {
-  const { chatState, chatDispatch, memberState } = useChatContexts();
+  const { chatState, chatDispatch, memberState, messageDispatch } =
+    useChatContexts();
   const [bannedUsers, setBannedUsers] = useState(null);
   const [isBannedUsersDropdown, setIsBannedUsersDropdown] = useState(false);
 
@@ -31,6 +32,7 @@ const ChatSettings = ({ setIsSettingsOpen }) => {
       user.username,
       chatDispatch,
       memberState.members,
+      messageDispatch,
     );
   };
   return (
@@ -61,7 +63,7 @@ const ChatSettings = ({ setIsSettingsOpen }) => {
           (bannedUsers?.length > 0 ? (
             bannedUsers.map((user) => (
               <div
-                key={user.userUid}
+                key={user.uid}
                 className="flex items-center p-2 bg-gray-400 rounded-lg"
               >
                 <div className="h-10 w-10 rounded-full overflow-hidden mr-3">

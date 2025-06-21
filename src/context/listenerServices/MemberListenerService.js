@@ -8,10 +8,12 @@ export const MemberListenerService = {
 
     const unsubscribers = [];
     const membersRef = ref(db, `members/${chatID}`);
-
+    console.log(action);
     if (action.onMemberAdded) {
       const handleMemberAdded = async (snap) => {
+        console.log(snap.key);
         const userBlockData = await getBlockData(db, currUserUid);
+        console.log(userBlockData);
         const memberObj = { ...snap.val(), isBlocked: userBlockData[snap.key] };
         action.onMemberAdded(snap.key, memberObj);
       };

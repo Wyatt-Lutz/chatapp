@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 import { initialMemberState } from "../initialState";
 import { membersReducer } from "../reducers/membersReducer";
 import { useAuth } from "./AuthContext";
-import { MemberListenerService } from "../listenerServices/MemberListenerService";
+import { MemberListenerService } from "../listenerServices/memberListenerService";
 import { ChatContext } from "./ChatContext";
 
 export const MemberContext = createContext();
@@ -25,17 +25,18 @@ export const MemberContextProvider = ({ children }) => {
       chatID,
       currUserUid,
       {
-        onMemberAdded: (userUid, memberData) => {
+        onMemberAdded: (uid, memberData) => {
+          console.log("onMemberAdded");
           memberDispatch({
             type: "ADD_MEMBER",
-            payload: { userUid, data: memberData },
+            payload: { uid, data: memberData },
           });
         },
 
-        onMemberUpdated: (userUid, memberData, currUserUid) => {
+        onMemberUpdated: (uid, memberData, currUserUid) => {
           memberDispatch({
             type: "UPDATE_MEMBER_DATA",
-            payload: { userUid, data: memberData, currUserUid },
+            payload: { uid, data: memberData, currUserUid },
           });
         },
       },

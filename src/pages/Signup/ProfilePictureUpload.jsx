@@ -14,7 +14,7 @@ const ProfilePictureUpload = ({ user }) => {
     user.userCredential.user.photoURL,
   );
   const [isChangingPicture, setIsChangingPicture] = useState(false);
-  const userUid = user.userCredential.user.uid;
+  const uid = user.userCredential.user.uid;
 
   const onFinish = async () => {
     if (!isChangingPicture) {
@@ -22,14 +22,14 @@ const ProfilePictureUpload = ({ user }) => {
       return;
     }
 
-    const photoStorageLocation = `users/${userUid}`;
+    const photoStorageLocation = `users/${uid}`;
     const photoUrl = await uploadFile(profilePicture, photoStorageLocation);
     console.log("photo url: " + photoUrl);
     await updateProfile(user.userCredential.user, {
       photoURL: photoUrl,
     });
 
-    const userRef = ref(db, `users/${userUid}`);
+    const userRef = ref(db, `users/${uid}`);
 
     await update(userRef, {
       profilePictureURL: photoUrl,

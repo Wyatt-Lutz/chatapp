@@ -5,10 +5,10 @@ export const membersReducer = (state, action) => {
   switch (action.type) {
     case "ADD_MEMBER":
     case "UPDATE_MEMBER_DATA":
-      const { userUid, data } = action.payload;
+      const { uid, data } = action.payload;
       console.log(action.payload);
 
-      newMembers.set(userUid, data);
+      newMembers.set(uid, data);
       return { members: newMembers };
     case "RESET":
       return initialMemberState;

@@ -37,11 +37,12 @@ export const fetchOlderChats = async (db, chatID, endTimestamp) => {
 export const addMessage = async (
   text,
   chatID,
-  userUID,
+  uid,
   db,
   renderTimeAndSender,
   chatDispatch,
   memberData,
+  messageDispatch,
   fileToUpload = null,
 ) => {
   const chatRef = ref(db, `messages/${chatID}/`);
@@ -51,7 +52,7 @@ export const addMessage = async (
   const newMessage = {
     timestamp,
     text,
-    sender: userUID,
+    sender: uid,
     renderTimeAndSender,
     hasBeenEdited: false,
     fileRef: fileToUpload ? "uploading" : null,
@@ -77,6 +78,10 @@ export const addMessage = async (
       chatDispatch({
         type: "UPDATE_FIRST_MESSAGE_ID",
         payload: newMessageRef.key,
+      });
+      messageDispatch({
+        type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
+        payload: true,
       });
       return newMessageRef.key; //the message ID
     }
@@ -107,8 +112,8 @@ const updateUnreadCount = async (db, chatID, memberData) => {
     false,
   );
 
-  for (const userUid of offlineMembers) {
-    const userDataRef = ref(db, `users/${userUid}/chatsIn`);
+  for (const uid of offlineMembers) {
+    const userDataRef = ref(db, `users/${uid}/chatsIn`);
 
     const updates = {
       [`${chatID}`]: increment(1),

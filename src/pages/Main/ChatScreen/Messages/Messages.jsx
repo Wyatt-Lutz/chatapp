@@ -12,13 +12,15 @@ import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
 import MemberContextMenu from "../MembersBar/MemberContextMenu";
 import DownArrow from "../../../../components/ui/DownArrow";
+import { useScrollListener } from "../../../../hooks/useScrollListener";
+import StartOfChatBanner from "./StartOfChatBanner";
 
 const Messages = () => {
   const { chatState, memberState, messageState, messageDispatch } =
     useChatContexts();
   const { currUser } = useAuth();
 
-  const { chatID, title, tempTitle } = chatState;
+  const { chatID, title, tempTitle, numOfMembers, firstMessageID } = chatState;
   const {
     numUnread,
     isAtBottom,
@@ -27,9 +29,16 @@ const Messages = () => {
     isFirstMessageRendered,
   } = messageState;
 
-  const [scrolled, setScrolled] = useState(false);
+  //Intersection Observer configurations
+  const [containerRef, isVisible] = useElementOnScreen({
+    root: null,
+    rootMargin: "1000px",
+    threshold: 1,
+  });
+
+  useScrollListener(containerRef, isAtBottom, messageDispatch);
+
   const [editState, setEditState] = useState({});
-  const [jsxNames, setJsxNames] = useState(null);
 
   const [memberContextMenuData, setMemberContextMenuData] = useState({});
   const [messageContextMenuData, setMessageContextMenuData] = useState({});
@@ -38,104 +47,78 @@ const Messages = () => {
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
 
-  //Intersection Observer configurations
-  const [containerRef, isVisible] = useElementOnScreen({
-    root: null,
-    rootMargin: "0px",
-    threshold: 1,
-  });
-
   useEffect(() => {
-    const names = tempTitle.split(", ");
-    const newJsxNames =
-      names.length === 3
-        ? `${names[0]}, ${names[1]}, and ${names[2]}`
-        : names.length === 2
-          ? `${names[0]} and ${names[1]}`
-          : names[0];
-    setJsxNames(newJsxNames);
-  }, [tempTitle]);
-
-  useEffect(() => {
-    if (!chatID) {
-      console.info("chatID undefined");
-      return;
+    if (!isFirstMessageRendered && isVisible) {
+      const debouncedFetch = debounce(async () => {
+        await handleFetchMore();
+      }, 300);
+      debouncedFetch();
+      return () => debouncedFetch.cancel();
     }
+  }, [isVisible, isFirstMessageRendered]);
 
-    const handleScroll = () => {
-      const scrollTop = messagesContainerRef.current.scrollTop;
-      setScrolled(true);
-      if (scrollTop !== 0 && isAtBottom) {
-        messageDispatch({ type: "UPDATE_IS_AT_BOTTOM", payload: false });
-      } else if (scrollTop === 0 && !isAtBottom) {
-        messageDispatch({ type: "UPDATE_IS_AT_BOTTOM", payload: true });
-        messageDispatch({ type: "UPDATE_UNREAD", payload: 0 });
-      }
-    };
+  const handleFetchMore = async () => {
+    const messageData = await fetchOlderChats(db, chatID, endTimestamp);
+    if (!messageData) return;
 
-    const container = messagesContainerRef.current;
-
-    container.addEventListener("scroll", handleScroll);
-    return () => {
-      container.removeEventListener("scroll", handleScroll);
-    };
-  }, [
-    chatID,
-    currUser.uid,
-    messageDispatch,
-    isAtBottom,
-    isFirstMessageRendered,
-  ]);
-
-  useEffect(() => {
-    const handleFetchMore = debounce(async () => {
-      console.log("handleFetchMoreRun");
-      const messageData = await fetchOlderChats(db, chatID, endTimestamp);
-      if (!messageData) return;
-
-      const newMessageMap = new Map(Object.entries(messageData));
-      messageDispatch({ type: "ADD_OLDER_MESSAGES", payload: newMessageMap });
-      const keysOfMessages = Object.keys(messageData);
-      if (keysOfMessages.length > 0) {
-        const timestampOfOldestMessage =
-          messageData[keysOfMessages[0]].timestamp;
-        messageDispatch({
-          type: "UPDATE_END_TIMESTAMP",
-          payload: timestampOfOldestMessage,
-        });
-      }
-      if (keysOfMessages.some((key) => key === chatState.firstMessageID)) {
-        messageDispatch({
-          type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
-          payload: true,
-        });
-      }
-
-      console.log();
-    }, 300);
-
-    if (!isFirstMessageRendered && isVisible && scrolled) {
-      handleFetchMore();
+    const newMessageMap = new Map(Object.entries(messageData));
+    messageDispatch({ type: "ADD_OLDER_MESSAGES", payload: newMessageMap });
+    const keysOfMessages = Object.keys(messageData);
+    if (keysOfMessages.length > 0) {
+      const timestampOfOldestMessage = messageData[keysOfMessages[0]].timestamp;
+      messageDispatch({
+        type: "UPDATE_END_TIMESTAMP",
+        payload: timestampOfOldestMessage,
+      });
     }
-  }, [
-    isVisible,
-    scrolled,
-    messageDispatch,
-    chatID,
-    endTimestamp,
-    isFirstMessageRendered,
-  ]);
+    if (keysOfMessages.some((key) => key === firstMessageID)) {
+      messageDispatch({
+        type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
+        payload: true,
+      });
+    }
+  };
 
   const changeEditState = (id, state) => {
     setEditState((prev) => ({ ...prev, [id]: state }));
   };
 
   const scrollToBottom = () => {
-    console.log(lastMessageRef.current);
-    console.log(isAtBottom);
     if (lastMessageRef.current && !isAtBottom) {
       lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  const renderMessages = () => {
+    return [...messages].map(([messageUid, messageData], index) => {
+      const memberDataOfSender = memberState.members.get(messageData.sender);
+      return (
+        <div key={messageUid}>
+          <Message
+            messageUid={messageUid}
+            memberDataOfSender={memberDataOfSender}
+            messageData={messageData}
+            isEditing={editState[messageUid]}
+            changeEditState={changeEditState}
+            index={index}
+            onMemberContextMenu={(e, memberUid, memberData) => {
+              e.preventDefault();
+              setContextMenu({ member: true });
+              setPoints({ member: { x: e.pageX, y: e.pageY } });
+              setMemberContextMenuData({ memberUid, memberData });
+            }}
+            onMessageContextMenu={(e, messageUid, messageData) => {
+              e.preventDefault();
+              setContextMenu({ messages: true });
+              setPoints({ messages: { x: e.pageX, y: e.pageY } });
+              setMessageContextMenuData({ messageUid, messageData });
+            }}
+          />
+
+          {index === messages.size - 1 && <div ref={lastMessageRef} />}
+        </div>
+      );
+    });
   };
 
   return (
@@ -149,62 +132,14 @@ const Messages = () => {
             <div className="text-center text-red-900 py-4">Loading...</div>
           ) : (
             <>
-              {(isFirstMessageRendered || chatState.firstMessageID === "") &&
-                (title ? (
-                  <div className="text-center text-lg mb-2">
-                    This is the start of{" "}
-                    <span className="font-semibold">{title}</span>
-                  </div>
-                ) : chatState.numOfUsers > 3 ? (
-                  <div className="text-center text-lg mb-2">
-                    This is the start of your chat with{" "}
-                    <span className="font-semibold">
-                      {tempTitle +
-                        ", and " +
-                        chatState.numOfMembers -
-                        3 +
-                        " other users"}
-                    </span>{" "}
-                  </div>
-                ) : (
-                  <div className="text-center text-lg mb-2">
-                    This is the start of your chat with{" "}
-                    <span className="font-semibold">{jsxNames}</span>
-                  </div>
-                ))}
-              {[...messages].map(([messageUid, messageData], index) => {
-                const memberDataOfSender = memberState.members.get(
-                  messageData.sender,
-                );
-                return (
-                  <div key={messageUid}>
-                    <Message
-                      messageUid={messageUid}
-                      memberDataOfSender={memberDataOfSender}
-                      messageData={messageData}
-                      isEditing={editState[messageUid]}
-                      changeEditState={changeEditState}
-                      index={index}
-                      onMemberContextMenu={(e, memberUid, memberData) => {
-                        e.preventDefault();
-                        setContextMenu({ member: true });
-                        setPoints({ member: { x: e.pageX, y: e.pageY } });
-                        setMemberContextMenuData({ memberUid, memberData });
-                      }}
-                      onMessageContextMenu={(e, messageUid, messageData) => {
-                        e.preventDefault();
-                        setContextMenu({ messages: true });
-                        setPoints({ messages: { x: e.pageX, y: e.pageY } });
-                        setMessageContextMenuData({ messageUid, messageData });
-                      }}
-                    />
-
-                    {index === messages.size - 1 && (
-                      <div ref={lastMessageRef} />
-                    )}
-                  </div>
-                );
-              })}
+              <StartOfChatBanner
+                title={title}
+                tempTitle={tempTitle}
+                numOfMembers={numOfMembers}
+                isFirstMessageRendered={isFirstMessageRendered}
+                firstMessageID={firstMessageID}
+              />
+              {renderMessages()}
             </>
           )}
           {!isAtBottom && (

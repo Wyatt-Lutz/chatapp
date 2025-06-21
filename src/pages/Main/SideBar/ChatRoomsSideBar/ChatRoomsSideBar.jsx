@@ -58,7 +58,6 @@ const ChatRoomsSideBar = () => {
           contextMenuData={contextMenuData}
           setContextMenu={setContextMenu}
           points={points}
-          setContextMenuData={setContextMenuData}
         />
       )}
     </section>

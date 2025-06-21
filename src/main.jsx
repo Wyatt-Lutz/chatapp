@@ -6,13 +6,16 @@ import { MessageContextProvider } from "./context/providers/MessageContext.jsx";
 import { AuthContextProvider } from "./context/providers/AuthContext.jsx";
 import { ChatroomsContextProvider } from "./context/providers/ChatroomsContext.jsx";
 import { ChatContextProvider } from "./context/providers/ChatContext.jsx";
+import ChatroomsListenerWrapper from "./context/ChatroomsListenerWrapper.jsx";
 
 const Providers = ({ children }) => (
   <AuthContextProvider>
     <ChatroomsContextProvider>
       <ChatContextProvider>
         <MemberContextProvider>
-          <MessageContextProvider>{children}</MessageContextProvider>
+          <MessageContextProvider>
+            <ChatroomsListenerWrapper>{children}</ChatroomsListenerWrapper>
+          </MessageContextProvider>
         </MemberContextProvider>
       </ChatContextProvider>
     </ChatroomsContextProvider>
