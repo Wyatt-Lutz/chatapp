@@ -110,7 +110,8 @@ const Input = () => {
           {fileToUpload.type.startsWith("image/") ? (
             <img
               src={
-                fileToUpload instanceof Blob
+                fileToUpload instanceof Blob &&
+                fileToUpload.type.startsWith("image/")
                   ? URL.createObjectURL(fileToUpload)
                   : null
               }
