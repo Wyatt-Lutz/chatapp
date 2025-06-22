@@ -25,12 +25,12 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
 
     const currUserUid = currUser.uid;
     const currUserData = await fetchUserData(db, currUserUid);
-    const transformedCurrUserData = { userUid: currUserUid, ...currUserData };
+    const transformedCurrUserData = { uid: currUserUid, ...currUserData };
 
     const usersToAdd = [...addedUsers, transformedCurrUserData];
     console.log(usersToAdd);
 
-    const uids = usersToAdd.map((user) => user.userUid);
+    const uids = usersToAdd.map((user) => user.uid);
     const memberUids = uids.sort().join("");
     let title, tempTitle;
     title = tempTitle = "";
@@ -46,10 +46,11 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
     const membersList = {};
 
     for (const member of usersToAdd) {
-      membersList[member.userUid] = {
+      membersList[member.uid] = {
         isOnline: false,
         username: member.username,
-        hasBeenRemoved: false,
+        isRemoved: false,
+        isBanned: false,
         profilePictureURL: member.profilePictureURL,
       };
     }
@@ -96,7 +97,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
 
   return (
     <>
-      <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
+      <div className="fixed z-50 inset-0 flex items-center justify-center p-6 bg-black/50">
         <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
           <button
             onClick={() => changeChatRoomCreationState(false)}

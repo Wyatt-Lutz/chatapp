@@ -18,11 +18,11 @@ const ChatRoomsSideBar = () => {
     setIsCreatingChat(state);
   };
 
-  const handleContextMenu = (e, chatID, numOfMembers) => {
+  const handleContextMenu = (e, chatID) => {
     e.preventDefault();
     setContextMenu({ chatroom: true });
     setPoints({ x: e.pageX, y: e.pageY });
-    setContextMenuData({ chatID: chatID, numOfMembers: numOfMembers });
+    setContextMenuData({ chatID: chatID });
   };
 
   return (
@@ -45,9 +45,7 @@ const ChatRoomsSideBar = () => {
           {[...chatrooms].map(([chatID, chatroomData]) => (
             <div
               key={chatID}
-              onContextMenu={(e) =>
-                handleContextMenu(e, chatID, chatroomData.numOfMembers)
-              }
+              onContextMenu={(e) => handleContextMenu(e, chatID)}
             >
               <ChatRoom chatID={chatID} chatroomData={chatroomData} />
             </div>

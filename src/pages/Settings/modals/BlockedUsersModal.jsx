@@ -1,43 +1,43 @@
 import { useEffect, useState } from "react";
 import {
   getBlockData,
-  getUsernameFromUid,
   updateBlockedStatus,
 } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 
-import Minus from "../../../components/ui/Minus";
 import CloseModal from "../../../components/ui/CloseModal";
+import { fetchUserData } from "../../../services/globalDataService";
 
 const BlockedUsersModal = ({ changeDisplayment }) => {
   const { currUser } = useAuth();
-  const [blockedUsers, setBlockedUsers] = useState({});
-  const [usernames, setUsernames] = useState({});
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchBlockedUsers = async () => {
       const blockedUsers = await getBlockData(db, currUser.uid);
-      setBlockedUsers(blockedUsers);
 
-      const usernameData = {};
-      for (const uid of Object.keys(blockedUsers)) {
-        if (blockedUsers[uid]) {
-          const username = await fetchUsername(uid);
-          usernameData[uid] = username;
-        }
-      }
-      setUsernames(usernameData);
+      const blockedUids = Object.entries(blockedUsers).reduce(
+        (uids, [uid, isBlocked]) => {
+          if (isBlocked) uids.push(uid);
+          return uids;
+        },
+        [],
+      );
+
+      const usersData = await Promise.all(
+        blockedUids.map(async (uid) => {
+          const userData = await fetchUserData(db, uid);
+          return { ...userData, uid };
+        }),
+      );
+      setUsers(usersData);
     };
     fetchBlockedUsers();
   }, [currUser.uid]);
 
-  const fetchUsername = async (uid) => {
-    const username = await getUsernameFromUid(db, uid);
-    return username;
-  };
-
   const unBlockUser = async (uid) => {
+    setUsers((prev) => prev.filter((user) => user.uid !== uid));
     await updateBlockedStatus(db, currUser.uid, uid, false);
   };
 
@@ -51,17 +51,31 @@ const BlockedUsersModal = ({ changeDisplayment }) => {
           <CloseModal />
         </button>
         <h2 className="mb-4 text-lg font-semibold">Blocked Users</h2>
-
-        {Object.keys(blockedUsers).map(
-          (uid) =>
-            blockedUsers[uid] && (
-              <div key={uid} className="flex">
-                <div>{usernames[uid] || "Loading..."}</div>
-                <button onClick={() => unBlockUser(uid)}>
-                  <Minus />
+        {users.length === 0 ? (
+          <div>No blocked users.</div>
+        ) : (
+          <div>
+            {users.map((user) => (
+              <div
+                className="flex items-center p-2 bg-gray-400 rounded-lg hover:bg-gray-200 transition"
+                key={user.uid}
+              >
+                <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
+                  <img
+                    className="h-full w-full object-cover"
+                    src={user.profilePictureURL}
+                  />
+                </div>
+                <span className="flex-grow font-medium">{user.username}</span>
+                <button
+                  onClick={() => unBlockUser(user.uid)}
+                  className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-blue-600 transition"
+                >
+                  Unblock
                 </button>
               </div>
-            ),
+            ))}
+          </div>
         )}
       </div>
     </div>

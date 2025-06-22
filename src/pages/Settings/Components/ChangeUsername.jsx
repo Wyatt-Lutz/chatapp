@@ -4,13 +4,16 @@ import { useState } from "react";
 import { fetchLastUsernameChangeTime } from "../../../services/userDataService";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { db } from "../../../../firebase";
+import { useChatContexts } from "../../../hooks/useContexts";
 
 const ChangeUsername = ({
   displayPassModal,
   passwordModalHeader,
   passwordModalText,
+  setCurrUsername,
 }) => {
   const { currUser } = useAuth();
+  const { chatroomsState, chatroomsDispatch } = useChatContexts();
 
   const [isEditUsernameDisabled, setIsEditUsernameDisabled] = useState(false);
   const [username, setUsername] = useState(currUser.displayName);
@@ -19,6 +22,10 @@ const ChangeUsername = ({
 
   const editUsername = async () => {
     if (isEditUsernameDisabled) return;
+    if (!currUser.emailVerified) {
+      console.info("To change your username, please verify your email.");
+      return;
+    }
     const lastUsernameChange = await fetchLastUsernameChangeTime(
       db,
       currUser.uid,
@@ -31,7 +38,14 @@ const ChangeUsername = ({
     await displayPassModal(passwordModalHeader, passwordModalText);
 
     setIsDisplayUsernameConfirmation(false);
-    await changeUsername(db, username, currUser);
+    setCurrUsername(username);
+    await changeUsername(
+      db,
+      username,
+      currUser,
+      chatroomsState.chatrooms,
+      chatroomsDispatch,
+    );
   };
   return (
     <>

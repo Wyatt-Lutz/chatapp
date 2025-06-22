@@ -27,6 +27,7 @@ export const ChatroomsListenerService = {
 
     if (action.onChatroomRemoved) {
       const handleChatroomRemoved = (snap) => {
+        console.log(snap.key);
         action.onChatroomRemoved(snap.key);
       };
 

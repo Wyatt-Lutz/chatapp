@@ -19,8 +19,8 @@ export const queryUsernames = async (db, username) => {
   return usernameQueryData;
 };
 
-export const fetchUserData = async (db, userUid) => {
-  const userDataRef = ref(db, `users/${userUid}`);
+export const fetchUserData = async (db, uid) => {
+  const userDataRef = ref(db, `users/${uid}`);
   const userData = (await get(userDataRef)).val();
   console.log(userData);
   return userData;

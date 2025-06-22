@@ -25,17 +25,17 @@ export const MemberContextProvider = ({ children }) => {
       chatID,
       currUserUid,
       {
-        onMemberAdded: (userUid, memberData) => {
+        onMemberAdded: (uid, memberData) => {
           memberDispatch({
             type: "ADD_MEMBER",
-            payload: { userUid, data: memberData },
+            payload: { uid, data: memberData },
           });
         },
 
-        onMemberUpdated: (userUid, memberData, currUserUid) => {
+        onMemberUpdated: (uid, memberData) => {
           memberDispatch({
             type: "UPDATE_MEMBER_DATA",
-            payload: { userUid, data: memberData, currUserUid },
+            payload: { uid, data: memberData },
           });
         },
       },

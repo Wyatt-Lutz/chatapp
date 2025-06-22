@@ -3,9 +3,7 @@ import { db } from "../../../firebase";
 
 export const ChatListenerService = {
   setUpChatListeners(chatID, action) {
-    if (!chatID) {
-      return;
-    }
+    if (!chatID) return;
 
     const propHandler = {
       title: action.onTitleChanged,

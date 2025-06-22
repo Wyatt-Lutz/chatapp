@@ -6,11 +6,33 @@ import { addMessage } from "../../../../services/messageDataService";
 
 import UserSearch from "../../../../components/UserSearch";
 import CloseModal from "../../../../components/ui/CloseModal";
+import { useEffect } from "react";
+import { useAuth } from "../../../../context/providers/AuthContext";
 
 const AddUserModal = ({ setIsDisplayAddUser }) => {
+  const { chatState, chatDispatch, memberState, messageDispatch } =
+    useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
+  const [previousUsers, setPreviousUsers] = useState([]);
+  const { currUser } = useAuth();
 
-  const { chatState, chatDispatch } = useChatContexts();
+  useEffect(() => {
+    const currMemberData = [...memberState.members.entries()].reduce(
+      (acc, [uid, data]) => {
+        const shouldIncludeUser =
+          (!data.isRemoved || (data.isRemoved && data.isBanned)) && // keep users who are not removed but not banned or banned (which means they have been removed)
+          uid !== currUser.uid;
+
+        if (shouldIncludeUser) {
+          acc.push({ uid, ...data });
+        }
+        return acc;
+      },
+      [],
+    );
+
+    setPreviousUsers(currMemberData);
+  }, [memberState.members, currUser.uid]);
 
   const onFinishAddingUsers = async () => {
     if (addedUsers.length === 0) {
@@ -22,7 +44,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
       await addUserToChat(
         db,
         chatState.chatID,
-        user.userUid,
+        user.uid,
         user.username,
         user.profilePictureURL,
         chatState.numOfMembers,
@@ -41,17 +63,18 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
       "server",
       db,
       true,
-      chatState.firstMessageID,
       chatDispatch,
+      memberState.members,
+      messageDispatch,
     );
     setIsDisplayAddUser(null);
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50">
       <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
         <button
-          onClick={() => setIsDisplayAddUser(null)}
+          onClick={() => setIsDisplayAddUser(false)}
           className="absolute top-4 right-4"
         >
           <CloseModal />
@@ -59,7 +82,11 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
         <h2 className="mb-4 text-lg font-semibold">Add User</h2>
 
         <p>Enter username:</p>
-        <UserSearch addedUsers={addedUsers} setAddedUsers={setAddedUsers} />
+        <UserSearch
+          addedUsers={addedUsers}
+          setAddedUsers={setAddedUsers}
+          previousUsers={previousUsers}
+        />
 
         <div className="flex justify-end space-x-2">
           <button
@@ -69,9 +96,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
             Finish
           </button>
           <button
-            onClick={() => {
-              setIsDisplayAddUser(null);
-            }}
+            onClick={() => setIsDisplayAddUser(false)}
             className="px-4 py-2 text-white"
           >
             Cancel

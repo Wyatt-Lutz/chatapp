@@ -4,23 +4,45 @@ import { useChatContexts } from "../../../../../hooks/useContexts";
 import { removeUserFromChat } from "../../../../../services/memberDataService";
 
 import CloseModal from "../../../../../components/ui/CloseModal";
+import { fetchChatRoomData } from "../../../../../services/chatBarDataService";
 
 const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
   const { currUser } = useAuth();
-  const { chatDispatch, resetAllChatContexts } = useChatContexts();
+  const {
+    chatDispatch,
+    resetAllChatContexts,
+    memberState,
+    chatState,
+    messageDispatch,
+  } = useChatContexts();
 
   const onLeaveChat = async () => {
     setContextMenu({});
     setModal({ type: "" });
+    let updatedContextMenuData;
+    if (chatState.chatID !== contextMenuData.chatID) {
+      const chatroomData = await fetchChatRoomData(db, contextMenuData.chatID);
+      updatedContextMenuData = {
+        ...contextMenuData,
+        numOfMembers: chatroomData.numOfMembers,
+        tempTitle: chatroomData.tempTitle,
+        ownerUid: chatroomData.owner,
+        memberUids: chatroomData.memberUids,
+      };
+    }
+
     await removeUserFromChat(
       db,
-      contextMenuData.chatID,
+      chatState.chatID !== contextMenuData.chatID
+        ? updatedContextMenuData
+        : chatState,
       currUser.uid,
       currUser.displayName,
       currUser.uid,
-      contextMenuData.numOfMembers,
       chatDispatch,
       resetAllChatContexts,
+      memberState.members,
+      messageDispatch,
     );
   };
 

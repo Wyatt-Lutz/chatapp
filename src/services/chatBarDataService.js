@@ -62,7 +62,7 @@ export const fetchChatRoomData = async (db, chatID) => {
   const chatroomRef = ref(db, `chats/${chatID}`);
   const chatroomDataSnap = await get(chatroomRef);
   if (!chatroomDataSnap.val()) {
-    console.error("Chatroom doesn\nt exist");
+    console.error("Chatroom doesn't exist");
     return null;
   }
   return chatroomDataSnap.val();

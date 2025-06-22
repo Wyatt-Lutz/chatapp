@@ -2,19 +2,27 @@ import { sendEmailVerification } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/providers/AuthContext";
 import { useEffect, useState } from "react";
+import { useRef } from "react";
 
 const EmailNotVerified = ({ email, setIsVerified }) => {
   const { currUser, refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
+  const hasResentEmail = useRef(false);
 
   const navigate = useNavigate();
   const resendEmail = async () => {
+    if (hasResentEmail.current) {
+      console.info(
+        "You have already tried resending the verification email, please check your email, including spam.If you think the email you entered signing up is incorrect, please click the change email button to continue to your account settings.",
+      );
+      return;
+    }
     await sendEmailVerification(currUser);
+    hasResentEmail.current = true;
     console.info("Email Verification resent");
   };
 
   useEffect(() => {
-    console.log("useEffect run");
     const checkIfUserVerified = async () => {
       const verificationCookieId = `verification-${currUser.uid}`;
       const alreadySentVerification =
@@ -49,7 +57,7 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
     return () => {
       clearInterval(timeoutID);
     };
-  }, [loading]);
+  }, [loading, currUser.emailVerified, refreshUser, setIsVerified]);
 
   return (
     <div>

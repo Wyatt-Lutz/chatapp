@@ -26,8 +26,8 @@ export const fetchMembersFromChat = async (db, chatID) => {
   return (await get(membersRef)).val();
 };
 
-export const fetchChatsInData = async (db, userUid) => {
-  const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
+export const fetchChatsInData = async (db, uid) => {
+  const chatsInRef = ref(db, `users/${uid}/chatsIn`);
   return (await get(chatsInRef)).val();
 };
 
@@ -40,45 +40,41 @@ export const fetchNumOfMembers = async (db, chatID) => {
 
 export const removeUserFromChat = async (
   db,
-  chatID,
+  chatState,
   uidToRemove,
   usernameOfUserRemoved,
   currUserUid,
-  numOfMembers,
   chatDispatch,
   resetAllChatContexts,
+  memberData,
+  messageDispatch,
   memberOptions = {},
+  isBanned = false,
 ) => {
-  console.log("chatID: " + chatID);
-  console.log("uidToRemove: " + uidToRemove);
+  const { chatID, numOfMembers, tempTitle, ownerUid, memberUids } = chatState;
   if (uidToRemove === currUserUid) {
-    resetAllChatContexts();
+    if (!isBanned) {
+      resetAllChatContexts();
+    } else {
+      console.error("Can't ban yourself");
+      return;
+    }
   }
-  const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
-  const chatDataRef = ref(db, `chats/${chatID}`);
 
-  const userRemovedServerMessage =
-    uidToRemove === currUserUid
+  const userRemovedServerMessage = isBanned
+    ? `${usernameOfUserRemoved} has been banned.`
+    : uidToRemove === currUserUid
       ? `${usernameOfUserRemoved} has left the chat.`
       : `${usernameOfUserRemoved} has been removed from the chat.`;
 
-  console.log(chatID);
-  console.log(numOfMembers);
-
-  if (!numOfMembers) {
-    numOfMembers = await fetchNumOfMembers(db, chatID);
-  }
+  const memberToRemoveRef = ref(db, `members/${chatID}/${uidToRemove}`);
+  const chatDataRef = ref(db, `chats/${chatID}`);
 
   if (numOfMembers && numOfMembers <= 2) {
     await deleteChatRoom(db, chatID);
     resetAllChatContexts();
     return;
   }
-
-  const { tempTitle, ownerUid, memberUids } = await fetchChatRoomData(
-    db,
-    chatID,
-  );
 
   const newMemberUids = memberUids.replace(uidToRemove, "");
   const newTempTitle = updateTempTitle(tempTitle, usernameOfUserRemoved);
@@ -87,7 +83,11 @@ export const removeUserFromChat = async (
   console.log("newTempTitle: " + newTempTitle);
 
   await Promise.all([
-    update(memberToRemoveRef, { hasBeenRemoved: true, ...memberOptions }),
+    update(memberToRemoveRef, {
+      isRemoved: true,
+      ...memberOptions,
+      isBanned: isBanned,
+    }),
     update(chatDataRef, { memberUids: newMemberUids, tempTitle: newTempTitle }),
   ]);
 
@@ -98,6 +98,8 @@ export const removeUserFromChat = async (
     db,
     true,
     chatDispatch,
+    memberData,
+    messageDispatch,
   );
 
   await updateNumOfMembers(db, chatID, false);
@@ -125,24 +127,25 @@ export const removeUserFromChat = async (
 export const addUserToChat = async (
   db,
   chatID,
-  userUid,
+  uid,
   username,
   profilePictureURL,
   numOfMembers,
   chatDispatch,
 ) => {
-  const memberRef = ref(db, `members/${chatID}/${userUid}`);
-  const chatsInRef = ref(db, `users/${userUid}/chatsIn`);
+  const memberRef = ref(db, `members/${chatID}/${uid}`);
+  const chatsInRef = ref(db, `users/${uid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
   const { tempTitle, memberUids } = await fetchChatRoomData(db, chatID);
   const updatedTempTitle = updateTempTitle(tempTitle, "", username);
   console.log(updatedTempTitle);
-  const newUserUidsArr = [...memberUids.match(/.{1,28}/g), userUid];
+  const newUserUidsArr = [...memberUids.match(/.{1,28}/g), uid];
   const updatedMemberUids = newUserUidsArr.sort().join("");
 
   await Promise.all([
     set(memberRef, {
-      hasBeenRemoved: false,
+      isRemoved: false,
+      isBanned: false,
       isOnline: false,
       username: username,
       profilePictureURL: profilePictureURL,
@@ -171,7 +174,6 @@ export const updateNumOfMembers = async (db, chatID, isAdd) => {
 };
 
 export const deleteChatRoom = async (db, chatID, memberData = null) => {
-  console.log("deleting chat room");
   if (!memberData) {
     memberData = Object.keys(await fetchMembersFromChat(db, chatID));
   }
@@ -206,11 +208,11 @@ export const transferOwnership = async (
 /**
  * Fetches the block status of users blocked by current user
  * @param {Database} db - Reference to Realtime Database
- * @param {string} userUid - Uid of the user whose block data is fetched
+ * @param {string} uid - Uid of the user whose block data is fetched
  * @returns {Object} Object of blocked users by current user with true and false values for current blocked status
  */
-export const getBlockData = async (db, userUid) => {
-  const userBlockListRef = ref(db, `users/${userUid}/blockList`);
+export const getBlockData = async (db, uid) => {
+  const userBlockListRef = ref(db, `users/${uid}/blockList`);
 
   const userBlockDataSnap = await get(userBlockListRef);
   const userBlockData = userBlockDataSnap.val() || {};
@@ -221,11 +223,11 @@ export const getBlockData = async (db, userUid) => {
 /**
  * Fetches a users username using their uid
  * @param {Database} db - Realtime Database Reference
- * @param {string} userUid - Uid of the user
+ * @param {string} uid - Uid of the user
  * @returns username of the user
  */
-export const getUsernameFromUid = async (db, userUid) => {
-  const userRef = ref(db, `users/${userUid}/username`);
+export const getUsernameFromUid = async (db, uid) => {
+  const userRef = ref(db, `users/${uid}/username`);
 
   const usernameSnap = await get(userRef);
   const username = usernameSnap.val();
@@ -234,11 +236,49 @@ export const getUsernameFromUid = async (db, userUid) => {
 };
 
 export const fetchChatUsersByStatus = async (memberData, status) => {
-  return [...memberData]
-    .filter(([_, user]) => {
-      if (status === true) return user?.isOnline === true;
-      if (status === false) return user?.isOnline == null;
-      return false;
-    })
-    .map(([userUid, _]) => userUid);
+  return memberData.reduce((uids, [uid, userData]) => {
+    const isOnline = userData?.isOnline;
+    if (
+      (status === true && isOnline === true) ||
+      (status === false && (isOnline === undefined || isOnline === null))
+    ) {
+      uids.push(uid);
+    }
+    return uids;
+  }, []);
+};
+
+export const unBanUser = async (
+  db,
+  chatID,
+  uid,
+  username,
+  chatDispatch,
+  memberData,
+  messageDispatch,
+) => {
+  const memberRef = ref(db, `members/${chatID}/${uid}`);
+  await update(memberRef, { isBanned: false });
+  const unBanMessageText = `${username} has been unbanned!`;
+  await addMessage(
+    unBanMessageText,
+    chatID,
+    "server",
+    db,
+    true,
+    chatDispatch,
+    memberData,
+    messageDispatch,
+  );
+};
+
+export const fetchBannedUsers = async (db, chatID) => {
+  const membersRef = ref(db, `members/${chatID}`);
+  const memberData = (await get(membersRef)).val();
+
+  const bannedUsers = Object.entries(memberData)
+    .filter(([, userData]) => userData.isBanned)
+    .map(([uid, user]) => ({ uid, ...user }));
+
+  return bannedUsers;
 };

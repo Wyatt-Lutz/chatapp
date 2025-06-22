@@ -157,7 +157,7 @@ const SignupForm = ({ onSubmitForm }) => {
             message: "Passwords must be at least 6 characters.",
           },
           pattern: {
-            value: /^[A-Za-z0-9$!@#%^&*()_\-+=\[\]{};:'",.<>/?`~\\|]+$/,
+            value: /^[A-Za-z0-9$!@#%^&*()_\-+=[\]{};:'",.<>/?`~\\|]+$/,
             message: "Invalid use of characters inside password.",
           },
         })}
@@ -172,7 +172,7 @@ const SignupForm = ({ onSubmitForm }) => {
       </button>
 
       <input type="checkbox" ref={checkboxRef} />
-      <span>Don't Remember Login</span>
+      <span>Don&apos;t Remember Login</span>
 
       {errors.username?.message}
       {errors.email?.message}

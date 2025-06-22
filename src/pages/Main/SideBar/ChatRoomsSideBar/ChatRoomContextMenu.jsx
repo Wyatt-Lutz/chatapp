@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import LeaveChatModal from "./modals/LeaveChatModal";
 const ChatRoomContextMenu = ({ contextMenuData, setContextMenu, points }) => {
   const [modal, setModal] = useState({ type: "" });

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { deleteObject, ref } from "firebase/storage";
 import { storage } from "../../../../firebase";
-import { uploadPicture } from "../../../services/storageDataService";
+import { uploadFile } from "../../../services/storageDataService";
 import { compressImage } from "../../../utils/mediaUtils";
 import { useAuth } from "../../../context/providers/AuthContext";
 import Camera from "../../../components/ui/Camera";
@@ -16,7 +16,7 @@ const ChangeProfilePicture = () => {
     const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
 
     await deleteObject(photoStorageLocation);
-    const photoURL = await uploadPicture(profilePicture, photoStorageLocation);
+    const photoURL = await uploadFile(profilePicture, photoStorageLocation);
     await updateProfile(currUser, { photoURL: photoURL });
     setIsChangingPicture(false);
     // add successful toast
@@ -40,6 +40,12 @@ const ChangeProfilePicture = () => {
     URL.revokeObjectURL(imageToUpload);
   };
 
+  const handleClick = (e) => {
+    if (!currUser.emailVerified) {
+      e.preventDefault();
+      console.info("To change your profile picture, please verify your email.");
+    }
+  };
   return (
     <div>
       <div className="relative w-32 h-32 group">
@@ -63,6 +69,7 @@ const ChangeProfilePicture = () => {
           type="file"
           id="filePicker"
           hidden
+          onClick={handleClick}
           accept="image/*"
           onChange={handlePickImage}
         />

@@ -13,6 +13,7 @@ import BlockedUsersModal from "./modals/BlockedUsersModal";
 const Settings = () => {
   const { currUser } = useAuth();
   const navigate = useNavigate();
+  const [currUsername, setCurrUsername] = useState(currUser.displayName);
 
   const [modal, setModal] = useState({ type: null, props: {} });
 
@@ -26,7 +27,7 @@ const Settings = () => {
         type: "ConfirmPassModal",
         props: {
           changeDisplayment: () => setModal({ type: null, props: {} }),
-          changeConfirmation: (confirmed) => confirmed && resolve(),
+          changeConfirmation: (confirmed) => resolve(confirmed),
           modalHeader: header,
           modalText: text,
           isDeleteAccount: isDeleteAccount,
@@ -43,13 +44,14 @@ const Settings = () => {
 
       <div className="flex">
         <ChangeProfilePicture />
-        <div>{currUser.displayName}</div>
+        <div>{currUsername}</div>
       </div>
 
       <ChangeUsername
         displayPassModal={displayPassModal}
         passwordModalHeader={passwordModalHeader}
         passwordModalText={passwordModalText}
+        setCurrUsername={setCurrUsername}
       />
       <ChangeEmail
         displayPassModal={displayPassModal}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { uploadPicture } from "../../services/storageDataService";
+import { uploadFile } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
 import { update, ref } from "firebase/database";
 import { db } from "../../../firebase";
@@ -14,7 +14,7 @@ const ProfilePictureUpload = ({ user }) => {
     user.userCredential.user.photoURL,
   );
   const [isChangingPicture, setIsChangingPicture] = useState(false);
-  const userUid = user.userCredential.user.uid;
+  const uid = user.userCredential.user.uid;
 
   const onFinish = async () => {
     if (!isChangingPicture) {
@@ -22,14 +22,14 @@ const ProfilePictureUpload = ({ user }) => {
       return;
     }
 
-    const photoStorageLocation = `users/${userUid}`;
-    const photoUrl = await uploadPicture(profilePicture, photoStorageLocation);
+    const photoStorageLocation = `users/${uid}`;
+    const photoUrl = await uploadFile(profilePicture, photoStorageLocation);
     console.log("photo url: " + photoUrl);
     await updateProfile(user.userCredential.user, {
       photoURL: photoUrl,
     });
 
-    const userRef = ref(db, `users/${userUid}`);
+    const userRef = ref(db, `users/${uid}`);
 
     await update(userRef, {
       profilePictureURL: photoUrl,
@@ -51,9 +51,9 @@ const ProfilePictureUpload = ({ user }) => {
   };
 
   const onCancel = () => {
-    setProfilePicture(currUser.photoURL);
+    setProfilePicture(user.userCredential.user.photoURL);
     setIsChangingPicture(false);
-    URL.revokeObjectURL(imageToUpload);
+    URL.revokeObjectURL(profilePicture);
   };
 
   return (

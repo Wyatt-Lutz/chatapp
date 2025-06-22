@@ -1,6 +1,7 @@
 import {
   removeUserFromChat,
   transferOwnership,
+  unBanUser,
   updateBlockedStatus,
 } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
@@ -11,8 +12,14 @@ const MemberContextMenu = ({
   contextMenuData: { memberUid, memberData },
   points,
 }) => {
-  const { chatState, memberDispatch, chatDispatch, resetAllChatContexts } =
-    useChatContexts();
+  const {
+    chatState,
+    memberDispatch,
+    memberState,
+    chatDispatch,
+    messageDispatch,
+    resetAllChatContexts,
+  } = useChatContexts();
   const { currUser } = useAuth();
 
   const onChangeBlockStatus = async (newBlockStatus) => {
@@ -21,25 +28,53 @@ const MemberContextMenu = ({
     console.log(newMemberObj);
     memberDispatch({
       type: "UPDATE_MEMBER_DATA",
-      payload: { userUid: memberUid, data: newMemberObj },
+      payload: { uid: memberUid, data: newMemberObj },
     });
   };
 
   const onRemoveMemberFromChat = async () => {
     await removeUserFromChat(
       db,
-      chatState.chatID,
+      chatState,
       memberUid,
       memberData.username,
       currUser.uid,
-      chatState.numOfMembers,
       chatDispatch,
       resetAllChatContexts,
+      memberState.members,
+      messageDispatch,
     );
   };
 
   const onTransferOwnership = async () => {
     await transferOwnership(db, chatState.chatID, memberUid, chatDispatch);
+  };
+
+  const onBanMemberFromChat = async () => {
+    await removeUserFromChat(
+      db,
+      chatState,
+      memberUid,
+      memberData.username,
+      currUser.uid,
+      chatDispatch,
+      resetAllChatContexts,
+      memberState.members,
+      messageDispatch,
+      {}, //memberOptions
+      true, //isBanned
+    );
+  };
+
+  const onUnbanUser = async () => {
+    await unBanUser(
+      db,
+      chatState.chatID,
+      memberUid,
+      memberData.username,
+      memberState.members,
+      messageDispatch,
+    );
   };
 
   return (
@@ -54,10 +89,25 @@ const MemberContextMenu = ({
       )}
 
       {currUser.uid === chatState.owner && (
-        <>
-          <button onClick={onRemoveMemberFromChat}>Remove User</button>
-          <button onClick={onTransferOwnership}>Transfer Ownership</button>
-        </>
+        <div>
+          {!memberData.isRemoved && (
+            <div className="flex flex-col">
+              {" "}
+              <button onClick={onRemoveMemberFromChat}>Remove User</button>
+              <button onClick={onTransferOwnership}>Transfer Ownership</button>
+            </div>
+          )}
+
+          {memberData.isBanned ? (
+            <button className="text-red-700" onClick={onUnbanUser}>
+              Unban User
+            </button>
+          ) : (
+            <button className="text-red-700" onClick={onBanMemberFromChat}>
+              Ban User
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

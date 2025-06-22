@@ -9,15 +9,17 @@ import {
   orderByChild,
   remove,
   serverTimestamp,
-  limitToFirst,
   increment,
   update,
   limitToLast,
 } from "firebase/database";
-import { fetchChatUsersByStatus } from "./memberDataService";
+import {
+  fetchChatUsersByStatus,
+  fetchMembersFromChat,
+} from "./memberDataService";
 import { storage } from "../../firebase";
 import { ref as storageRef } from "firebase/storage";
-import { uploadPicture } from "./storageDataService";
+import { uploadFile } from "./storageDataService";
 
 export const fetchOlderChats = async (db, chatID, endTimestamp) => {
   const chatsRef = ref(db, `messages/${chatID}/`);
@@ -35,13 +37,13 @@ export const fetchOlderChats = async (db, chatID, endTimestamp) => {
 export const addMessage = async (
   text,
   chatID,
-  userUID,
+  uid,
   db,
   renderTimeAndSender,
-  firstMessageID,
   chatDispatch,
-  imageToUpload = null,
   memberData,
+  messageDispatch,
+  fileToUpload = null,
 ) => {
   const chatRef = ref(db, `messages/${chatID}/`);
   const newMessageRef = push(chatRef);
@@ -50,38 +52,41 @@ export const addMessage = async (
   const newMessage = {
     timestamp,
     text,
-    sender: userUID,
+    sender: uid,
     renderTimeAndSender,
     hasBeenEdited: false,
-    imageRef: imageToUpload ? "uploading" : null,
+    fileRef: fileToUpload ? "uploading" : null,
+    fileType: fileToUpload?.type || null,
+    fileName: fileToUpload?.name || null,
   };
   await set(newMessageRef, newMessage);
 
-  if (imageToUpload) {
-    const imageStorageLocation = storageRef(
+  if (fileToUpload) {
+    const fileStorageLocation = storageRef(
       storage,
       `chats/${chatID}/${newMessageRef.key}`,
     );
-    const imageRef = await uploadPicture(imageToUpload, imageStorageLocation);
+    const fileRef = await uploadFile(fileToUpload, fileStorageLocation);
     await update(newMessageRef, {
-      imageRef: imageRef,
+      fileRef: fileRef,
     });
   }
 
-  //If there isn't a first message already, set this message to be the first using runTransaction for atomicity
-  if (!firstMessageID) {
-    const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
-    await runTransaction(firstMessageIdRef, (currID) => {
-      if (!currID) {
-        return newMessageRef.key; //the message ID
-      }
-      return currID;
-    });
-    chatDispatch({
-      type: "UPDATE_FIRST_MESSAGE_ID",
-      payload: newMessageRef.key,
-    });
-  }
+  const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
+  await runTransaction(firstMessageIdRef, (currID) => {
+    if (!currID) {
+      chatDispatch({
+        type: "UPDATE_FIRST_MESSAGE_ID",
+        payload: newMessageRef.key,
+      });
+      messageDispatch({
+        type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
+        payload: true,
+      });
+      return newMessageRef.key; //the message ID
+    }
+    return currID;
+  });
 
   await updateUnreadCount(db, chatID, memberData);
 };
@@ -100,10 +105,15 @@ export const updateFirstMessageID = async (db, chatID, messageID) => {
  * @param {String} chatID - ID of the chatroom
  */
 const updateUnreadCount = async (db, chatID, memberData) => {
-  const offlineMembers = await fetchChatUsersByStatus(memberData, false);
+  const transformedMemberData = [...memberData.entries()];
+  console.log(transformedMemberData);
+  const offlineMembers = await fetchChatUsersByStatus(
+    transformedMemberData,
+    false,
+  );
 
-  for (const userUid of offlineMembers) {
-    const userDataRef = ref(db, `users/${userUid}/chatsIn`);
+  for (const uid of offlineMembers) {
+    const userDataRef = ref(db, `users/${uid}/chatsIn`);
 
     const updates = {
       [`${chatID}`]: increment(1),
@@ -131,6 +141,7 @@ export const editTitle = async (
   db,
   displayName,
   chatDispatch,
+  memberData,
 ) => {
   const titleRef = ref(db, `chats/${chatID}`);
   await update(titleRef, {
@@ -138,5 +149,13 @@ export const editTitle = async (
   });
   const changedTitleText =
     displayName + " has changed the chat name to " + newTitle;
-  await addMessage(changedTitleText, chatID, "server", db, true, chatDispatch);
+  await addMessage(
+    changedTitleText,
+    chatID,
+    "server",
+    db,
+    true,
+    chatDispatch,
+    memberData,
+  );
 };

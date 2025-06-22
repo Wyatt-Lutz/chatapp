@@ -6,6 +6,8 @@ import { useChatContexts } from "../../../../hooks/useContexts";
 import Search from "./Search";
 import SearchSVG from "../../../../components/ui/SearchSVG";
 import AddUserModal from "../modals/AddUserModal";
+import SettingsSVG from "../../../../components/ui/SettingsSVG";
+import ChatSettings from "../modals/ChatSettings";
 
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -14,6 +16,7 @@ const TopBar = () => {
   const { currUser } = useAuth();
   const [isDisplayAddUser, setIsDisplayAddUser] = useState(false);
   const [isSearchingMessages, setIsSearchingMessages] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [topBarTitle, setTopBarTitle] = useState("");
 
   const onFinishEditTitle = async () => {
@@ -28,6 +31,7 @@ const TopBar = () => {
       db,
       currUser.displayName,
       chatDispatch,
+      memberState.members,
     );
   };
 
@@ -36,6 +40,7 @@ const TopBar = () => {
       {isDisplayAddUser && (
         <AddUserModal setIsDisplayAddUser={setIsDisplayAddUser} />
       )}
+      {isSettingsOpen && <ChatSettings setIsSettingsOpen={setIsSettingsOpen} />}
       <div
         className="ring"
         onMouseOver={() => setIsEditingTitle(true)}
@@ -58,6 +63,9 @@ const TopBar = () => {
         <button onClick={() => setIsDisplayAddUser(true)}>Add User</button>
         <button onClick={() => setIsSearchingMessages(true)}>
           <SearchSVG />
+        </button>
+        <button onClick={() => setIsSettingsOpen(true)}>
+          <SettingsSVG />
         </button>
       </div>
       {isSearchingMessages && <Search />}

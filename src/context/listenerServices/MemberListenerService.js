@@ -8,11 +8,15 @@ export const MemberListenerService = {
 
     const unsubscribers = [];
     const membersRef = ref(db, `members/${chatID}`);
-
+    console.log(action);
     if (action.onMemberAdded) {
+      //This will only handle loading members when the user opens a chatroom, or adding a user to a chatroom that has never been added to it before.
       const handleMemberAdded = async (snap) => {
         const userBlockData = await getBlockData(db, currUserUid);
-        const memberObj = { ...snap.val(), isBlocked: userBlockData[snap.key] };
+        const memberObj = {
+          ...snap.val(),
+          isBlocked: userBlockData[snap.key] || false,
+        };
         action.onMemberAdded(snap.key, memberObj);
       };
 
@@ -21,8 +25,11 @@ export const MemberListenerService = {
     }
 
     if (action.onMemberUpdated) {
-      const handleUpdateMember = (snap) => {
-        action.onMemberUpdated(snap.key, snap.val(), currUserUid);
+      //This also runs if a user who has been previously removed is re-added because their data isn't ever deleted
+      const handleUpdateMember = async (snap) => {
+        const userBlockData = await getBlockData(db, currUserUid);
+        const memberObj = { ...snap.val(), isBlocked: userBlockData[snap.key] };
+        action.onMemberUpdated(snap.key, memberObj);
       };
 
       const memberUpdatedListener = onChildChanged(

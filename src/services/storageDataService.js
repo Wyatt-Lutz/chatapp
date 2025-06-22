@@ -1,21 +1,21 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../../firebase";
 
-export const fetchProfilePicture = async (userUid) => {
-  const pictureRef = ref(storage, `users/${userUid}`);
+export const fetchProfilePicture = async (uid) => {
+  const pictureRef = ref(storage, `users/${uid}`);
   const pictureUrl = await getDownloadURL(pictureRef);
   return pictureUrl;
 };
 
-export const uploadPicture = async (image, storageLocation) => {
+export const uploadFile = async (file, storageLocation) => {
   return new Promise((resolve) => {
     const metadata = {
-      contentType: image.type,
+      contentType: file.type,
       cacheControl: "public,max-age=31536000",
     };
 
-    const pictureRef = ref(storage, storageLocation);
-    const uploadTask = uploadBytesResumable(pictureRef, image, metadata);
+    const fileRef = ref(storage, storageLocation);
+    const uploadTask = uploadBytesResumable(fileRef, file, metadata);
 
     uploadTask.on(
       "state_changed",
@@ -43,8 +43,8 @@ export const uploadPicture = async (image, storageLocation) => {
         }
       },
       async () => {
-        const imageURL = await getDownloadURL(uploadTask.snapshot.ref);
-        resolve(imageURL);
+        const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
+        resolve(fileURL);
       },
     );
   });

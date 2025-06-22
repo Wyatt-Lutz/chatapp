@@ -1,18 +1,10 @@
 import CloseModal from "./ui/CloseModal";
 
-const BlockedUserWarning = ({ setModal, setAddedUsers, user }) => {
-  const onAddUser = () => {
-    setAddedUsers((prev) => [...prev, user]);
-    setModal({ type: "", user: null });
-  };
-
+const BlockedUserWarning = ({ changeDisplayment, changeConfirmation }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
       <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
-        <button
-          onClick={() => setModal({ type: "", user: null })}
-          className="absolute top-4 right-4"
-        >
+        <button onClick={changeDisplayment} className="absolute top-4 right-4">
           <CloseModal />
         </button>
 
@@ -24,13 +16,13 @@ const BlockedUserWarning = ({ setModal, setAddedUsers, user }) => {
         <div>
           <button
             className="border rounded-md bg-zinc-500 m-2 p-1"
-            onClick={onAddUser}
+            onClick={() => changeConfirmation(true)}
           >
             Yes
           </button>
           <button
             className="border rounded-md bg-zinc-500 m-2 p-1"
-            onClick={() => setModal({ type: "", user: null })}
+            onClick={() => changeConfirmation(false)}
           >
             No
           </button>

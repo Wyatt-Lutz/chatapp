@@ -11,7 +11,7 @@ const ChatRoom = ({ chatID, chatroomData }) => {
   const handleChangeChat = async () => {
     resetAllChatContexts();
 
-    const { firstMessageID, owner, tempTitle, title, numOfMembers } =
+    const { firstMessageID, owner, title, tempTitle, numOfMembers } =
       await fetchChatRoomData(db, chatID);
     if (title !== chatroomData.title) {
       chatroomsDispatch({
@@ -35,8 +35,9 @@ const ChatRoom = ({ chatID, chatroomData }) => {
         firstMessageID,
         owner,
         tempTitle: updatedTempTitle,
-        title,
+        title: chatroomData.title,
         numOfMembers,
+        memberUids: chatroomData.memberUids,
       },
     });
   };
