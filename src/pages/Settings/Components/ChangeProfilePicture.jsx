@@ -40,6 +40,12 @@ const ChangeProfilePicture = () => {
     URL.revokeObjectURL(imageToUpload);
   };
 
+  const handleClick = (e) => {
+    if (!currUser.emailVerified) {
+      e.preventDefault();
+      console.info("To change your profile picture, please verify your email.");
+    }
+  };
   return (
     <div>
       <div className="relative w-32 h-32 group">
@@ -63,6 +69,7 @@ const ChangeProfilePicture = () => {
           type="file"
           id="filePicker"
           hidden
+          onClick={handleClick}
           accept="image/*"
           onChange={handlePickImage}
         />

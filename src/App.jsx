@@ -60,9 +60,7 @@ function App() {
             path="/settings"
             element={
               <AuthProtected>
-                <VerifiedProtected>
-                  <Settings />
-                </VerifiedProtected>
+                <Settings />
               </AuthProtected>
             }
           />

@@ -10,11 +10,13 @@ import {
 import { signUserOut } from "../utils/userUtils";
 import { auth } from "../../firebase";
 import { fetchChatRoomData } from "./chatBarDataService";
+import { updateTempTitle } from "../utils/chatroomUtils";
 
 export const changeUsername = async (
   db,
   newUsername,
   currUser,
+  chatroomsData,
   chatroomsDispatch,
 ) => {
   const userData = await queryUsernames(db, newUsername);
@@ -23,46 +25,55 @@ export const changeUsername = async (
     return;
   }
 
+  const oldUsername = currUser.displayName;
+
   const currUserDataRef = ref(db, `users/${currUser.uid}`);
+
   await update(currUserDataRef, {
     username: newUsername,
     lastUsernameChange: Date.now(),
   });
 
-  const chatsInData = await fetchChatsInData(db, currUser.uid);
-
-  if (chatsInData) {
-    const updateChatroomsPromise = Object.keys(chatsInData).map(
-      async (chatID) => {
-        const chatroomMemberRef = ref(db, `members/${chatID}/${currUser.uid}`);
-        const chatroomDataRef = ref(db, `chats/${chatID}`);
-        const { tempTitle } = await fetchChatRoomData(db, chatID);
-        const updatedTempTitle = tempTitle
-          .split(", ")
-          .filter((user) => user !== currUser.displayName)
-          .concat(newUsername)
-          .join(", ");
-        chatroomsDispatch({
-          type: "UPDATE_TEMP_TITLE",
-          payload: { key: chatID, data: updatedTempTitle },
-        });
-        return Promise.all([
-          update(chatroomMemberRef, {
-            username: newUsername,
-          }),
-
-          update(chatroomDataRef, {
-            tempTitle: updatedTempTitle,
-          }),
-        ]);
-      },
-    );
-    await Promise.all(updateChatroomsPromise);
-  }
-
   await updateProfile(currUser, {
     displayName: newUsername,
   });
+
+  let chatroomUids = [...chatroomsData.keys()];
+  if (chatroomUids.length < 1) {
+    const chatsInData = await fetchChatsInData(db, currUser.uid);
+    if (!chatsInData) {
+      return;
+    } else {
+      chatroomUids = Object.keys(chatsInData);
+    }
+  }
+
+  const updateChatroomsPromise = chatroomUids.map(async (chatID) => {
+    const chatroomMemberRef = ref(db, `members/${chatID}/${currUser.uid}`);
+    const chatroomDataRef = ref(db, `chats/${chatID}`);
+    const { tempTitle } = await fetchChatRoomData(db, chatID);
+    const newServerTempTitle = updateTempTitle(
+      tempTitle,
+      oldUsername,
+      newUsername,
+    );
+    const newClientTempTitle = updateTempTitle(newServerTempTitle, newUsername);
+
+    chatroomsDispatch({
+      type: "UPDATE_TEMP_TITLE",
+      payload: { key: chatID, data: newClientTempTitle },
+    });
+    return Promise.all([
+      update(chatroomMemberRef, {
+        username: newUsername,
+      }),
+
+      update(chatroomDataRef, {
+        tempTitle: newServerTempTitle,
+      }),
+    ]);
+  });
+  await Promise.all(updateChatroomsPromise);
 };
 
 export const changeEmail = async (db, currUser, newEmail) => {
@@ -81,8 +92,6 @@ export const deleteAccount = async (
   resetAllChatContexts,
   messageDispatch,
 ) => {
-  navigate("/");
-
   const userRef = ref(db, `users/${currUser.uid}`);
 
   const chatsInData = await fetchChatsInData(db, currUser.uid);
@@ -115,4 +124,5 @@ export const deleteAccount = async (
   await deleteUser(currUser);
 
   await signUserOut(auth, resetAllChatContexts, chatroomsDispatch);
+  navigate("/signin");
 };

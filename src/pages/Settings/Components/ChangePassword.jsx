@@ -12,6 +12,12 @@ const ChangePassword = ({
   const { currUser } = useAuth();
 
   const editPassword = async () => {
+    if (!currUser.emailVerified) {
+      console.info(
+        "You have not yet verified your email. To change your password, please use the reset password button on the signin page.",
+      );
+      return;
+    }
     if (password !== confirmPassword) return;
 
     await displayPassModal(passwordModalHeader, passwordModalText);
