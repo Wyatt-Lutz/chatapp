@@ -26,17 +26,16 @@ export const MemberContextProvider = ({ children }) => {
       currUserUid,
       {
         onMemberAdded: (uid, memberData) => {
-          console.log("onMemberAdded");
           memberDispatch({
             type: "ADD_MEMBER",
             payload: { uid, data: memberData },
           });
         },
 
-        onMemberUpdated: (uid, memberData, currUserUid) => {
+        onMemberUpdated: (uid, memberData) => {
           memberDispatch({
             type: "UPDATE_MEMBER_DATA",
-            payload: { uid, data: memberData, currUserUid },
+            payload: { uid, data: memberData },
           });
         },
       },

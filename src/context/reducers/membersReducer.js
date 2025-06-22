@@ -6,7 +6,6 @@ export const membersReducer = (state, action) => {
     case "ADD_MEMBER":
     case "UPDATE_MEMBER_DATA":
       const { uid, data } = action.payload;
-      console.log(action.payload);
 
       newMembers.set(uid, data);
       return { members: newMembers };
