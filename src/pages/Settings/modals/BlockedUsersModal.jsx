@@ -6,7 +6,6 @@ import {
 import { db } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 
-import Minus from "../../../components/ui/Minus";
 import CloseModal from "../../../components/ui/CloseModal";
 import { fetchUserData } from "../../../services/globalDataService";
 
