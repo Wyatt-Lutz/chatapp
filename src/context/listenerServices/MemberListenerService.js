@@ -8,7 +8,6 @@ export const MemberListenerService = {
 
     const unsubscribers = [];
     const membersRef = ref(db, `members/${chatID}`);
-    console.log(action);
     if (action.onMemberAdded) {
       //This will only handle loading members when the user opens a chatroom, or adding a user to a chatroom that has never been added to it before.
       const handleMemberAdded = async (snap) => {

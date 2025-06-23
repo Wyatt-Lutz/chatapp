@@ -47,7 +47,7 @@ const MemberContextMenu = ({
   };
 
   const onTransferOwnership = async () => {
-    await transferOwnership(db, chatState.chatID, memberUid, chatDispatch);
+    await transferOwnership(db, chatState.chatID, memberUid);
   };
 
   const onBanMemberFromChat = async () => {

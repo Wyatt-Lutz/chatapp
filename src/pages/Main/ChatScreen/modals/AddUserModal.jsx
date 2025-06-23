@@ -38,18 +38,10 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
     if (addedUsers.length === 0) {
       return; //toast
     }
-
+    setIsDisplayAddUser(null);
     addedUsers.forEach(async (user) => {
       console.log(user);
-      await addUserToChat(
-        db,
-        chatState.chatID,
-        user.uid,
-        user.username,
-        user.profilePictureURL,
-        chatState.numOfMembers,
-        chatDispatch,
-      );
+      await addUserToChat(db, user, chatState);
     });
     const userAddedServerMessage =
       addedUsers
@@ -67,7 +59,6 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
       memberState.members,
       messageDispatch,
     );
-    setIsDisplayAddUser(null);
   };
 
   return (

@@ -52,6 +52,12 @@ export const ChatContextProvider = ({ children }) => {
       onNumOfMembersChanged: (numOfMembers) => {
         chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: numOfMembers });
       },
+      onLastMessageTimestampChange: (lastMessageTimestamp) => {
+        chatroomsDispatch({
+          type: "UPDATE_LAST_MESSAGE_TIMESTAMP",
+          payload: { key: chatID, data: lastMessageTimestamp },
+        });
+      },
     });
 
     return unsubscribe;

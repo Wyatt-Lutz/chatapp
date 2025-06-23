@@ -28,7 +28,7 @@ function App() {
 
   const VerifiedProtected = ({ children }) => {
     if (loading || loadingAuth) {
-      return <div>Loading...</div>;
+      return <div>Loading App...</div>;
     }
     if (!isVerified) {
       return (

@@ -1,4 +1,11 @@
-import { push, ref, set, update, get } from "firebase/database";
+import {
+  push,
+  ref,
+  set,
+  update,
+  get,
+  serverTimestamp,
+} from "firebase/database";
 
 export const createChat = async (
   db,
@@ -23,6 +30,7 @@ export const createChat = async (
       memberUids: memberUids,
       firstMessageID: "",
       numOfMembers: numOfMembers,
+      lastMessageTimestamp: serverTimestamp(),
     };
 
     await Promise.all([
@@ -44,12 +52,9 @@ export const createChat = async (
 };
 
 export const checkIfDuplicateChat = (newChatMemberUids, chatrooms) => {
-  for (const chatroom of chatrooms.values()) {
-    if (chatroom.memberUids === newChatMemberUids) {
-      return true;
-    }
-  }
-  return false;
+  return [...chatrooms.values()].some(
+    (chatroom) => chatroom.memberUids === newChatMemberUids,
+  );
 };
 
 /**

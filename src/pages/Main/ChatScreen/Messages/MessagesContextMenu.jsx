@@ -8,12 +8,10 @@ const MessagesContextMenu = ({
   contextMenuData: { messageUid, messageData },
   points,
 }) => {
-  const { chatState, messageDispatch } = useChatContexts();
+  const { chatState } = useChatContexts();
   const { currUser } = useAuth();
 
   const handleDeleteMessage = async () => {
-    messageDispatch({ type: "REMOVE_MESSAGE", payload: messageUid });
-
     await deleteMessage(db, chatState.chatID, messageUid);
     if (messageData.imageRef) {
       const imageLocation = ref(

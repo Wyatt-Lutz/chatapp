@@ -7,7 +7,6 @@ import {
 } from "../../../../../services/chatBarDataService";
 import { useChatContexts } from "../../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../../utils/chatroomUtils";
-import { fetchUserData } from "../../../../../services/globalDataService";
 
 import UserSearch from "../../../../../components/UserSearch";
 import CloseModal from "../../../../../components/ui/CloseModal";
@@ -20,51 +19,40 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
   const [chatTitleInputText, setChatTitleInputText] = useState("");
 
   const handleCreateChat = async () => {
-    console.log("run");
     if (addedUsers.length === 0) return;
 
-    const currUserUid = currUser.uid;
-    const currUserData = await fetchUserData(db, currUserUid);
-    const transformedCurrUserData = { uid: currUserUid, ...currUserData };
+    const { uid, displayName, photoURL } = currUser;
 
-    const usersToAdd = [...addedUsers, transformedCurrUserData];
-    console.log(usersToAdd);
+    const usersToAdd = [
+      ...addedUsers,
+      { uid, username: displayName, profilePictureURL: photoURL }, //This is the client users data
+    ];
 
     const uids = usersToAdd.map((user) => user.uid);
     const memberUids = uids.sort().join("");
-    let title, tempTitle;
-    title = tempTitle = "";
 
-    const isDuplicate = checkIfDuplicateChat(
-      memberUids,
-      chatroomsState.chatrooms,
-    );
-    if (isDuplicate) {
+    //Check if there is an existing chatroom with duplicate members
+    if (checkIfDuplicateChat(memberUids, chatroomsState.chatrooms)) {
       console.log("chat with those members already exists");
       return;
     }
-    const membersList = {};
 
-    for (const member of usersToAdd) {
-      membersList[member.uid] = {
+    const membersList = usersToAdd.reduce((acc, member) => {
+      acc[member.uid] = {
         isOnline: false,
         username: member.username,
         isRemoved: false,
         isBanned: false,
         profilePictureURL: member.profilePictureURL,
       };
-    }
+      return acc;
+    }, {});
 
-    console.log(membersList);
+    const title = chatTitleInputText?.trim() || "";
+    const tempTitle = Object.values(membersList)
+      .map((member) => member.username)
+      .join(", ");
 
-    //if the user entered a title, use it, if not, take the members list and map them out to use as the title
-    if (chatTitleInputText && chatTitleInputText.length > 0) {
-      title = chatTitleInputText;
-    } else {
-      tempTitle = Object.values(membersList)
-        .map((member) => member.username)
-        .join(", ");
-    }
     setChatTitleInputText("");
 
     const newChatID = await createChat(
@@ -75,11 +63,11 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
       membersList,
       uids,
       usersToAdd.length,
-      currUserUid,
+      uid,
     );
     console.log(newChatID);
     changeChatRoomCreationState(false);
-    const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
+    const updatedTempTitle = updateTempTitle(tempTitle, displayName);
 
     resetAllChatContexts();
     chatDispatch({
@@ -87,10 +75,11 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
       payload: {
         chatID: newChatID,
         title,
-        owner: currUserUid,
+        owner: uid,
         tempTitle: updatedTempTitle,
         numOfMembers: usersToAdd.length,
         firstMessageID: "",
+        memberUids: memberUids,
       },
     });
   };

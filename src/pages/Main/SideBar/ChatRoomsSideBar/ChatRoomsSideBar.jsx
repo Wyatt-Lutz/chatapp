@@ -42,14 +42,18 @@ const ChatRoomsSideBar = () => {
         <div>You aren't in any chats</div>
       ) : (
         <div className="flex flex-col">
-          {[...chatrooms].map(([chatID, chatroomData]) => (
-            <div
-              key={chatID}
-              onContextMenu={(e) => handleContextMenu(e, chatID)}
-            >
-              <ChatRoom chatID={chatID} chatroomData={chatroomData} />
-            </div>
-          ))}
+          {[...chatrooms]
+            .sort(
+              ([, a], [, b]) => b.lastMessageTimestamp - a.lastMessageTimestamp, //Sorts the chatrooms so the ones with the most recent messages are at the top
+            )
+            .map(([chatID, chatroomData]) => (
+              <div
+                key={chatID}
+                onContextMenu={(e) => handleContextMenu(e, chatID)}
+              >
+                <ChatRoom chatID={chatID} chatroomData={chatroomData} />
+              </div>
+            ))}
         </div>
       )}
 
