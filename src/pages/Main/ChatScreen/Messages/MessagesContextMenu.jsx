@@ -8,7 +8,7 @@ const MessagesContextMenu = ({
   contextMenuData: { messageUid, messageData },
   points,
 }) => {
-  const { chatState, messageDispatch } = useChatContexts();
+  const { chatState } = useChatContexts();
   const { currUser } = useAuth();
 
   const handleDeleteMessage = async () => {

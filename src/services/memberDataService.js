@@ -123,7 +123,7 @@ export const removeUserFromChat = async (
   await remove(chatsInRef);
 };
 
-export const addUserToChat = async (db, user, chatroomData, chatDispatch) => {
+export const addUserToChat = async (db, user, chatroomData) => {
   const { profilePictureURL, username, uid } = user;
   const { chatID, memberUids, tempTitle, numOfMembers } = chatroomData;
 

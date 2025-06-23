@@ -6,7 +6,7 @@ export const messagesReducer = (state, action) => {
   let newMessages = new Map(state?.messages);
 
   switch (type) {
-    case "ADD_MESSAGE":
+    case "ADD_MESSAGE": {
       const isFirstMessage = state.messages.size === 0;
 
       const numUnread = state.isAtBottom
@@ -21,7 +21,7 @@ export const messagesReducer = (state, action) => {
         numUnread,
         endTimestamp: isFirstMessage ? data.timestamp : state.endTimestamp,
       };
-
+    }
     case "EDIT_MESSAGE":
       const currMessage = newMessages.get(key);
       if (!currMessage) return state;

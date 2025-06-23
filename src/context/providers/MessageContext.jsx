@@ -19,7 +19,7 @@ export const MessageContextProvider = ({ children }) => {
     messagesReducer,
     initialMessageState,
   );
-  const { chatState, chatDispatch } = useContext(ChatContext);
+  const { chatState } = useContext(ChatContext);
 
   const messagesRef = useRef(messageState.messages);
 

@@ -17,7 +17,6 @@ export const changeUsername = async (
   newUsername,
   currUser,
   chatroomsData,
-  chatroomsDispatch,
 ) => {
   const userData = await queryUsernames(db, newUsername);
   if (userData) {
