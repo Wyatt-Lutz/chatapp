@@ -15,6 +15,7 @@ export const ChatroomsListenerService = {
 
     if (action.onChatroomAdded) {
       const handleChatroomAdded = async (snap) => {
+        console.log("yoooo");
         action.onChatroomAdded(snap.key, snap.val());
       };
 

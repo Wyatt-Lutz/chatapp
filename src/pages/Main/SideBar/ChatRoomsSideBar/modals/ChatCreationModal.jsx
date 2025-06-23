@@ -7,7 +7,6 @@ import {
 } from "../../../../../services/chatBarDataService";
 import { useChatContexts } from "../../../../../hooks/useContexts";
 import { updateTempTitle } from "../../../../../utils/chatroomUtils";
-import { fetchUserData } from "../../../../../services/globalDataService";
 
 import UserSearch from "../../../../../components/UserSearch";
 import CloseModal from "../../../../../components/ui/CloseModal";

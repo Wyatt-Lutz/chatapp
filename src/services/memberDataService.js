@@ -72,7 +72,6 @@ export const removeUserFromChat = async (
 
   if (numOfMembers && numOfMembers <= 2) {
     await deleteChatRoom(db, chatID);
-    resetAllChatContexts();
     return;
   }
 

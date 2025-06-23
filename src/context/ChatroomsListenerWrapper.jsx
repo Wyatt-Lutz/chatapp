@@ -38,6 +38,7 @@ const ChatroomsListenerWrapper = ({ children }) => {
           });
         },
         onChatroomRemoved: (chatID) => {
+          console.log("yo");
           chatroomsDispatch({ type: "REMOVE_CHATROOM", payload: chatID });
 
           if (chatID === chatState.chatID) {
@@ -55,7 +56,7 @@ const ChatroomsListenerWrapper = ({ children }) => {
     );
 
     return unsubscribe;
-  }, [currUser?.uid, chatState.chatID]);
+  }, [currUser?.uid]);
 
   return children;
 };
