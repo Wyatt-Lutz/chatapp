@@ -18,10 +18,8 @@ const ChatroomsListenerWrapper = ({ children }) => {
       currUser.uid,
       {
         onChatroomAdded: async (chatID, numUnread) => {
-          const { title, tempTitle, memberUids } = await fetchChatRoomData(
-            db,
-            chatID,
-          );
+          const { title, tempTitle, memberUids, lastMessageTimestamp } =
+            await fetchChatRoomData(db, chatID);
           const updatedTempTitle = updateTempTitle(
             tempTitle,
             currUser.displayName,
@@ -32,6 +30,7 @@ const ChatroomsListenerWrapper = ({ children }) => {
             title,
             tempTitle: updatedTempTitle,
             memberUids: memberUids,
+            lastMessageTimestamp: lastMessageTimestamp,
           };
           chatroomsDispatch({
             type: "ADD_CHATROOM",

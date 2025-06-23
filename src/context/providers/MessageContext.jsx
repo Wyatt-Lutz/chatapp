@@ -64,13 +64,9 @@ export const MessageContextProvider = ({ children }) => {
             const messageKeys = Array.from(messagesRef.current.keys());
             const nextMessageID = messageKeys.length > 1 ? messageKeys[1] : "";
             await updateFirstMessageID(db, chatState.chatID, nextMessageID);
-            chatDispatch({
-              type: "UPDATE_FIRST_MESSAGE_ID",
-              payload: nextMessageID,
-            });
           }
 
-          messageDispatch({ type: "REMOVE_MESSAGE", payload: messageID });
+          messageDispatch({ type: "DELETE_MESSAGE", payload: messageID });
         },
       },
     );

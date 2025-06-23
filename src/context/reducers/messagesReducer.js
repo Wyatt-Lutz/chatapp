@@ -35,7 +35,7 @@ export const messagesReducer = (state, action) => {
         messages: combinedMessages,
       };
 
-    case "REMOVE_MESSAGE":
+    case "DELETE_MESSAGE":
       newMessages.delete(action.payload);
       return { ...state, messages: newMessages };
 

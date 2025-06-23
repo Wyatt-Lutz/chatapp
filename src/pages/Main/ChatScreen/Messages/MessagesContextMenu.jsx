@@ -12,8 +12,6 @@ const MessagesContextMenu = ({
   const { currUser } = useAuth();
 
   const handleDeleteMessage = async () => {
-    messageDispatch({ type: "REMOVE_MESSAGE", payload: messageUid });
-
     await deleteMessage(db, chatState.chatID, messageUid);
     if (messageData.imageRef) {
       const imageLocation = ref(

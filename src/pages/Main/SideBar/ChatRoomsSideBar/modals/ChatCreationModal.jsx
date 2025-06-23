@@ -11,6 +11,7 @@ import { fetchUserData } from "../../../../../services/globalDataService";
 
 import UserSearch from "../../../../../components/UserSearch";
 import CloseModal from "../../../../../components/ui/CloseModal";
+import { serverTimestamp } from "firebase/database";
 
 const ChatCreationModal = ({ changeChatRoomCreationState }) => {
   const { currUser } = useAuth();
@@ -91,6 +92,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
         tempTitle: updatedTempTitle,
         numOfMembers: usersToAdd.length,
         firstMessageID: "",
+        memberUids: memberUids,
       },
     });
   };

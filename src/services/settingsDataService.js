@@ -57,12 +57,7 @@ export const changeUsername = async (
       oldUsername,
       newUsername,
     );
-    const newClientTempTitle = updateTempTitle(newServerTempTitle, newUsername);
 
-    chatroomsDispatch({
-      type: "UPDATE_TEMP_TITLE",
-      payload: { key: chatID, data: newClientTempTitle },
-    });
     return Promise.all([
       update(chatroomMemberRef, {
         username: newUsername,

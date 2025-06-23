@@ -30,7 +30,6 @@ export const fetchOlderChats = async (db, chatID, endTimestamp) => {
     limitToLast(10),
   );
   const messageSnap = await get(messageQuery);
-  console.log(messageSnap.val());
   return messageSnap.val();
 };
 
@@ -75,10 +74,6 @@ export const addMessage = async (
   const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
   await runTransaction(firstMessageIdRef, (currID) => {
     if (!currID) {
-      chatDispatch({
-        type: "UPDATE_FIRST_MESSAGE_ID",
-        payload: newMessageRef.key,
-      });
       messageDispatch({
         type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
         payload: true,
@@ -87,6 +82,9 @@ export const addMessage = async (
     }
     return currID;
   });
+
+  const chatDataRef = ref(db, `chats/${chatID}`);
+  await update(chatDataRef, { lastMessageTimestamp: timestamp });
 
   await updateUnreadCount(db, chatID, memberData);
 };

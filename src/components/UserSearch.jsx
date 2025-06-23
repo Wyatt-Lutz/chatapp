@@ -49,7 +49,7 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
 
     const timeout = setTimeout(fetchUsernames, 300);
     return () => clearTimeout(timeout);
-  }, [searchedUsername, addedUsers, previousUsers, currUser.uid]);
+  }, [searchedUsername, previousUsers, currUser.uid]);
 
   const addUser = async (user) => {
     console.log(user);
@@ -89,6 +89,7 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
     setAddedUsers((prev) =>
       prev.filter((addedUser) => addedUser.uid !== user.uid),
     );
+
     setUsernameQueryData((prev) => [...prev, user]);
   };
 

@@ -30,6 +30,12 @@ export const chatroomReducer = (state, action) => {
         numUnread: action.payload.data,
       });
       return { chatrooms: newChatrooms };
+    case "UPDATE_LAST_MESSAGE_TIMESTAMP":
+      newChatrooms.set(action.payload.key, {
+        ...newChatrooms.get(action.payload.key),
+        lastMessageTimestamp: action.payload.data,
+      });
+      return { chatrooms: newChatrooms };
     case "REMOVE_CHATROOM":
       newChatrooms.delete(action.payload);
       return { chatrooms: newChatrooms };

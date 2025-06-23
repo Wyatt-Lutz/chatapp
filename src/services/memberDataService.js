@@ -116,7 +116,7 @@ export const removeUserFromChat = async (
     const members = await fetchMembersFromChat(db, chatID);
     const randomMemberUid = members[scaledRandomValue];
 
-    await transferOwnership(db, chatID, randomMemberUid, chatDispatch);
+    await transferOwnership(db, chatID, randomMemberUid);
   }
 
   const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
@@ -124,19 +124,14 @@ export const removeUserFromChat = async (
   await remove(chatsInRef);
 };
 
-export const addUserToChat = async (
-  db,
-  chatID,
-  uid,
-  username,
-  profilePictureURL,
-  numOfMembers,
-  chatDispatch,
-) => {
+export const addUserToChat = async (db, user, chatroomData, chatDispatch) => {
+  const { profilePictureURL, username, uid } = user;
+  const { chatID, memberUids, tempTitle, numOfMembers } = chatroomData;
+
   const memberRef = ref(db, `members/${chatID}/${uid}`);
   const chatsInRef = ref(db, `users/${uid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
-  const { tempTitle, memberUids } = await fetchChatRoomData(db, chatID);
+
   const updatedTempTitle = updateTempTitle(tempTitle, "", username);
   console.log(updatedTempTitle);
   const newUserUidsArr = [...memberUids.match(/.{1,28}/g), uid];
@@ -161,8 +156,6 @@ export const addUserToChat = async (
       memberUids: updatedMemberUids,
     }),
   ]);
-
-  chatDispatch({ type: "UPDATE_NUM_OF_MEMBERS", payload: numOfMembers + 1 });
 };
 
 export const updateNumOfMembers = async (db, chatID, isAdd) => {
@@ -191,18 +184,11 @@ export const deleteChatRoom = async (db, chatID, memberData = null) => {
   ]);
 };
 
-export const transferOwnership = async (
-  db,
-  chatID,
-  newOwnerUid,
-  chatDispatch,
-) => {
+export const transferOwnership = async (db, chatID, newOwnerUid) => {
   const chatMetadataRef = ref(db, `chats/${chatID}`);
   await update(chatMetadataRef, {
     owner: newOwnerUid,
   });
-
-  chatDispatch({ type: "UPDATE_OWNER", payload: newOwnerUid });
 };
 
 /**

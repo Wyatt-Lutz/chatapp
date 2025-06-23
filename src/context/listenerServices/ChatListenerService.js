@@ -12,6 +12,7 @@ export const ChatListenerService = {
       firstMessageID: action.onFirstMessageIDChanged,
       memberUids: action.onMemberUidsChanged,
       numOfMembers: action.onNumOfMembersChanged,
+      lastMessageTimestamp: action.onLastMessageTimestampChange,
     };
 
     const handleChatroomChanged = async (snap) => {
