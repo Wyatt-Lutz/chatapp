@@ -1,6 +1,5 @@
 import { get, increment, ref, remove, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
-import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
 
 /**
