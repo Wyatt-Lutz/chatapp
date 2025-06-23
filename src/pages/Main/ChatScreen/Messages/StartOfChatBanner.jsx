@@ -6,7 +6,6 @@ const StartOfChatBanner = ({
   tempTitle,
   numOfMembers,
   isFirstMessageRendered,
-  firstMessageID,
 }) => {
   const [jsxNames, setJsxNames] = useState(null);
   useEffect(() => {
@@ -22,7 +21,7 @@ const StartOfChatBanner = ({
 
   return (
     <div>
-      {(isFirstMessageRendered || firstMessageID === "") &&
+      {isFirstMessageRendered &&
         (title ? (
           <div className="text-center text-lg mb-2">
             This is the start of <span className="font-semibold">{title}</span>

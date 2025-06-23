@@ -1,47 +1,46 @@
 import { initialChatroomState } from "../initialState";
 
+const updatePropNameMap = {
+  UPDATE_TEMP_TITLE: "tempTitle",
+  UPDATE_TITLE: "title",
+  UPDATE_MEMBER_UIDS: "memberUids",
+  UPDATE_UNREAD_COUNT: "numUnread",
+  UPDATE_LAST_MESSAGE_TIMESTAMP: "lastMessageTimestamp",
+};
+
 export const chatroomReducer = (state, action) => {
   let newChatrooms = new Map(state?.chatrooms);
+
+  const updateProp = (prop, key, data) => {
+    const chatroom = newChatrooms.get(key);
+    if (!chatroom) return;
+    newChatrooms.set(key, { ...chatroom, [prop]: data });
+  };
+
   switch (action.type) {
     case "ADD_CHATROOM":
       newChatrooms.set(action.payload.key, action.payload.data);
-      return { chatrooms: newChatrooms };
-    case "UPDATE_TEMP_TITLE":
-      newChatrooms.set(action.payload.key, {
-        ...newChatrooms.get(action.payload.key),
-        tempTitle: action.payload.data,
-      });
-      return { chatrooms: newChatrooms };
-    case "UPDATE_TITLE":
-      newChatrooms.set(action.payload.key, {
-        ...newChatrooms.get(action.payload.key),
-        title: action.payload.data,
-      });
-      return { chatrooms: newChatrooms };
-    case "UPDATE_MEMBER_UIDS":
-      newChatrooms.set(action.payload.key, {
-        ...newChatrooms.get(action.payload.key),
-        memberUids: action.payload.data,
-      });
-      return { chatrooms: newChatrooms };
-    case "UPDATE_UNREAD_COUNT":
-      newChatrooms.set(action.payload.key, {
-        ...newChatrooms.get(action.payload.key),
-        numUnread: action.payload.data,
-      });
-      return { chatrooms: newChatrooms };
-    case "UPDATE_LAST_MESSAGE_TIMESTAMP":
-      newChatrooms.set(action.payload.key, {
-        ...newChatrooms.get(action.payload.key),
-        lastMessageTimestamp: action.payload.data,
-      });
-      return { chatrooms: newChatrooms };
+      break;
     case "REMOVE_CHATROOM":
       newChatrooms.delete(action.payload);
-      return { chatrooms: newChatrooms };
+      break;
+
+    case "UPDATE_TEMP_TITLE":
+    case "UPDATE_TITLE":
+    case "UPDATE_MEMBER_UIDS":
+    case "UPDATE_UNREAD_COUNT":
+    case "UPDATE_LAST_MESSAGE_TIMESTAMP":
+      updateProp(
+        updatePropNameMap[action.type],
+        action.payload.key,
+        action.payload.data,
+      );
+      break;
+
     case "RESET":
       return initialChatroomState;
     default:
       return state;
   }
+  return { chatrooms: newChatrooms };
 };

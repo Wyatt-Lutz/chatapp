@@ -57,7 +57,17 @@ const Messages = () => {
     }
   }, [isVisible, isFirstMessageRendered]);
 
+  useEffect(() => {
+    if (messages.size === 0) {
+      messageDispatch({
+        type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
+        payload: true,
+      });
+    }
+  }, [messages]);
+
   const handleFetchMore = async () => {
+    console.log("handleFEtchMore run");
     const messageData = await fetchOlderChats(db, chatID, endTimestamp);
     if (!messageData) return;
 
@@ -137,7 +147,6 @@ const Messages = () => {
                 tempTitle={tempTitle}
                 numOfMembers={numOfMembers}
                 isFirstMessageRendered={isFirstMessageRendered}
-                firstMessageID={firstMessageID}
               />
               {renderMessages()}
             </>

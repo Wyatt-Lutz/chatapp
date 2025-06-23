@@ -1,30 +1,30 @@
 import { initialMessageState } from "../initialState";
 
 export const messagesReducer = (state, action) => {
+  const { type, payload } = action;
+  const { key, data } = payload || {};
   let newMessages = new Map(state?.messages);
-  const { key, data } = action?.payload || {};
 
-  switch (action.type) {
+  switch (type) {
     case "ADD_MESSAGE":
       const isFirstMessage = state.messages.size === 0;
-      let numUnread = state.numUnread;
 
-      if (!state.isAtBottom) {
-        numUnread = numUnread + 1;
-      }
+      const numUnread = state.isAtBottom
+        ? state.numUnread
+        : state.numUnread + 1;
 
       newMessages.set(key, data);
+
       return {
         ...state,
         messages: newMessages,
         numUnread,
-        endTimestamp: isFirstMessage
-          ? action.payload.data.timestamp
-          : state.endTimestamp,
+        endTimestamp: isFirstMessage ? data.timestamp : state.endTimestamp,
       };
 
     case "EDIT_MESSAGE":
       const currMessage = newMessages.get(key);
+      if (!currMessage) return state;
       newMessages.set(key, { ...currMessage, ...data });
       return { ...state, messages: newMessages };
 
