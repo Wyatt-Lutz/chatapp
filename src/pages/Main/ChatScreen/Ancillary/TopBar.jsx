@@ -11,7 +11,7 @@ import ChatSettings from "../modals/ChatSettings";
 
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const { chatState, chatDispatch, memberState } = useChatContexts();
+  const { chatState, memberState } = useChatContexts();
   const { chatID, title, tempTitle } = chatState;
   const { currUser } = useAuth();
   const [isDisplayAddUser, setIsDisplayAddUser] = useState(false);
@@ -30,7 +30,6 @@ const TopBar = () => {
       chatID,
       db,
       currUser.displayName,
-      chatDispatch,
       memberState.members,
     );
   };

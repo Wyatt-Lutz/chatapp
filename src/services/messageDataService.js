@@ -13,10 +13,7 @@ import {
   update,
   limitToLast,
 } from "firebase/database";
-import {
-  fetchChatUsersByStatus,
-  fetchMembersFromChat,
-} from "./memberDataService";
+import { fetchChatUsersByStatus } from "./memberDataService";
 import { storage } from "../../firebase";
 import { ref as storageRef } from "firebase/storage";
 import { uploadFile } from "./storageDataService";
@@ -39,9 +36,7 @@ export const addMessage = async (
   uid,
   db,
   renderTimeAndSender,
-  chatDispatch,
   memberData,
-  messageDispatch,
   fileToUpload = null,
 ) => {
   const chatRef = ref(db, `messages/${chatID}/`);
@@ -74,10 +69,6 @@ export const addMessage = async (
   const firstMessageIdRef = ref(db, `chats/${chatID}/firstMessageID`);
   await runTransaction(firstMessageIdRef, (currID) => {
     if (!currID) {
-      messageDispatch({
-        type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
-        payload: true,
-      });
       return newMessageRef.key; //the message ID
     }
     return currID;
@@ -104,20 +95,16 @@ export const updateFirstMessageID = async (db, chatID, messageID) => {
  */
 const updateUnreadCount = async (db, chatID, memberData) => {
   const transformedMemberData = [...memberData.entries()];
-  console.log(transformedMemberData);
   const offlineMembers = await fetchChatUsersByStatus(
     transformedMemberData,
     false,
   );
 
-  for (const uid of offlineMembers) {
-    const userDataRef = ref(db, `users/${uid}/chatsIn`);
-
-    const updates = {
-      [`${chatID}`]: increment(1),
-    };
-    await update(userDataRef, updates);
-  }
+  await Promise.all(
+    offlineMembers.map((uid) => {
+      update(ref(db, `users/${uid}/chatsIn`), { [`${chatID}`]: increment(1) });
+    }),
+  );
 };
 
 export const editMessage = async (messageUid, text, chatID, db) => {
@@ -138,7 +125,6 @@ export const editTitle = async (
   chatID,
   db,
   displayName,
-  chatDispatch,
   memberData,
 ) => {
   const titleRef = ref(db, `chats/${chatID}`);
@@ -147,13 +133,5 @@ export const editTitle = async (
   });
   const changedTitleText =
     displayName + " has changed the chat name to " + newTitle;
-  await addMessage(
-    changedTitleText,
-    chatID,
-    "server",
-    db,
-    true,
-    chatDispatch,
-    memberData,
-  );
+  await addMessage(changedTitleText, chatID, "server", db, true, memberData);
 };

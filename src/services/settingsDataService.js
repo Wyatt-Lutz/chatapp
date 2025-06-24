@@ -80,11 +80,8 @@ export const changeEmail = async (db, currUser, newEmail) => {
 export const deleteAccount = async (
   db,
   currUser,
-  chatDispatch,
   chatroomsDispatch,
-  navigate,
   resetAllChatContexts,
-  messageDispatch,
 ) => {
   const userRef = ref(db, `users/${currUser.uid}`);
 
@@ -95,28 +92,31 @@ export const deleteAccount = async (
     username: "Removed User",
     isOnline: false,
   };
-  for (const chatID in chatsInData) {
-    const chatroomData = await fetchChatRoomData(db, chatID);
-    const memberData = Object.entries(await fetchMembersFromChat(db, chatID));
 
-    await removeUserFromChat(
-      db,
-      { ...chatroomData, chatID },
-      currUser.uid,
-      currUser.displayName,
-      currUser.uid,
-      chatDispatch,
-      resetAllChatContexts,
-      memberData,
-      messageDispatch,
-      memberOptions,
-    );
-  }
+  const removeUserFromEachChat = Object.entries(chatsInData).map(
+    async (chatID) => {
+      const [chatroomData, memberData] = await Promise.all([
+        fetchChatRoomData(db, chatID),
+        fetchMembersFromChat(db, chatID),
+      ]);
 
+      const transformedMemberData = Object.entries(memberData);
+
+      removeUserFromChat(
+        db,
+        { ...chatroomData, chatID },
+        currUser.uid,
+        currUser.displayName,
+        currUser.uid,
+        resetAllChatContexts,
+        transformedMemberData,
+        memberOptions,
+      );
+    },
+  );
+
+  await Promise.all(removeUserFromEachChat);
   await remove(userRef);
-
   await deleteUser(currUser);
-
   await signUserOut(auth, resetAllChatContexts, chatroomsDispatch);
-  navigate("/signin");
 };

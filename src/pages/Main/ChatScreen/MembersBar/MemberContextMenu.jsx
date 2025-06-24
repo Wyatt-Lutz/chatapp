@@ -12,14 +12,8 @@ const MemberContextMenu = ({
   contextMenuData: { memberUid, memberData },
   points,
 }) => {
-  const {
-    chatState,
-    memberDispatch,
-    memberState,
-    chatDispatch,
-    messageDispatch,
-    resetAllChatContexts,
-  } = useChatContexts();
+  const { chatState, memberDispatch, memberState, resetAllChatContexts } =
+    useChatContexts();
   const { currUser } = useAuth();
 
   const onChangeBlockStatus = async (newBlockStatus) => {
@@ -39,10 +33,8 @@ const MemberContextMenu = ({
       memberUid,
       memberData.username,
       currUser.uid,
-      chatDispatch,
       resetAllChatContexts,
       memberState.members,
-      messageDispatch,
     );
   };
 
@@ -57,10 +49,8 @@ const MemberContextMenu = ({
       memberUid,
       memberData.username,
       currUser.uid,
-      chatDispatch,
       resetAllChatContexts,
       memberState.members,
-      messageDispatch,
       {}, //memberOptions
       true, //isBanned
     );
@@ -73,7 +63,6 @@ const MemberContextMenu = ({
       memberUid,
       memberData.username,
       memberState.members,
-      messageDispatch,
     );
   };
 

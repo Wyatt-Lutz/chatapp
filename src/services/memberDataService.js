@@ -43,10 +43,8 @@ export const removeUserFromChat = async (
   uidToRemove,
   usernameOfUserRemoved,
   currUserUid,
-  chatDispatch,
   resetAllChatContexts,
   memberData,
-  messageDispatch,
   memberOptions = {},
   isBanned = false,
 ) => {
@@ -95,9 +93,7 @@ export const removeUserFromChat = async (
     "server",
     db,
     true,
-    chatDispatch,
     memberData,
-    messageDispatch,
   );
 
   await updateNumOfMembers(db, chatID, false);
@@ -169,17 +165,17 @@ export const deleteChatRoom = async (db, chatID, memberData = null) => {
     memberData = Object.keys(await fetchMembersFromChat(db, chatID));
   }
 
-  const membersRef = ref(db, `members/${chatID}`);
+  const deleteUserChatsInRefs = memberData.map((uid) => {
+    remove(ref(db, `users/${uid}/chatsIn/${chatID}`));
+  });
 
-  for (const memberUid of memberData) {
-    const chatsInRef = ref(db, `users/${memberUid}/chatsIn/${chatID}`);
-    await remove(chatsInRef);
-  }
-  await Promise.all([
-    remove(membersRef),
+  const deleteChatRefs = [
+    remove(ref(db, `members/${chatID}`)),
     remove(ref(db, `messages/${chatID}`)),
     remove(ref(db, `chats/${chatID}`)),
-  ]);
+  ];
+
+  await Promise.all([...deleteUserChatsInRefs, ...deleteChatRefs]); //Parallelization
 };
 
 export const transferOwnership = async (db, chatID, newOwnerUid) => {
@@ -232,28 +228,11 @@ export const fetchChatUsersByStatus = async (memberData, status) => {
   }, []);
 };
 
-export const unBanUser = async (
-  db,
-  chatID,
-  uid,
-  username,
-  chatDispatch,
-  memberData,
-  messageDispatch,
-) => {
+export const unBanUser = async (db, chatID, uid, username, memberData) => {
   const memberRef = ref(db, `members/${chatID}/${uid}`);
   await update(memberRef, { isBanned: false });
   const unBanMessageText = `${username} has been unbanned!`;
-  await addMessage(
-    unBanMessageText,
-    chatID,
-    "server",
-    db,
-    true,
-    chatDispatch,
-    memberData,
-    messageDispatch,
-  );
+  await addMessage(unBanMessageText, chatID, "server", db, true, memberData);
 };
 
 export const fetchBannedUsers = async (db, chatID) => {
