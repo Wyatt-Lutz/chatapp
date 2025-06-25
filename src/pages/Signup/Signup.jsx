@@ -4,16 +4,12 @@ import { lazy, useState } from "react";
 const ProfilePictureUpload = lazy(() => import("./ProfilePictureUpload"));
 
 const Signup = () => {
-  const [userData, setUserdata] = useState(null);
-
-  const handleSignupSubmit = (user) => {
-    setUserdata(user);
-  };
+  const [userData, setUserData] = useState({});
 
   return (
     <section>
       {!userData ? (
-        <SignupForm onSubmitForm={handleSignupSubmit} />
+        <SignupForm onSubmitForm={setUserData} />
       ) : (
         <ProfilePictureUpload user={userData} />
       )}

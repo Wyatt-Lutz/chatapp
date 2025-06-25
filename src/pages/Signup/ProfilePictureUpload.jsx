@@ -3,18 +3,16 @@ import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { uploadFile } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
-import { update, ref } from "firebase/database";
 import { db } from "../../../firebase";
 
 import Camera from "../../components/ui/Camera";
+import { updateProfilePicture } from "../../services/userDataService";
 
 const ProfilePictureUpload = ({ user }) => {
   const navigate = useNavigate();
-  const [profilePicture, setProfilePicture] = useState(
-    user.userCredential.user.photoURL,
-  );
+  const { uid, photoURL } = user.userCredential.user;
+  const [profilePicture, setProfilePicture] = useState(photoURL);
   const [isChangingPicture, setIsChangingPicture] = useState(false);
-  const uid = user.userCredential.user.uid;
 
   const onFinish = async () => {
     if (!isChangingPicture) {
@@ -29,11 +27,7 @@ const ProfilePictureUpload = ({ user }) => {
       photoURL: photoUrl,
     });
 
-    const userRef = ref(db, `users/${uid}`);
-
-    await update(userRef, {
-      profilePictureURL: photoUrl,
-    });
+    await updateProfilePicture(db, uid, photoUrl);
 
     navigate("/");
   };
@@ -51,7 +45,7 @@ const ProfilePictureUpload = ({ user }) => {
   };
 
   const onCancel = () => {
-    setProfilePicture(user.userCredential.user.photoURL);
+    setProfilePicture(photoURL);
     setIsChangingPicture(false);
     URL.revokeObjectURL(profilePicture);
   };

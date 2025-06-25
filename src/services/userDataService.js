@@ -16,3 +16,10 @@ export const fetchUserDataByEmail = async (db, email) => {
   const userData = (await get(userQuery)).val();
   return userData;
 };
+
+export const updateProfilePicture = async (db, uid, profilePictureURL) => {
+  const userRef = ref(db, `users/${uid}`);
+  await update(userRef, {
+    profilePictureURL: profilePictureURL,
+  });
+};

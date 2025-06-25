@@ -26,11 +26,18 @@ export const fetchUserData = async (db, uid) => {
   return userData;
 };
 
-export const createUserData = async (db, uid, trimmedUsername, email) => {
+export const createUserData = async (
+  db,
+  uid,
+  trimmedUsername,
+  email,
+  profilePictureURL,
+) => {
   const userRef = ref(db, `users/${uid}`);
   await set(userRef, {
     username: trimmedUsername,
     email: email,
     lastUsernameChange: 0,
+    profilePictureURL: profilePictureURL,
   });
 };
