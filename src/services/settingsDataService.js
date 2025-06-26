@@ -8,9 +8,10 @@ import {
   removeUserFromChat,
 } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
-import { auth } from "../../firebase";
+import { auth, storage } from "../../firebase";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
+import { deleteObject, ref as storageRef } from "firebase/storage";
 
 export const changeUsername = async (
   db,
@@ -93,7 +94,7 @@ export const deleteAccount = async (
     isOnline: false,
   };
 
-  const removeUserFromEachChat = Object.entries(chatsInData).map(
+  const removeUserFromEachChat = Object.keys(chatsInData).map(
     async (chatID) => {
       const [chatroomData, memberData] = await Promise.all([
         fetchChatRoomData(db, chatID),
@@ -114,6 +115,11 @@ export const deleteAccount = async (
       );
     },
   );
+
+  if (currUser.photoURL !== "/default-profile.jpg") {
+    const profilePictureRef = storageRef(storage, `users/${currUser.uid}`);
+    await deleteObject(profilePictureRef);
+  }
 
   await Promise.all(removeUserFromEachChat);
   await remove(userRef);

@@ -1,6 +1,5 @@
 export const validateSignin = (email, password) => {
   const errors = {};
-
   if (!email) {
     errors.email = "Please enter an email.";
   } else if (!/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/.test(email)) {

@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import PasswordReset from "./PasswordReset/PasswordReset";
-import { useRef } from "react";
 import { validateSignin } from "../../utils/validation/signinValidation";
 
 const Signin = () => {
@@ -17,7 +16,9 @@ const Signin = () => {
 
   const signUserIn = async (e) => {
     e.preventDefault();
-    handleValidation();
+    const { email, password } = formData;
+    const errors = handleValidation(email, password);
+    if (errors) return;
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/");
@@ -36,14 +37,10 @@ const Signin = () => {
     }
   };
 
-  const handleValidation = () => {
-    const { email, password } = formData;
+  const handleValidation = (email, password) => {
     const errors = validateSignin(email, password);
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return errors;
-    }
-    return null;
+    setFormErrors(errors);
+    return Object.keys(errors).length > 0 ? errors : null;
   };
 
   const handleChange = (e) => {
@@ -52,15 +49,17 @@ const Signin = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = async (e) => {
     if (e.key !== "Enter") return;
-    const errors = handleValidation();
-    if (!errors) return;
     e.preventDefault();
+    const { email, password } = formData;
+    if (email && password) {
+      await signUserIn(e);
+    }
 
-    if (errors.email) {
+    if (!email || formErrors?.email) {
       emailRef.current.focus();
-    } else if (errors.password) {
+    } else if (!password || formErrors?.password) {
       passwordRef.current.focus();
     }
   };

@@ -4,16 +4,16 @@ import { lazy, useState } from "react";
 const ProfilePictureUpload = lazy(() => import("./ProfilePictureUpload"));
 
 const Signup = () => {
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState(null);
 
   return (
-    <section>
+    <>
       {!userData ? (
         <SignupForm onSubmitForm={setUserData} />
       ) : (
-        <ProfilePictureUpload user={userData} />
+        <ProfilePictureUpload userData={userData} />
       )}
-    </section>
+    </>
   );
 };
 export default Signup;

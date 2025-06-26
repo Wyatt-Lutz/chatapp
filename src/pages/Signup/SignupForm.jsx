@@ -7,13 +7,13 @@ import {
   updateProfile,
 } from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   createUserData,
   queryUsernames,
 } from "../../services/globalDataService";
-import { useRef } from "react";
 import { validateSignup } from "../../utils/validation/signupValidation";
+import { useNavigate } from "react-router";
 
 const SignupForm = ({ onSubmitForm }) => {
   const [formData, setFormData] = useState({
@@ -29,10 +29,14 @@ const SignupForm = ({ onSubmitForm }) => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
+  const navigate = useNavigate();
+
   const onSignUserUp = async (e) => {
     if (isButtonDisabled) return;
     e.preventDefault();
-    handleValidation();
+    const { username, email, password } = formData;
+    const errors = handleValidation(username, email, password);
+    if (errors) return;
 
     try {
       const usernameQueryData = await queryUsernames(db, username);
@@ -93,26 +97,25 @@ const SignupForm = ({ onSubmitForm }) => {
     }
   };
 
-  const handleValidation = () => {
-    const { username, email, password } = formData;
+  const handleValidation = (username, email, password) => {
     const errors = validateSignup(username, email, password);
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return errors;
-    }
-    return null;
+    setFormErrors(errors);
+    return Object.keys(errors).length > 0 ? errors : null;
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = async (e) => {
     if (e.key !== "Enter") return;
-    const errors = handleValidation();
-    if (!errors) return;
     e.preventDefault();
-    if (errors.username) {
+    const { username, email, password } = formData;
+    if (username && email && password) {
+      await onSignUserUp(e);
+    }
+
+    if (!username || formErrors?.username) {
       usernameRef.current.focus();
-    } else if (errors.email) {
+    } else if (!email || formErrors?.email) {
       emailRef.current.focus();
-    } else if (errors.password) {
+    } else if (!password || formErrors?.password) {
       passwordRef.current.focus();
     }
   };
@@ -124,57 +127,60 @@ const SignupForm = ({ onSubmitForm }) => {
   };
 
   return (
-    <form noValidate onSubmit={onSignUserUp} className="flex flex-col">
-      <label>Username</label>
-      <input
-        name="username"
-        type="text"
-        placeholder="Username"
-        value={formData.username}
-        ref={usernameRef}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-      />
-      <UsernameAvailability
-        username={formData.username}
-        setIsButtonDisabled={setIsButtonDisabled}
-      />
-      <label>Email</label>
-      <input
-        name="email"
-        type="email"
-        placeholder="Email"
-        ref={emailRef}
-        value={formData.email}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-      />
-      <label>Password</label>
-      <input
-        name="password"
-        type="password"
-        placeholder="******"
-        value={formData.password}
-        ref={passwordRef}
-        onChange={handleChange}
-      />
-      <div className="italic text-sm">*Must be at least 6 characters</div>
-      <button
-        type="submit"
-        disabled={isButtonDisabled}
-        className="border rounded-md bg-zinc-500"
-      >
-        Next
-      </button>
+    <div>
+      <form noValidate onSubmit={onSignUserUp} className="flex flex-col">
+        <label>Username</label>
+        <input
+          name="username"
+          type="text"
+          placeholder="Username"
+          value={formData.username}
+          ref={usernameRef}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+        />
+        <UsernameAvailability
+          username={formData.username}
+          setIsButtonDisabled={setIsButtonDisabled}
+        />
+        <label>Email</label>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          ref={emailRef}
+          value={formData.email}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+        />
+        <label>Password</label>
+        <input
+          name="password"
+          type="password"
+          placeholder="******"
+          value={formData.password}
+          ref={passwordRef}
+          onChange={handleChange}
+        />
+        <div className="italic text-sm">*Must be at least 6 characters</div>
+        <button
+          type="submit"
+          disabled={isButtonDisabled}
+          className="border rounded-md bg-zinc-500"
+        >
+          Next
+        </button>
 
-      <input type="checkbox" ref={checkboxRef} />
-      <span>Don&apos;t Remember Login</span>
+        <input type="checkbox" ref={checkboxRef} />
+        <span>Don&apos;t Remember Login</span>
 
-      {formErrors.username ||
-        formErrors.email ||
-        formErrors.password ||
-        errorMessage}
-    </form>
+        {formErrors.username ||
+          formErrors.email ||
+          formErrors.password ||
+          errorMessage}
+      </form>
+      <button onClick={() => navigate("/signin")}>Sign in</button>
+    </div>
   );
 };
 

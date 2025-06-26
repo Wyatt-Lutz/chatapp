@@ -8,9 +8,9 @@ import { db } from "../../../firebase";
 import Camera from "../../components/ui/Camera";
 import { updateProfilePicture } from "../../services/userDataService";
 
-const ProfilePictureUpload = ({ user }) => {
+const ProfilePictureUpload = ({ userData }) => {
   const navigate = useNavigate();
-  const { uid, photoURL } = user.userCredential.user;
+  const { uid, photoURL } = userData.userCredential.user;
   const [profilePicture, setProfilePicture] = useState(photoURL);
   const [isChangingPicture, setIsChangingPicture] = useState(false);
 
@@ -23,7 +23,7 @@ const ProfilePictureUpload = ({ user }) => {
     const photoStorageLocation = `users/${uid}`;
     const photoUrl = await uploadFile(profilePicture, photoStorageLocation);
     console.log("photo url: " + photoUrl);
-    await updateProfile(user.userCredential.user, {
+    await updateProfile(userData.userCredential.user, {
       photoURL: photoUrl,
     });
 
