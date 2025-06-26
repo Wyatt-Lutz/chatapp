@@ -6,12 +6,7 @@ import { db, storage } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 
 const DeleteAccount = ({ displayPassModal }) => {
-  const {
-    chatroomsDispatch,
-    chatDispatch,
-    resetAllChatContexts,
-    messageDispatch,
-  } = useChatContexts();
+  const { chatroomsDispatch, resetAllChatContexts } = useChatContexts();
   const navigate = useNavigate();
   const { currUser } = useAuth();
 
@@ -27,15 +22,8 @@ const DeleteAccount = ({ displayPassModal }) => {
       await deleteObject(profilePictureRef);
     }
 
-    await deleteAccount(
-      db,
-      currUser,
-      chatDispatch,
-      chatroomsDispatch,
-      navigate,
-      resetAllChatContexts,
-      messageDispatch,
-    );
+    await deleteAccount(db, currUser, chatroomsDispatch, resetAllChatContexts);
+    navigate("/signin");
   };
   return (
     <>

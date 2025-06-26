@@ -13,13 +13,7 @@ import CloseFile from "../../../../components/ui/CloseFile";
 
 const Input = () => {
   const { currUser } = useAuth();
-  const {
-    chatState,
-    messageState,
-    messageDispatch,
-    chatDispatch,
-    memberState,
-  } = useChatContexts();
+  const { chatState, messageState, memberState } = useChatContexts();
   const [fileToUpload, setFileToUpload] = useState(null);
   const [text, setText] = useState("");
   const textInputRef = useRef(null);
@@ -51,9 +45,7 @@ const Input = () => {
       currUser.uid,
       db,
       willRenderTimeAndSender,
-      chatDispatch,
       memberState.members,
-      messageDispatch,
       fileToUpload,
     );
   };

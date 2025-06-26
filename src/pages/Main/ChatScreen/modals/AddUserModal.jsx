@@ -10,8 +10,7 @@ import { useEffect } from "react";
 import { useAuth } from "../../../../context/providers/AuthContext";
 
 const AddUserModal = ({ setIsDisplayAddUser }) => {
-  const { chatState, chatDispatch, memberState, messageDispatch } =
-    useChatContexts();
+  const { chatState, memberState } = useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
   const [previousUsers, setPreviousUsers] = useState([]);
   const { currUser } = useAuth();
@@ -55,9 +54,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
       "server",
       db,
       true,
-      chatDispatch,
       memberState.members,
-      messageDispatch,
     );
   };
 

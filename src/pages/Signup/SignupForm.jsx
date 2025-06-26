@@ -1,4 +1,3 @@
-import { useForm, useWatch } from "react-hook-form";
 import { db, auth } from "../../../firebase";
 import {
   browserLocalPersistence,
@@ -8,29 +7,37 @@ import {
   updateProfile,
 } from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   createUserData,
   queryUsernames,
 } from "../../services/globalDataService";
-import { update, ref } from "firebase/database";
-import { useRef } from "react";
+import { validateSignup } from "../../utils/validation/signupValidation";
+import { useNavigate } from "react-router";
 
 const SignupForm = ({ onSubmitForm }) => {
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    control,
-    getValues,
-    setFocus,
-  } = useForm();
-  const username = useWatch({ name: "username", control });
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const checkboxRef = useRef(false);
+  const usernameRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
 
-  const onSubmit = async ({ email, password, username }) => {
+  const navigate = useNavigate();
+
+  const onSignUserUp = async (e) => {
     if (isButtonDisabled) return;
+    e.preventDefault();
+    const { username, email, password } = formData;
+    const errors = handleValidation(username, email, password);
+    if (errors) return;
+
     try {
       const usernameQueryData = await queryUsernames(db, username);
       if (usernameQueryData) {
@@ -49,24 +56,25 @@ const SignupForm = ({ onSubmitForm }) => {
           ? browserSessionPersistence
           : browserLocalPersistence,
       );
-      console.log(userCredential);
+
       const trimmedUsername = username.trim();
 
       const uid = userCredential.user.uid;
 
-      await createUserData(db, uid, trimmedUsername, email);
+      const defaultProfilePictureURL = "/default-profile.jpg";
+
+      await createUserData(
+        db,
+        uid,
+        trimmedUsername,
+        email,
+        defaultProfilePictureURL,
+      );
 
       await updateProfile(userCredential.user, {
         displayName: trimmedUsername,
-        photoURL: "/default-profile.jpg",
+        photoURL: defaultProfilePictureURL,
       });
-
-      const userRef = ref(db, `users/${uid}`);
-      await update(userRef, {
-        profilePictureURL: "/default-profile.jpg",
-      });
-
-      console.info("registration successful");
 
       onSubmitForm({
         displayName: trimmedUsername,
@@ -74,110 +82,105 @@ const SignupForm = ({ onSubmitForm }) => {
       });
     } catch (error) {
       const errorMap = {
-        "username-already-in-use": "Username is already taken",
-        "auth/email-already-in-use": `Email address ${email} already in use.`,
+        "username-already-in-use":
+          "The username you entered has been taken, please choose a new one.",
+        "auth/email-already-in-use": `The email address: ${email} is already in use, either try signing in with ${email} or use a different email.`,
         "auth/invalid-email": `Email address ${email} is invalid.`,
         "auth/operation-not-allowed": `Error during sign up.`,
         "auth/weak-password":
           "Password is not strong enough. Add additional characters including special characters and numbers.",
       };
-      console.error(errorMap[error.code] || error.message);
+      setErrorMessage(
+        errorMap[error.code] ||
+          "Error signing up, please reload the page and try again.",
+      );
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key != "Enter") return;
-    const { username, email, password } = getValues();
-    if (!username || !email || !password) {
-      e.preventDefault();
+  const handleValidation = (username, email, password) => {
+    const errors = validateSignup(username, email, password);
+    setFormErrors(errors);
+    return Object.keys(errors).length > 0 ? errors : null;
+  };
+
+  const handleKeyDown = async (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const { username, email, password } = formData;
+    if (username && email && password) {
+      await onSignUserUp(e);
     }
-    if (e.target.name === "username" && !email) {
-      setFocus("email");
-    } else if (e.target.name === "email" && !password) {
-      setFocus("password");
+
+    if (!username || formErrors?.username) {
+      usernameRef.current.focus();
+    } else if (!email || formErrors?.email) {
+      emailRef.current.focus();
+    } else if (!password || formErrors?.password) {
+      passwordRef.current.focus();
     }
   };
+
+  const handleChange = (e) => {
+    setErrorMessage("");
+    setFormErrors({});
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   return (
-    <form
-      noValidate
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col"
-    >
-      <label>Username</label>
-      <input
-        type="text"
-        placeholder="Username"
-        onKeyDown={handleKeyDown}
-        {...register("username", {
-          required: { value: true, message: "Usernames are required." },
-          maxLength: {
-            value: 15,
-            message: "Usernames cannot be longer than 15 characters.",
-          },
-          pattern: {
-            value: /^[A-Za-z0-9]+$/,
-            message:
-              "can only use lowercase and uppercase letters, and numbers.",
-          },
-        })}
-      />
-      <UsernameAvailability
-        username={username}
-        setIsButtonDisabled={setIsButtonDisabled}
-      />
-      <label>Email</label>
-      <input
-        type="email"
-        placeholder="Email"
-        onKeyDown={handleKeyDown}
-        {...register("email", {
-          required: { value: true, message: "Emails are required." },
-          maxLength: {
-            value: 254,
-            message: "Email addresses cannot exceed 254 characters.",
-          },
-          pattern: {
-            value: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/,
-            message: "Not valid email.",
-          },
-        })}
-      />
-      <label>Password</label>
-      <input
-        type="password"
-        placeholder="******"
-        {...register("password", {
-          required: { value: true, message: "Passwords are required." },
-          maxLength: {
-            value: 128,
-            message: "Passwords cannot exceed 128 characters.",
-          },
-          minLength: {
-            value: 6,
-            message: "Passwords must be at least 6 characters.",
-          },
-          pattern: {
-            value: /^[A-Za-z0-9$!@#%^&*()_\-+=[\]{};:'",.<>/?`~\\|]+$/,
-            message: "Invalid use of characters inside password.",
-          },
-        })}
-      />
-      <div className="italic text-sm">*Must be at least 6 characters</div>
-      <button
-        type="submit"
-        disabled={isButtonDisabled}
-        className="border rounded-md bg-zinc-500"
-      >
-        Next
-      </button>
+    <div>
+      <form noValidate onSubmit={onSignUserUp} className="flex flex-col">
+        <label>Username</label>
+        <input
+          name="username"
+          type="text"
+          placeholder="Username"
+          value={formData.username}
+          ref={usernameRef}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+        />
+        <UsernameAvailability
+          username={formData.username}
+          setIsButtonDisabled={setIsButtonDisabled}
+        />
+        <label>Email</label>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          ref={emailRef}
+          value={formData.email}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+        />
+        <label>Password</label>
+        <input
+          name="password"
+          type="password"
+          placeholder="******"
+          value={formData.password}
+          ref={passwordRef}
+          onChange={handleChange}
+        />
+        <div className="italic text-sm">*Must be at least 6 characters</div>
+        <button
+          type="submit"
+          disabled={isButtonDisabled}
+          className="border rounded-md bg-zinc-500"
+        >
+          Next
+        </button>
 
-      <input type="checkbox" ref={checkboxRef} />
-      <span>Don&apos;t Remember Login</span>
+        <input type="checkbox" ref={checkboxRef} />
+        <span>Don&apos;t Remember Login</span>
 
-      {errors.username?.message}
-      {errors.email?.message}
-      {errors.password?.message}
-    </form>
+        {formErrors.username ||
+          formErrors.email ||
+          formErrors.password ||
+          errorMessage}
+      </form>
+      <button onClick={() => navigate("/signin")}>Sign in</button>
+    </div>
   );
 };
 

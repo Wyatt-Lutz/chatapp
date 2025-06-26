@@ -36,8 +36,6 @@ const Messages = () => {
     threshold: 1,
   });
 
-  useScrollListener(containerRef, isAtBottom, messageDispatch);
-
   const [editState, setEditState] = useState({});
 
   const [memberContextMenuData, setMemberContextMenuData] = useState({});
@@ -46,6 +44,8 @@ const Messages = () => {
 
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
+
+  useScrollListener(containerRef, isAtBottom, messageDispatch);
 
   useEffect(() => {
     if (!isFirstMessageRendered && isVisible) {
@@ -64,7 +64,7 @@ const Messages = () => {
         payload: true,
       });
     }
-  }, [messages]);
+  }, []);
 
   const handleFetchMore = async () => {
     console.log("handleFEtchMore run");
