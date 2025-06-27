@@ -7,25 +7,35 @@ import { AuthContextProvider } from "./context/providers/AuthContext.jsx";
 import { ChatroomsContextProvider } from "./context/providers/ChatroomsContext.jsx";
 import { ChatContextProvider } from "./context/providers/ChatContext.jsx";
 import ChatroomsListenerWrapper from "./context/ChatroomsListenerWrapper.jsx";
+import { ErrorBoundary } from "react-error-boundary";
+import { GlobalErrorFallback } from "./utils/fallbacks/GlobalErrorFallback.jsx";
+import { ToastProvider } from "./context/ToastContext.jsx";
 
 const Providers = ({ children }) => (
-  <AuthContextProvider>
-    <ChatroomsContextProvider>
-      <ChatContextProvider>
-        <MemberContextProvider>
-          <MessageContextProvider>
-            <ChatroomsListenerWrapper>{children}</ChatroomsListenerWrapper>
-          </MessageContextProvider>
-        </MemberContextProvider>
-      </ChatContextProvider>
-    </ChatroomsContextProvider>
-  </AuthContextProvider>
+  <ToastProvider>
+    <AuthContextProvider>
+      <ChatroomsContextProvider>
+        <ChatContextProvider>
+          <MemberContextProvider>
+            <MessageContextProvider>
+              <ChatroomsListenerWrapper>{children}</ChatroomsListenerWrapper>
+            </MessageContextProvider>
+          </MemberContextProvider>
+        </ChatContextProvider>
+      </ChatroomsContextProvider>
+    </AuthContextProvider>
+  </ToastProvider>
 );
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Providers>
-      <App />
+      <ErrorBoundary
+        FallbackComponent={GlobalErrorFallback}
+        onReset={() => window.location.reload()}
+      >
+        <App />
+      </ErrorBoundary>
     </Providers>
   </StrictMode>,
 );

@@ -33,7 +33,6 @@ export const fetchChatsInData = async (db, uid) => {
 export const fetchNumOfMembers = async (db, chatID) => {
   const chatRef = ref(db, `chats/${chatID}/numOfMembers`);
   const numOfMembers = (await get(chatRef)).val();
-  console.log(numOfMembers);
   return numOfMembers;
 };
 
@@ -74,9 +73,6 @@ export const removeUserFromChat = async (
 
   const newMemberUids = memberUids.replace(uidToRemove, "");
   const newTempTitle = updateTempTitle(tempTitle, usernameOfUserRemoved);
-
-  console.log("newMemberUids: " + newMemberUids);
-  console.log("newTempTitle: " + newTempTitle);
 
   await Promise.all([
     update(memberToRemoveRef, {
@@ -127,7 +123,6 @@ export const addUserToChat = async (db, user, chatroomData) => {
   const chatRef = ref(db, `chats/${chatID}`);
 
   const updatedTempTitle = updateTempTitle(tempTitle, "", username);
-  console.log(updatedTempTitle);
   const newUserUidsArr = [...memberUids.match(/.{1,28}/g), uid];
   const updatedMemberUids = newUserUidsArr.sort().join("");
 
@@ -211,7 +206,6 @@ export const getUsernameFromUid = async (db, uid) => {
 
   const usernameSnap = await get(userRef);
   const username = usernameSnap.val();
-  console.log(username);
   return username;
 };
 

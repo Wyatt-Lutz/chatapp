@@ -19,9 +19,6 @@ export const chatroomReducer = (state, action) => {
 
   switch (action.type) {
     case "ADD_CHATROOM":
-      console.log("addchatroom");
-      console.log(action.payload.key);
-      console.log(action.payload.data);
       newChatrooms.set(action.payload.key, action.payload.data);
       break;
     case "REMOVE_CHATROOM":

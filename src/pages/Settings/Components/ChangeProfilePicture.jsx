@@ -43,7 +43,7 @@ const ChangeProfilePicture = () => {
   const handleClick = (e) => {
     if (!currUser.emailVerified) {
       e.preventDefault();
-      console.info("To change your profile picture, please verify your email.");
+      console.info("To change your profile picture, please verify your email."); //toast
     }
   };
   return (

@@ -13,7 +13,7 @@ const PasswordReset = ({ passChange }) => {
     const previousPasswordResetTimestamp =
       localStorage.getItem(passwordCookieId);
     if (!email) {
-      console.log("Please enter an email");
+      console.log("Please enter an email"); //toast (not toast make div thing under)
       return;
     }
     //if Less than 59 minutes because previous link expires in a hour
@@ -22,14 +22,13 @@ const PasswordReset = ({ passChange }) => {
       Date.now() - previousPasswordResetTimestamp < 3540000
     ) {
       console.log(
-        `You have already received a password reset email at ${email}`,
+        `You have already received a password reset email at ${email}`, //toast
       );
       return;
     }
     const userData = await fetchUserDataByEmail(db, email);
-    console.log(userData);
     if (!userData) {
-      console.info("email is not connected to any user");
+      console.info("email is not connected to any user"); //toast (not toast make div under maybe?)
       return;
     }
     await sendPasswordResetEmail(auth, email);
@@ -37,7 +36,7 @@ const PasswordReset = ({ passChange }) => {
     localStorage.setItem(passwordCookieId, Date.now());
     setIsDisplayCheckEmail(true);
 
-    console.info("password reset email sent");
+    console.info("password reset email sent"); //toast
   };
 
   return (

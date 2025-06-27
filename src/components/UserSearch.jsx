@@ -28,12 +28,11 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
         setUsernameQueryData([]);
         return;
       }
-      console.log(usernameQueryData);
 
       const transformedData = Object.entries(usernameQueryData).map(
         ([uid, userData]) => ({ uid, ...userData }),
       );
-      console.log(previousUsers);
+
       const combinedUsers = previousUsers
         ? [...addedUsers, ...previousUsers]
         : addedUsers;
@@ -43,7 +42,6 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
           !combinedUsers.some((addedUser) => addedUser.uid === user.uid),
       );
 
-      console.log(cleanedData);
       setUsernameQueryData(cleanedData);
     };
 
@@ -52,7 +50,6 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
   }, [searchedUsername, previousUsers, currUser.uid]);
 
   const addUser = async (user) => {
-    console.log(user);
     const [currUserBlockData, addedUserBlockData] = await Promise.all([
       getBlockData(db, currUser.uid),
       getBlockData(db, user.uid),
@@ -60,7 +57,7 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
 
     if (addedUserBlockData[currUser.uid]) {
       console.log(
-        "The user you are adding has blocked you. You cannot add them to a group chat",
+        "The user you are adding has blocked you. You cannot add them to a group chat", //toast
       );
       return;
     }

@@ -12,7 +12,7 @@ export const signUserOut = async (
   //Firebase sign out
   await signOut(auth)
     .then(() => {
-      console.info("Sign out successful");
+      console.info("Sign out successful"); //toast
     })
     .catch((error) => {
       console.error(error);

@@ -54,7 +54,6 @@ const Input = () => {
     const file = e.target.files[0];
     e.target.value = null; //Allows the onChange to trigger again if the user tries to add the same picture to a different message
     if (!file) return;
-    console.log(file.type);
     if (file.type.startsWith("image/")) {
       const compressedImage = await compressImage(file);
       setFileToUpload(compressedImage);

@@ -14,7 +14,7 @@ const ChangePassword = ({
   const editPassword = async () => {
     if (!currUser.emailVerified) {
       console.info(
-        "You have not yet verified your email. To change your password, please use the reset password button on the signin page.",
+        "You have not yet verified your email. To change your password, please use the reset password button on the signin page.", //toast (add like a to signin button)
       );
       return;
     }

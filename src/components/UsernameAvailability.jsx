@@ -25,7 +25,6 @@ const UsernameAvailability = ({ username, setIsButtonDisabled }) => {
         setIsButtonDisabled(false);
         return;
       }
-      console.log(usernameData);
       const topUsername = Object.values(usernameData)[0]?.username;
       const isAvailable = topUsername !== username;
 

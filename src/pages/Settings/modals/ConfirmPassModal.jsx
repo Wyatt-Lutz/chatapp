@@ -23,7 +23,7 @@ const ConfirmPassModal = ({
         changeDisplayment(null);
       })
       .catch((error) => {
-        console.error(error);
+        console.error(error); //toast (not a toast, make it a text box under where you enter your password, test the errors)
         changeConfirmation(false);
       });
   };

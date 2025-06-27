@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import PasswordReset from "./PasswordReset/PasswordReset";
 import { validateSignin } from "../../utils/validation/signinValidation";
+import { useToast } from "../../context/ToastContext";
 
 const Signin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -13,7 +14,7 @@ const Signin = () => {
   const navigate = useNavigate();
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-
+  const { showToast } = useToast();
   const signUserIn = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
@@ -21,6 +22,8 @@ const Signin = () => {
     if (errors) return;
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
+      showToast("Success!", "success");
       navigate("/");
     } catch (error) {
       const errorMap = {
@@ -40,7 +43,6 @@ const Signin = () => {
   const handleValidation = (email, password) => {
     const errors = validateSignin(email, password);
     setFormErrors(errors);
-    console.log(errors);
     return Object.keys(errors).length > 0 ? errors : null;
   };
 
@@ -57,9 +59,7 @@ const Signin = () => {
     if (email && password) {
       await signUserIn(e);
     }
-    console.log(formErrors.email);
     if (!email || formErrors?.email) {
-      console.log("yo");
       emailRef.current.focus();
     } else if (!password || formErrors?.password) {
       passwordRef.current.focus();

@@ -22,7 +22,7 @@ const ProfilePictureUpload = ({ userData }) => {
 
     const photoStorageLocation = `users/${uid}`;
     const photoUrl = await uploadFile(profilePicture, photoStorageLocation);
-    console.log("photo url: " + photoUrl);
+
     await updateProfile(userData.userCredential.user, {
       photoURL: photoUrl,
     });

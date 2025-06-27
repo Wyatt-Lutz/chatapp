@@ -24,7 +24,6 @@ const Search = () => {
       }
 
       const messagesArray = Object.entries(messagesObject);
-      console.log(messagesArray);
       setSearchedMessages(new Map(messagesArray));
     };
 

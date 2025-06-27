@@ -17,11 +17,6 @@ const DeleteAccount = ({ displayPassModal }) => {
 
     await displayPassModal(deleteAccountHeader, deleteAccountText, true);
 
-    if (currUser.photoURL !== "/default-profile.jpg") {
-      const profilePictureRef = ref(storage, `users/${currUser.uid}`);
-      await deleteObject(profilePictureRef);
-    }
-
     await deleteAccount(db, currUser, chatroomsDispatch, resetAllChatContexts);
     navigate("/signin");
   };

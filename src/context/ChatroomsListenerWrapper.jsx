@@ -38,7 +38,6 @@ const ChatroomsListenerWrapper = ({ children }) => {
           });
         },
         onChatroomRemoved: (chatID) => {
-          console.log("yo");
           chatroomsDispatch({ type: "REMOVE_CHATROOM", payload: chatID });
 
           if (chatID === chatState.chatID) {

@@ -19,7 +19,7 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
     }
     await sendEmailVerification(currUser);
     hasResentEmail.current = true;
-    console.info("Email Verification resent");
+    console.info("Email Verification resent"); //toast
   };
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
           await sendEmailVerification(currUser);
 
           localStorage.setItem(verificationCookieId, true);
-          console.info("Email Verification sent");
+          console.info("Email Verification sent"); //toast
         }
       } else if (alreadySentVerification) {
         localStorage.removeItem(verificationCookieId);

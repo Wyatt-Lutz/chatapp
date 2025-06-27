@@ -67,7 +67,6 @@ const Messages = () => {
   }, []);
 
   const handleFetchMore = async () => {
-    console.log("handleFEtchMore run");
     const messageData = await fetchOlderChats(db, chatID, endTimestamp);
     if (!messageData) return;
 

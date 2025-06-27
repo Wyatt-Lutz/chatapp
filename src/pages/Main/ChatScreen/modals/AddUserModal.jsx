@@ -39,7 +39,6 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
     }
     setIsDisplayAddUser(null);
     addedUsers.forEach(async (user) => {
-      console.log(user);
       await addUserToChat(db, user, chatState);
     });
     const userAddedServerMessage =
@@ -47,7 +46,6 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
         .map((user) => " " + user.username)
         .toString()
         .trim() + " has been added to the chat!";
-    console.log(userAddedServerMessage);
     await addMessage(
       userAddedServerMessage,
       chatState.chatID,
