@@ -120,9 +120,9 @@ const SignupForm = ({ onSubmitForm }) => {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e, inputName) => {
     setErrorMessage("");
-    setFormErrors({});
+    setFormErrors((prev) => ({ ...prev, [inputName]: null }));
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -136,13 +136,14 @@ const SignupForm = ({ onSubmitForm }) => {
           placeholder="Username"
           value={formData.username}
           ref={usernameRef}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, "username")}
           onKeyDown={handleKeyDown}
         />
         <UsernameAvailability
           username={formData.username}
           setIsButtonDisabled={setIsButtonDisabled}
         />
+        <div>{formErrors.username}</div>
         <label>Email</label>
         <input
           name="email"
@@ -150,9 +151,10 @@ const SignupForm = ({ onSubmitForm }) => {
           placeholder="Email"
           ref={emailRef}
           value={formData.email}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, "email")}
           onKeyDown={handleKeyDown}
         />
+        <div>{formErrors.email}</div>
         <label>Password</label>
         <input
           name="password"
@@ -160,8 +162,9 @@ const SignupForm = ({ onSubmitForm }) => {
           placeholder="******"
           value={formData.password}
           ref={passwordRef}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, "password")}
         />
+        <div>{formErrors.password || errorMessage}</div>
         <div className="italic text-sm">*Must be at least 6 characters</div>
         <button
           type="submit"
@@ -173,11 +176,6 @@ const SignupForm = ({ onSubmitForm }) => {
 
         <input type="checkbox" ref={checkboxRef} />
         <span>Don&apos;t Remember Login</span>
-
-        {formErrors.username ||
-          formErrors.email ||
-          formErrors.password ||
-          errorMessage}
       </form>
       <button onClick={() => navigate("/signin")}>Sign in</button>
     </div>

@@ -40,12 +40,13 @@ const Signin = () => {
   const handleValidation = (email, password) => {
     const errors = validateSignin(email, password);
     setFormErrors(errors);
+    console.log(errors);
     return Object.keys(errors).length > 0 ? errors : null;
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e, inputName) => {
     setErrorMessage("");
-    setFormErrors({});
+    setFormErrors((prev) => ({ ...prev, [inputName]: null }));
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -56,8 +57,9 @@ const Signin = () => {
     if (email && password) {
       await signUserIn(e);
     }
-
+    console.log(formErrors.email);
     if (!email || formErrors?.email) {
+      console.log("yo");
       emailRef.current.focus();
     } else if (!password || formErrors?.password) {
       passwordRef.current.focus();
@@ -76,20 +78,21 @@ const Signin = () => {
               type="email"
               placeholder="Email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e, "email")}
               ref={emailRef}
               onKeyDown={handleKeyDown}
             />
+            <div>{formErrors.email}</div>
             <input
               name="password"
               type="password"
               placeholder="******"
               value={formData.password}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e, "password")}
               ref={passwordRef}
               onKeyDown={handleKeyDown}
             />
-            <div>{formErrors.email || formErrors.password || errorMessage}</div>
+            <div>{formErrors.password || errorMessage}</div>
 
             <button type="submit" className="border rounded-md bg-zinc-500">
               Signin

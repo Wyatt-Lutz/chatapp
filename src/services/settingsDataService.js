@@ -88,40 +88,42 @@ export const deleteAccount = async (
 
   const chatsInData = await fetchChatsInData(db, currUser.uid);
 
-  const memberOptions = {
-    profilePictureURL: "",
-    username: "Removed User",
-    isOnline: false,
-  };
+  if (chatsInData) {
+    const memberOptions = {
+      profilePictureURL: "",
+      username: "Removed User",
+      isOnline: false,
+    };
 
-  const removeUserFromEachChat = Object.keys(chatsInData).map(
-    async (chatID) => {
-      const [chatroomData, memberData] = await Promise.all([
-        fetchChatRoomData(db, chatID),
-        fetchMembersFromChat(db, chatID),
-      ]);
+    const removeUserFromEachChat = Object.keys(chatsInData).map(
+      async (chatID) => {
+        const [chatroomData, memberData] = await Promise.all([
+          fetchChatRoomData(db, chatID),
+          fetchMembersFromChat(db, chatID),
+        ]);
 
-      const transformedMemberData = Object.entries(memberData);
+        const transformedMemberData = Object.entries(memberData);
 
-      removeUserFromChat(
-        db,
-        { ...chatroomData, chatID },
-        currUser.uid,
-        currUser.displayName,
-        currUser.uid,
-        resetAllChatContexts,
-        transformedMemberData,
-        memberOptions,
-      );
-    },
-  );
+        removeUserFromChat(
+          db,
+          { ...chatroomData, chatID },
+          currUser.uid,
+          currUser.displayName,
+          currUser.uid,
+          resetAllChatContexts,
+          transformedMemberData,
+          memberOptions,
+        );
+      },
+    );
+    await Promise.all(removeUserFromEachChat);
+  }
 
   if (currUser.photoURL !== "/default-profile.jpg") {
     const profilePictureRef = storageRef(storage, `users/${currUser.uid}`);
     await deleteObject(profilePictureRef);
   }
 
-  await Promise.all(removeUserFromEachChat);
   await remove(userRef);
   await deleteUser(currUser);
   await signUserOut(auth, resetAllChatContexts, chatroomsDispatch);
