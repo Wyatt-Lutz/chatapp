@@ -23,7 +23,7 @@ const ChangeUsername = ({
   const editUsername = async () => {
     if (isEditUsernameDisabled) return;
     if (!currUser.emailVerified) {
-      console.info("To change your username, please verify your email."); //toast
+      console.info("To change your username, please verify your email."); //popup
       return;
     }
     const lastUsernameChange = await fetchLastUsernameChangeTime(

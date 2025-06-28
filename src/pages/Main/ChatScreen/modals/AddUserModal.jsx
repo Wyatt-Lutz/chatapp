@@ -35,7 +35,7 @@ const AddUserModal = ({ setIsDisplayAddUser }) => {
 
   const onFinishAddingUsers = async () => {
     if (addedUsers.length === 0) {
-      return; //toast
+      return;
     }
     setIsDisplayAddUser(null);
     addedUsers.forEach(async (user) => {

@@ -18,15 +18,8 @@ export const AuthContextProvider = ({ children }) => {
     };
   }, []);
 
-  const refreshUser = async () => {
-    if (auth.currentUser) {
-      await auth.currentUser.reload();
-      setCurrUser({ ...auth.currentUser });
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ currUser, loadingAuth, refreshUser }}>
+    <AuthContext.Provider value={{ currUser, loadingAuth }}>
       {children}
     </AuthContext.Provider>
   );

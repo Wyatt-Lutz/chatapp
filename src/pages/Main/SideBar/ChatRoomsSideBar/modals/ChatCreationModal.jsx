@@ -33,7 +33,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
 
     //Check if there is an existing chatroom with duplicate members
     if (checkIfDuplicateChat(memberUids, chatroomsState.chatrooms)) {
-      console.log("chat with those members already exists"); //toast
+      console.log("chat with those members already exists"); //popup
       return;
     }
 

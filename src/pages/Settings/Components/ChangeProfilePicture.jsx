@@ -6,12 +6,13 @@ import { uploadFile } from "../../../services/storageDataService";
 import { compressImage } from "../../../utils/mediaUtils";
 import { useAuth } from "../../../context/providers/AuthContext";
 import Camera from "../../../components/ui/Camera";
+import { useToast } from "../../../context/ToastContext";
 
 const ChangeProfilePicture = () => {
   const { currUser } = useAuth();
   const [profilePicture, setProfilePicture] = useState(currUser.photoURL);
   const [isChangingPicture, setIsChangingPicture] = useState(false);
-
+  const { showToast } = useToast();
   const onFinish = async () => {
     const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
 
@@ -19,7 +20,7 @@ const ChangeProfilePicture = () => {
     const photoURL = await uploadFile(profilePicture, photoStorageLocation);
     await updateProfile(currUser, { photoURL: photoURL });
     setIsChangingPicture(false);
-    // add successful toast
+    showToast("Successfully changed profile picture!", "success");
   };
 
   const handlePickImage = async (e) => {
@@ -43,7 +44,7 @@ const ChangeProfilePicture = () => {
   const handleClick = (e) => {
     if (!currUser.emailVerified) {
       e.preventDefault();
-      console.info("To change your profile picture, please verify your email."); //toast
+      console.info("To change your profile picture, please verify your email."); //popup
     }
   };
   return (

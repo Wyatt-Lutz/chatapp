@@ -2,53 +2,79 @@ import { sendEmailVerification } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/providers/AuthContext";
 import { useEffect, useState } from "react";
+import { useToast } from "../context/ToastContext";
 import { useRef } from "react";
+import { auth } from "../../firebase";
 
 const EmailNotVerified = ({ email, setIsVerified }) => {
-  const { currUser, refreshUser } = useAuth();
+  const { currUser } = useAuth();
   const [loading, setLoading] = useState(true);
-  const hasResentEmail = useRef(false);
-
+  const { showToast } = useToast();
   const navigate = useNavigate();
-  const resendEmail = async () => {
-    if (hasResentEmail.current) {
-      console.info(
-        "You have already tried resending the verification email, please check your email, including spam.If you think the email you entered signing up is incorrect, please click the change email button to continue to your account settings.",
-      );
+  const hasRanInitialCheck = useRef(false);
+
+  const fetchEmailVerificationCookies = (currUser) => {
+    const json = localStorage.getItem(`verification-${currUser.uid}`);
+    if (!json) return null;
+    const cookieData = JSON.parse(json);
+    return {
+      counter: cookieData.counter,
+      hasSentEmailRecently: Date.now() - cookieData.timestamp < 3540000,
+    };
+  };
+
+  const sendVerificationEmail = async (currUser, counter) => {
+    await sendEmailVerification(currUser).catch((error) => {
+      showToast(`Error sending verification email: ${error.message}`); //Example
+    });
+    localStorage.setItem(
+      `verification-${currUser.uid}`,
+      JSON.stringify({
+        timestamp: Date.now(),
+        counter: counter,
+      }),
+    );
+    showToast("Verification Email Sent", "success");
+  };
+
+  const checkIfSendEmail = async (currUser) => {
+    const data = fetchEmailVerificationCookies(currUser);
+    if (!data) {
+      await sendVerificationEmail(currUser, 1);
       return;
     }
-    await sendEmailVerification(currUser);
-    hasResentEmail.current = true;
-    console.info("Email Verification resent"); //toast
+    const { counter, hasSentEmailRecently } = data;
+    if (hasSentEmailRecently && counter >= 2) {
+      console.log(
+        "You have already tried resending the verification email, please check your email, including spam. If you think the email you entered signing up is incorrect, please click the change email button to continue to your account settings.",
+      ); //popup
+      return;
+    } else if (!hasSentEmailRecently) {
+      await sendVerificationEmail(currUser, 1);
+    } else if (hasSentEmailRecently && counter === 1) {
+      await sendVerificationEmail(currUser, 2);
+    }
   };
 
   useEffect(() => {
+    console.log("I reran");
     const checkIfUserVerified = async () => {
-      const verificationCookieId = `verification-${currUser.uid}`;
-      const alreadySentVerification =
-        localStorage.getItem(verificationCookieId);
-
-      if (!currUser.emailVerified) {
-        if (!alreadySentVerification) {
-          await sendEmailVerification(currUser);
-
-          localStorage.setItem(verificationCookieId, true);
-          console.info("Email Verification sent"); //toast
-        }
-      } else if (alreadySentVerification) {
-        localStorage.removeItem(verificationCookieId);
+      if (currUser.emailVerified) {
+        return;
       }
+      checkIfSendEmail(currUser);
+      hasRanInitialCheck.current = true;
       setLoading(false);
     };
 
     checkIfUserVerified();
-  }, [currUser]);
+  }, []);
 
   useEffect(() => {
     if (loading) return;
     const timeoutID = setInterval(async () => {
-      await refreshUser();
-      if (currUser.emailVerified) {
+      await auth.currentUser.reload();
+      if (auth.currentUser.emailVerified) {
         setIsVerified(true);
         clearInterval(timeoutID);
       }
@@ -57,14 +83,14 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
     return () => {
       clearInterval(timeoutID);
     };
-  }, [loading, currUser.emailVerified, refreshUser, setIsVerified]);
+  }, [loading, setIsVerified]);
 
   return (
     <div>
       <div>Before you continue, please verify your email.</div>
       <div>We have sent a email verification link to {email}.</div>
       <button
-        onClick={resendEmail}
+        onClick={() => checkIfSendEmail(currUser)}
         className="border rounded-md bg-zinc-500 m-2 p-1"
       >
         Resend Email

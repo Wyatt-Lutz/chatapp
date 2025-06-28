@@ -57,7 +57,7 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
 
     if (addedUserBlockData[currUser.uid]) {
       console.log(
-        "The user you are adding has blocked you. You cannot add them to a group chat", //toast
+        "The user you are adding has blocked you. You cannot add them to a group chat", //popup
       );
       return;
     }

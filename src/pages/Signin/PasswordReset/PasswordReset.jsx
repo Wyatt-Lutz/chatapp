@@ -7,13 +7,13 @@ import CheckEmail from "./CheckEmail";
 const PasswordReset = ({ passChange }) => {
   const [email, setEmail] = useState("");
   const [isDisplayCheckEmail, setIsDisplayCheckEmail] = useState(false);
-
+  const { showToast } = useToast();
   const handlePasswordReset = async () => {
     const passwordCookieId = `password-${email}`;
     const previousPasswordResetTimestamp =
       localStorage.getItem(passwordCookieId);
     if (!email) {
-      console.log("Please enter an email"); //toast (not toast make div thing under)
+      console.log("Please enter an email"); //popup (make div thing under)
       return;
     }
     //if Less than 59 minutes because previous link expires in a hour
@@ -22,21 +22,20 @@ const PasswordReset = ({ passChange }) => {
       Date.now() - previousPasswordResetTimestamp < 3540000
     ) {
       console.log(
-        `You have already received a password reset email at ${email}`, //toast
+        `You have already received a password reset email at ${email}`, //popup
       );
       return;
     }
     const userData = await fetchUserDataByEmail(db, email);
     if (!userData) {
-      console.info("email is not connected to any user"); //toast (not toast make div under maybe?)
+      console.info("email is not connected to any user"); //popup (not toast make div under maybe?)
       return;
     }
     await sendPasswordResetEmail(auth, email);
 
     localStorage.setItem(passwordCookieId, Date.now());
     setIsDisplayCheckEmail(true);
-
-    console.info("password reset email sent"); //toast
+    showToast("Sent password reset email.", "success");
   };
 
   return (
