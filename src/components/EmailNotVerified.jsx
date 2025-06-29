@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/providers/AuthContext";
 import { useEffect, useState } from "react";
 import { useToast } from "../context/ToastContext";
-import { useRef } from "react";
 import { auth } from "../../firebase";
+import PopupError from "./PopupError";
 
 const EmailNotVerified = ({ email, setIsVerified }) => {
   const { currUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const hasRanInitialCheck = useRef(false);
+  const [popup, setPopup] = useState();
 
   const fetchEmailVerificationCookies = (currUser) => {
     const json = localStorage.getItem(`verification-${currUser.uid}`);
@@ -25,7 +25,18 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
 
   const sendVerificationEmail = async (currUser, counter) => {
     await sendEmailVerification(currUser).catch((error) => {
-      showToast(`Error sending verification email: ${error.message}`); //Example
+      if (error.code === "auth/too-many-requests") {
+        setPopup(
+          "You are trying to send too many emails. Please check you email for the latest verification links or wait a few minutes and reload the page before trying again.",
+        );
+      } else {
+        setPopup(
+          "Error when sending verification email: " +
+            error.message +
+            " Please wait a few minutes and reload the page before trying again.",
+        );
+      }
+      return;
     });
     localStorage.setItem(
       `verification-${currUser.uid}`,
@@ -45,9 +56,9 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
     }
     const { counter, hasSentEmailRecently } = data;
     if (hasSentEmailRecently && counter >= 2) {
-      console.log(
-        "You have already tried resending the verification email, please check your email, including spam. If you think the email you entered signing up is incorrect, please click the change email button to continue to your account settings.",
-      ); //popup
+      setPopup(
+        "You should have already received a verification email, please check your email, including spam. If you think the email you entered signing up is incorrect, please click the change email button to continue to your account settings.",
+      );
       return;
     } else if (!hasSentEmailRecently) {
       await sendVerificationEmail(currUser, 1);
@@ -57,13 +68,11 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
   };
 
   useEffect(() => {
-    console.log("I reran");
     const checkIfUserVerified = async () => {
       if (currUser.emailVerified) {
         return;
       }
       checkIfSendEmail(currUser);
-      hasRanInitialCheck.current = true;
       setLoading(false);
     };
 
@@ -101,6 +110,8 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
       >
         Change Email
       </button>
+
+      {popup && <PopupError message={popup} type="error" />}
     </div>
   );
 };

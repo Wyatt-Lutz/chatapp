@@ -3,17 +3,21 @@ import { db, auth } from "../../../../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { fetchUserDataByEmail } from "../../../services/userDataService";
 import CheckEmail from "./CheckEmail";
+import { useToast } from "../../../context/ToastContext";
+import PopupError from "../../../components/PopupError";
 
 const PasswordReset = ({ passChange }) => {
   const [email, setEmail] = useState("");
   const [isDisplayCheckEmail, setIsDisplayCheckEmail] = useState(false);
   const { showToast } = useToast();
+  const [popup, setPopup] = useState("");
+
   const handlePasswordReset = async () => {
     const passwordCookieId = `password-${email}`;
     const previousPasswordResetTimestamp =
       localStorage.getItem(passwordCookieId);
     if (!email) {
-      console.log("Please enter an email"); //popup (make div thing under)
+      setPopup("Please enter an email.");
       return;
     }
     //if Less than 59 minutes because previous link expires in a hour
@@ -21,20 +25,36 @@ const PasswordReset = ({ passChange }) => {
       previousPasswordResetTimestamp &&
       Date.now() - previousPasswordResetTimestamp < 3540000
     ) {
-      console.log(
-        `You have already received a password reset email at ${email}`, //popup
+      const timeDifference = new Date(
+        Date.now() - previousPasswordResetTimestamp,
+      );
+      setPopup(
+        `You should have already received a password reset email at ${email}. Try again in ${60 - timeDifference.getMinutes()} minutes.`,
       );
       return;
     }
     const userData = await fetchUserDataByEmail(db, email);
     if (!userData) {
-      console.info("email is not connected to any user"); //popup (not toast make div under maybe?)
+      setPopup("This email is not connected with any user.");
       return;
     }
-    await sendPasswordResetEmail(auth, email);
 
     localStorage.setItem(passwordCookieId, Date.now());
     setIsDisplayCheckEmail(true);
+    await sendPasswordResetEmail(auth, email).catch(() => {
+      if (error.code === "auth/too-many-requests") {
+        setPopup(
+          "You are trying to send too many emails. Please check you email for the latest password reset email or wait a few minutes and reload the page before trying again.",
+        );
+      } else {
+        setPopup(
+          "Error when sending password reset email: " +
+            error.message +
+            " Please wait a few minutes and reload the page before trying again.",
+        );
+      }
+      return;
+    });
     showToast("Sent password reset email.", "success");
   };
 
@@ -65,6 +85,7 @@ const PasswordReset = ({ passChange }) => {
           >
             Return to Signin
           </button>
+          {popup && <PopupError message={popup} type="error" />}
         </div>
       )}
     </div>

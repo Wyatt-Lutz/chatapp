@@ -23,6 +23,11 @@ export const ToastProvider = ({ children }) => {
     registerToast(showToast);
   }, [showToast]);
 
+  const typeDependentCSS = {
+    error: "bg-red-500",
+    success: "bg-green-500",
+  };
+
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
@@ -31,7 +36,7 @@ export const ToastProvider = ({ children }) => {
           {toasts.map(({ id, message, type }) => (
             <motion.div
               key={id}
-              className={`px-8 py-8 rounded shadow text-white ${type === "error" ? "bg-red-500" : "bg-green-500"}`}
+              className={`px-8 py-8 rounded shadow text-white ${typeDependentCSS[type]}`}
               initial={{ opacity: 0, y: -100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -200 }}

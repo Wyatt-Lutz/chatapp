@@ -9,11 +9,15 @@ import { useAuth } from "../../context/providers/AuthContext";
 
 import ConfirmPassModal from "./modals/ConfirmPassModal";
 import BlockedUsersModal from "./modals/BlockedUsersModal";
+import { signUserOut } from "../../utils/userUtils";
+import { auth } from "../../../firebase";
+import { useChatContexts } from "../../hooks/useContexts";
 
 const Settings = () => {
   const { currUser } = useAuth();
   const navigate = useNavigate();
   const [currUsername, setCurrUsername] = useState(currUser.displayName);
+  const { chatroomsDispatch, resetAllChatContexts } = useChatContexts();
 
   const [modal, setModal] = useState({ type: null, props: {} });
 
@@ -80,6 +84,13 @@ const Settings = () => {
       </button>
 
       <button onClick={() => navigate("/")}>Go Home</button>
+      <button
+        onClick={async () =>
+          await signUserOut(auth, resetAllChatContexts, chatroomsDispatch)
+        }
+      >
+        Sign out
+      </button>
 
       {modal.type === "ConfirmPassModal" && (
         <ConfirmPassModal {...modal.props} />
