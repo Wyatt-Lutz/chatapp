@@ -3,6 +3,7 @@ import { EmailAuthProvider } from "firebase/auth/web-extension";
 import { useAuth } from "../../../context/providers/AuthContext";
 import CloseModal from "../../../components/ui/CloseModal";
 import { useState } from "react";
+import PopupError from "../../../components/PopupError";
 
 const ConfirmPassModal = ({
   changeDisplayment,
@@ -13,6 +14,7 @@ const ConfirmPassModal = ({
 }) => {
   const { currUser } = useAuth();
   const [password, setPassword] = useState("");
+  const [popup, setPopup] = useState("");
 
   const onCurrPassSubmit = async (e) => {
     e.preventDefault();
@@ -23,8 +25,14 @@ const ConfirmPassModal = ({
         changeDisplayment(null);
       })
       .catch((error) => {
-        console.error(error); //popup ( make it a text box under where you enter your password, test the errors)
-        changeConfirmation(false);
+        setPassword("");
+        if (error.code === "auth/wrong-password") {
+          setPopup("Wrong password.");
+        } else {
+          setPopup(
+            "There was an error while trying to change your password. Please reload the page and try again.",
+          );
+        }
       });
   };
 
@@ -47,6 +55,8 @@ const ConfirmPassModal = ({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          {popup && <PopupError message={popup} type="error" />}
 
           {isDeleteAccount ? (
             <button

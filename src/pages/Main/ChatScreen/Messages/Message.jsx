@@ -92,7 +92,7 @@ const Message = ({
         />
       )}
       <div className="hover:bg-gray-600 rounded-lg pt-2 pb-2">
-        {(messageData.renderTimeAndSender || index === 0) && (
+        {(messageData.showTimeAndSender || index === 0) && (
           <div className="flex items-center gap-2">
             {messageData.sender !== "server" && (
               <div

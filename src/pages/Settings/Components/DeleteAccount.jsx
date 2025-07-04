@@ -1,8 +1,7 @@
 import { deleteAccount } from "../../../services/settingsDataService";
 import { useNavigate } from "react-router-dom";
 import { useChatContexts } from "../../../hooks/useContexts";
-import { deleteObject, ref } from "firebase/storage";
-import { db, storage } from "../../../../firebase";
+import { db } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 
 const DeleteAccount = ({ displayPassModal }) => {

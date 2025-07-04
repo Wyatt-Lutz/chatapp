@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { queryUsernames } from "../services/globalDataService";
 import { db } from "../../firebase";
+import { checkIfUsernameExists } from "../services/userDataService";
 
 const UsernameAvailability = ({ username, setIsButtonDisabled }) => {
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
-
   useEffect(() => {
     if (!username) {
       setIsUsernameAvailable(null);
@@ -18,18 +17,9 @@ const UsernameAvailability = ({ username, setIsButtonDisabled }) => {
         return;
       }
 
-      const usernameData = await queryUsernames(db, username);
-
-      if (!usernameData) {
-        setIsUsernameAvailable(true);
-        setIsButtonDisabled(false);
-        return;
-      }
-      const topUsername = Object.values(usernameData)[0]?.username;
-      const isAvailable = topUsername !== username;
-
-      setIsUsernameAvailable(isAvailable);
-      setIsButtonDisabled(!isAvailable);
+      const usernameExists = await checkIfUsernameExists(db, username);
+      setIsUsernameAvailable(!usernameExists);
+      setIsButtonDisabled(usernameExists);
     };
     const timeout = setTimeout(fetchUsernames, 500);
     return () => clearTimeout(timeout);

@@ -6,6 +6,8 @@ import { useToast } from "../context/ToastContext";
 import { auth } from "../../firebase";
 import PopupError from "./PopupError";
 
+const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+
 const EmailNotVerified = ({ email, setIsVerified }) => {
   const { currUser } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -19,12 +21,22 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
     const cookieData = JSON.parse(json);
     return {
       counter: cookieData.counter,
-      hasSentEmailRecently: Date.now() - cookieData.timestamp < 3540000,
+      hasSentEmailRecently: Date.now() - cookieData.timestamp < ONE_HOUR_IN_MS,
     };
   };
 
   const sendVerificationEmail = async (currUser, counter) => {
-    await sendEmailVerification(currUser).catch((error) => {
+    try {
+      await sendEmailVerification(currUser);
+      localStorage.setItem(
+        `verification-${currUser.uid}`,
+        JSON.stringify({
+          timestamp: Date.now(),
+          counter,
+        }),
+      );
+      showToast("Verification Email Sent", "success");
+    } catch (error) {
       if (error.code === "auth/too-many-requests") {
         setPopup(
           "You are trying to send too many emails. Please check you email for the latest verification links or wait a few minutes and reload the page before trying again.",
@@ -36,19 +48,10 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
             " Please wait a few minutes and reload the page before trying again.",
         );
       }
-      return;
-    });
-    localStorage.setItem(
-      `verification-${currUser.uid}`,
-      JSON.stringify({
-        timestamp: Date.now(),
-        counter: counter,
-      }),
-    );
-    showToast("Verification Email Sent", "success");
+    }
   };
 
-  const checkIfSendEmail = async (currUser) => {
+  const handleSendEmail = async (currUser) => {
     const data = fetchEmailVerificationCookies(currUser);
     if (!data) {
       await sendVerificationEmail(currUser, 1);
@@ -68,16 +71,12 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
   };
 
   useEffect(() => {
-    const checkIfUserVerified = async () => {
-      if (currUser.emailVerified) {
-        return;
-      }
-      checkIfSendEmail(currUser);
-      setLoading(false);
-    };
+    if (!currUser) return;
+    if (currUser.emailVerified) return;
 
-    checkIfUserVerified();
-  }, []);
+    handleSendEmail(currUser);
+    setLoading(false);
+  }, [currUser]);
 
   useEffect(() => {
     if (loading) return;

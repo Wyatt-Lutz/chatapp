@@ -1,6 +1,6 @@
 import { onChildAdded, onChildChanged, ref } from "firebase/database";
 import { db } from "../../../firebase";
-import { getBlockData } from "../../services/memberDataService";
+import { fetchUserData } from "../../services/userDataService";
 
 export const MemberListenerService = {
   setUpMemberListeners(chatID, currUserUid, action) {
@@ -11,7 +11,7 @@ export const MemberListenerService = {
     if (action.onMemberAdded) {
       //This will only handle loading members when the user opens a chatroom, or adding a user to a chatroom that has never been added to it before.
       const handleMemberAdded = async (snap) => {
-        const userBlockData = await getBlockData(db, currUserUid);
+        const userBlockData = await fetchUserData(db, currUserUid, "blockList");
         const memberObj = {
           ...snap.val(),
           isBlocked: userBlockData[snap.key] || false,
@@ -26,7 +26,8 @@ export const MemberListenerService = {
     if (action.onMemberUpdated) {
       //This also runs if a user who has been previously removed is re-added because their data isn't ever deleted
       const handleUpdateMember = async (snap) => {
-        const userBlockData = await getBlockData(db, currUserUid);
+        const userBlockData = await fetchUserData(db, currUserUid, "blockList");
+        console.log(userBlockData);
         const memberObj = { ...snap.val(), isBlocked: userBlockData[snap.key] };
         action.onMemberUpdated(snap.key, memberObj);
       };

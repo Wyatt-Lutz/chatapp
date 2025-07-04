@@ -29,13 +29,13 @@ const Providers = ({ children }) => (
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Providers>
-      <ErrorBoundary
-        FallbackComponent={GlobalErrorFallback}
-        onReset={() => window.location.reload()}
-      >
+    <ErrorBoundary
+      FallbackComponent={GlobalErrorFallback}
+      onReset={() => window.location.reload()}
+    >
+      <Providers>
         <App />
-      </ErrorBoundary>
-    </Providers>
+      </Providers>
+    </ErrorBoundary>
   </StrictMode>,
 );

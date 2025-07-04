@@ -8,12 +8,12 @@ import {
 } from "firebase/auth";
 import UsernameAvailability from "../../components/UsernameAvailability";
 import { useState, useRef } from "react";
-import {
-  createUserData,
-  queryUsernames,
-} from "../../services/globalDataService";
 import { validateSignup } from "../../utils/validation/signupValidation";
 import { useNavigate } from "react-router";
+import {
+  checkIfUsernameExists,
+  createUserData,
+} from "../../services/userDataService";
 
 const SignupForm = ({ onSubmitForm }) => {
   const [formData, setFormData] = useState({
@@ -39,8 +39,8 @@ const SignupForm = ({ onSubmitForm }) => {
     if (errors) return;
 
     try {
-      const usernameQueryData = await queryUsernames(db, username);
-      if (usernameQueryData) {
+      const usernameExists = await checkIfUsernameExists(db, username);
+      if (usernameExists) {
         throw new Error("username-already-in-use");
       }
 
@@ -57,19 +57,11 @@ const SignupForm = ({ onSubmitForm }) => {
           : browserLocalPersistence,
       );
 
-      const trimmedUsername = username.trim();
-
       const uid = userCredential.user.uid;
 
       const defaultProfilePictureURL = "/default-profile.jpg";
 
-      await createUserData(
-        db,
-        uid,
-        trimmedUsername,
-        email,
-        defaultProfilePictureURL,
-      );
+      await createUserData(db, uid, username, email, defaultProfilePictureURL);
 
       await updateProfile(userCredential.user, {
         displayName: trimmedUsername,

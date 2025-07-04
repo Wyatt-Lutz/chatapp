@@ -1,6 +1,6 @@
 import { db } from "../../../../../firebase";
 import { addMessage } from "../../../../services/messageDataService";
-import { calculateRenderTimeAndSender } from "../../../../utils/messageUtils";
+import { calculateIfShowTimeAndSender } from "../../../../utils/messageUtils";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { useEffect, useRef, useState } from "react";
@@ -34,7 +34,7 @@ const Input = () => {
       messageKeys.length > 0
         ? messageState.messages.get(messageKeys[messageKeys.length - 1])
         : null;
-    const willRenderTimeAndSender = calculateRenderTimeAndSender(
+    const willShowTimeAndSender = calculateIfShowTimeAndSender(
       lastMessage,
       currUser.uid,
     );
@@ -44,7 +44,7 @@ const Input = () => {
       chatState.chatID,
       currUser.uid,
       db,
-      willRenderTimeAndSender,
+      willShowTimeAndSender,
       memberState.members,
       fileToUpload,
     );

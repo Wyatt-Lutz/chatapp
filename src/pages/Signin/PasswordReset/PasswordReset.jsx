@@ -12,7 +12,8 @@ const PasswordReset = ({ passChange }) => {
   const { showToast } = useToast();
   const [popup, setPopup] = useState("");
 
-  const handlePasswordReset = async () => {
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
     const passwordCookieId = `password-${email}`;
     const previousPasswordResetTimestamp =
       localStorage.getItem(passwordCookieId);
@@ -20,19 +21,21 @@ const PasswordReset = ({ passChange }) => {
       setPopup("Please enter an email.");
       return;
     }
-    //if Less than 59 minutes because previous link expires in a hour
-    if (
-      previousPasswordResetTimestamp &&
-      Date.now() - previousPasswordResetTimestamp < 3540000
-    ) {
-      const timeDifference = new Date(
-        Date.now() - previousPasswordResetTimestamp,
+
+    const oneHourInMS = 60 * 60 * 1000;
+    const timeElapsed = Date.now() - previousPasswordResetTimestamp;
+    const timeRemaining = oneHourInMS - timeElapsed;
+
+    if (timeRemaining > 0) {
+      const minutes = Math.floor(
+        (timeRemaining % (1000 * 60 * 60)) / (1000 * 60),
       );
       setPopup(
-        `You should have already received a password reset email at ${email}. Try again in ${60 - timeDifference.getMinutes()} minutes.`,
+        `You should have already received a password reset email at ${email}. Try again in ${minutes} minute(s).`,
       );
       return;
     }
+
     const userData = await fetchUserDataByEmail(db, email);
     if (!userData) {
       setPopup("This email is not connected with any user.");
@@ -64,20 +67,17 @@ const PasswordReset = ({ passChange }) => {
         <CheckEmail email={email} />
       ) : (
         <div>
-          <div className="flex flex-col">
+          <form onSubmit={handlePasswordReset} className="flex flex-col">
             <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <button
-              onClick={handlePasswordReset}
-              className="border rounded-md bg-zinc-500"
-            >
+            <button type="submit" className="border rounded-md bg-zinc-500">
               Send Reset Email
             </button>
-          </div>
+          </form>
 
           <button
             onClick={() => passChange(false)}

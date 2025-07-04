@@ -11,7 +11,7 @@ const CheckEmail = ({ email }) => {
       <div>
         When you finish, you can return to this tab and continue to signin.
       </div>
-      <button onClick={() => navigate("/signin")}>Return to Signin</button>
+      <button onClick={() => navigate("/")}>Return to Signin</button>
     </div>
   );
 };

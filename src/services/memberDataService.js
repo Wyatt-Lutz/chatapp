@@ -1,6 +1,7 @@
 import { get, increment, ref, remove, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
+import { deleteChatRoom, transferOwnership } from "./chatBarDataService";
 
 /**
  * Updates the block status of a given user for the current user
@@ -23,17 +24,6 @@ export const updateBlockedStatus = async (
 export const fetchMembersFromChat = async (db, chatID) => {
   const membersRef = ref(db, `members/${chatID}`);
   return (await get(membersRef)).val();
-};
-
-export const fetchChatsInData = async (db, uid) => {
-  const chatsInRef = ref(db, `users/${uid}/chatsIn`);
-  return (await get(chatsInRef)).val();
-};
-
-export const fetchNumOfMembers = async (db, chatID) => {
-  const chatRef = ref(db, `chats/${chatID}/numOfMembers`);
-  const numOfMembers = (await get(chatRef)).val();
-  return numOfMembers;
 };
 
 export const removeUserFromChat = async (
@@ -155,46 +145,6 @@ export const updateNumOfMembers = async (db, chatID, isAdd) => {
   await update(numOfMembersRef, updates);
 };
 
-export const deleteChatRoom = async (db, chatID, memberData = null) => {
-  if (!memberData) {
-    memberData = Object.keys(await fetchMembersFromChat(db, chatID));
-  }
-
-  const deleteUserChatsInRefs = memberData.map((uid) => {
-    remove(ref(db, `users/${uid}/chatsIn/${chatID}`));
-  });
-
-  const deleteChatRefs = [
-    remove(ref(db, `members/${chatID}`)),
-    remove(ref(db, `messages/${chatID}`)),
-    remove(ref(db, `chats/${chatID}`)),
-  ];
-
-  await Promise.all([...deleteUserChatsInRefs, ...deleteChatRefs]); //Parallelization
-};
-
-export const transferOwnership = async (db, chatID, newOwnerUid) => {
-  const chatMetadataRef = ref(db, `chats/${chatID}`);
-  await update(chatMetadataRef, {
-    owner: newOwnerUid,
-  });
-};
-
-/**
- * Fetches the block status of users blocked by current user
- * @param {Database} db - Reference to Realtime Database
- * @param {string} uid - Uid of the user whose block data is fetched
- * @returns {Object} Object of blocked users by current user with true and false values for current blocked status
- */
-export const getBlockData = async (db, uid) => {
-  const userBlockListRef = ref(db, `users/${uid}/blockList`);
-
-  const userBlockDataSnap = await get(userBlockListRef);
-  const userBlockData = userBlockDataSnap.val() || {};
-
-  return userBlockData;
-};
-
 /**
  * Fetches a users username using their uid
  * @param {Database} db - Realtime Database Reference
@@ -209,7 +159,7 @@ export const getUsernameFromUid = async (db, uid) => {
   return username;
 };
 
-export const fetchChatUsersByStatus = async (memberData, status) => {
+export const fetchMembersByStatus = async (memberData, status) => {
   return memberData.reduce((uids, [uid, userData]) => {
     const isOnline = userData?.isOnline;
     if (

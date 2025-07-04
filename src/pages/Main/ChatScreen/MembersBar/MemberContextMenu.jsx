@@ -1,12 +1,12 @@
 import {
   removeUserFromChat,
-  transferOwnership,
   unBanUser,
   updateBlockedStatus,
 } from "../../../../services/memberDataService";
 import { db } from "../../../../../firebase";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
+import { transferOwnership } from "../../../../services/chatBarDataService";
 
 const MemberContextMenu = ({
   contextMenuData: { memberUid, memberData },

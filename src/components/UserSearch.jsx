@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { queryUsernames } from "../services/globalDataService";
 import { db } from "../../firebase";
 import CloseModal from "./ui/CloseModal";
 import { useAuth } from "../context/providers/AuthContext";
-import { getBlockData } from "../services/memberDataService";
 
 import BlockedUserWarning from "./BlockedUserWarning";
+import PopupError from "./PopupError";
+import { fetchUserData, queryUsernames } from "../services/userDataService";
 
 const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
   const [usernameQueryData, setUsernameQueryData] = useState([]);
   const [searchedUsername, setSearchedUsername] = useState("");
   const [modal, setModal] = useState({ type: "", user: null });
   const { currUser } = useAuth();
+  const [popup, setPopup] = useState("");
 
   useEffect(() => {
     if (!searchedUsername.trim()) {
@@ -51,13 +52,13 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
 
   const addUser = async (user) => {
     const [currUserBlockData, addedUserBlockData] = await Promise.all([
-      getBlockData(db, currUser.uid),
-      getBlockData(db, user.uid),
+      fetchUserData(db, currUser.uid, "blockList"),
+      fetchUserData(db, user.uid, "blockList"),
     ]);
 
     if (addedUserBlockData[currUser.uid]) {
-      console.log(
-        "The user you are adding has blocked you. You cannot add them to a group chat", //popup
+      setPopup(
+        "The user you are adding has blocked you. You cannot add them to a group chat.",
       );
       return;
     }
@@ -179,6 +180,7 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
             ))}
         </div>
       )}
+      {popup && <PopupError message={popup} type="error" />}
     </div>
   );
 };

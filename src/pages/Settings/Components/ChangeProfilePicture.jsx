@@ -7,12 +7,14 @@ import { compressImage } from "../../../utils/mediaUtils";
 import { useAuth } from "../../../context/providers/AuthContext";
 import Camera from "../../../components/ui/Camera";
 import { useToast } from "../../../context/ToastContext";
+import PopupError from "../../../components/PopupError";
 
 const ChangeProfilePicture = () => {
   const { currUser } = useAuth();
   const [profilePicture, setProfilePicture] = useState(currUser.photoURL);
   const [isChangingPicture, setIsChangingPicture] = useState(false);
   const { showToast } = useToast();
+  const [popup, setPopup] = useState("");
   const onFinish = async () => {
     const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
 
@@ -44,7 +46,7 @@ const ChangeProfilePicture = () => {
   const handleClick = (e) => {
     if (!currUser.emailVerified) {
       e.preventDefault();
-      console.info("To change your profile picture, please verify your email."); //popup
+      setPopup("To change your profile picture, please verify your email.");
     }
   };
   return (
@@ -75,6 +77,7 @@ const ChangeProfilePicture = () => {
           onChange={handlePickImage}
         />
       </div>
+      {popup && <PopupError message={popup} type="error" />}
       {isChangingPicture && (
         <div>
           <button onClick={onCancel}>Cancel</button>

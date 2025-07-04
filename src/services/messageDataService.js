@@ -4,6 +4,8 @@ import {
   set,
   get,
   endBefore,
+  endAt,
+  startAt,
   runTransaction,
   push,
   orderByChild,
@@ -13,7 +15,7 @@ import {
   update,
   limitToLast,
 } from "firebase/database";
-import { fetchChatUsersByStatus } from "./memberDataService";
+import { fetchMembersByStatus } from "./memberDataService";
 import { storage } from "../../firebase";
 import { ref as storageRef } from "firebase/storage";
 import { uploadFile } from "./storageDataService";
@@ -35,7 +37,7 @@ export const addMessage = async (
   chatID,
   uid,
   db,
-  renderTimeAndSender,
+  showTimeAndSender,
   memberData,
   fileToUpload = null,
 ) => {
@@ -47,7 +49,7 @@ export const addMessage = async (
     timestamp,
     text,
     sender: uid,
-    renderTimeAndSender,
+    showTimeAndSender,
     hasBeenEdited: false,
     fileRef: fileToUpload ? "uploading" : null,
     fileType: fileToUpload?.type || null,
@@ -80,13 +82,6 @@ export const addMessage = async (
   await updateUnreadCount(db, chatID, memberData);
 };
 
-export const updateFirstMessageID = async (db, chatID, messageID) => {
-  const chatRef = ref(db, `chats/${chatID}`);
-  await update(chatRef, {
-    firstMessageID: messageID,
-  });
-};
-
 /**
  * Updates the number of unread messages for each offline user in a chatroom.
  * Uses runTransaction to ensure atomicity
@@ -95,7 +90,7 @@ export const updateFirstMessageID = async (db, chatID, messageID) => {
  */
 const updateUnreadCount = async (db, chatID, memberData) => {
   const transformedMemberData = [...memberData.entries()];
-  const offlineMembers = await fetchChatUsersByStatus(
+  const offlineMembers = await fetchMembersByStatus(
     transformedMemberData,
     false,
   );
@@ -120,18 +115,25 @@ export const deleteMessage = async (db, chatID, messageUid) => {
   await remove(chatRef);
 };
 
-export const editTitle = async (
-  newTitle,
-  chatID,
-  db,
-  displayName,
-  memberData,
-) => {
-  const titleRef = ref(db, `chats/${chatID}`);
-  await update(titleRef, {
-    title: newTitle,
-  });
-  const changedTitleText =
-    displayName + " has changed the chat name to " + newTitle;
-  await addMessage(changedTitleText, chatID, "server", db, true, memberData);
+export const queryMessages = async (db, chatID, searchQuery) => {
+  const messagesRef = ref(db, `messages/${chatID}`);
+  const textQuery = query(
+    messagesRef,
+    orderByChild("text"),
+    startAt(searchQuery),
+    endAt(searchQuery + "\uf8ff"),
+  );
+  const textSnap = await get(textQuery);
+  const textResults = textSnap.val() || {};
+
+  const fileQuery = query(
+    messagesRef,
+    orderByChild("fileName"),
+    startAt(searchQuery),
+    endAt(searchQuery + "\uf8ff"),
+  );
+  const fileSnap = await get(fileQuery);
+  const fileResults = fileSnap.val() || {};
+
+  return { ...textResults, ...fileResults };
 };

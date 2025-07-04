@@ -25,7 +25,7 @@ export const calcTime = (time) => {
  * @param {*} currUser
  * @returns {Boolean}
  */
-export const calculateRenderTimeAndSender = (lastMessage, currUserUid) => {
+export const calculateIfShowTimeAndSender = (lastMessage, currUserUid) => {
   if (!lastMessage) return false;
 
   const currTime = Date.now();

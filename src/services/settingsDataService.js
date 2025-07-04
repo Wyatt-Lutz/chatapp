@@ -1,17 +1,13 @@
 import { deleteUser, updateProfile } from "firebase/auth";
 
 import { update, ref, remove } from "firebase/database";
-import { queryUsernames } from "./globalDataService";
-import {
-  fetchChatsInData,
-  fetchMembersFromChat,
-  removeUserFromChat,
-} from "./memberDataService";
+import { fetchMembersFromChat, removeUserFromChat } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
 import { auth, storage } from "../../firebase";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
 import { deleteObject, ref as storageRef } from "firebase/storage";
+import { checkIfUsernameExists, fetchUserData } from "./userDataService";
 
 export const changeUsername = async (
   db,
@@ -19,8 +15,8 @@ export const changeUsername = async (
   currUser,
   chatroomsData,
 ) => {
-  const userData = await queryUsernames(db, newUsername);
-  if (userData) {
+  const usernameExists = await checkIfUsernameExists(db, newUsername);
+  if (usernameExists) {
     console.log("username already exists");
     return;
   }
@@ -40,7 +36,7 @@ export const changeUsername = async (
 
   let chatroomUids = [...chatroomsData.keys()];
   if (chatroomUids.length < 1) {
-    const chatsInData = await fetchChatsInData(db, currUser.uid);
+    const chatsInData = await fetchUserData(db, currUser.uid, "chatsIn");
     if (!chatsInData) {
       return;
     } else {
@@ -86,7 +82,7 @@ export const deleteAccount = async (
 ) => {
   const userRef = ref(db, `users/${currUser.uid}`);
 
-  const chatsInData = await fetchChatsInData(db, currUser.uid);
+  const chatsInData = await fetchUserData(db, currUser.uid, "chatsIn");
 
   if (chatsInData) {
     const memberOptions = {

@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  getBlockData,
-  updateBlockedStatus,
-} from "../../../services/memberDataService";
+import { updateBlockedStatus } from "../../../services/memberDataService";
 import { db } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 
 import CloseModal from "../../../components/ui/CloseModal";
-import { fetchUserData } from "../../../services/globalDataService";
+import { fetchUserData } from "../../../services/userDataService";
 
 const BlockedUsersModal = ({ changeDisplayment }) => {
   const { currUser } = useAuth();
@@ -15,7 +12,7 @@ const BlockedUsersModal = ({ changeDisplayment }) => {
 
   useEffect(() => {
     const fetchBlockedUsers = async () => {
-      const blockedUsers = await getBlockData(db, currUser.uid);
+      const blockedUsers = await fetchUserData(db, currUser.uid, "blockList");
 
       const blockedUids = Object.entries(blockedUsers).reduce(
         (uids, [uid, isBlocked]) => {

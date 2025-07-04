@@ -10,6 +10,7 @@ import { updateTempTitle } from "../../../../../utils/chatroomUtils";
 
 import UserSearch from "../../../../../components/UserSearch";
 import CloseModal from "../../../../../components/ui/CloseModal";
+import PopupError from "../../../../../components/PopupError";
 
 const ChatCreationModal = ({ changeChatRoomCreationState }) => {
   const { currUser } = useAuth();
@@ -17,6 +18,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
     useChatContexts();
   const [addedUsers, setAddedUsers] = useState([]);
   const [chatTitleInputText, setChatTitleInputText] = useState("");
+  const [popup, setPopup] = useState("");
 
   const handleCreateChat = async () => {
     if (addedUsers.length === 0) return;
@@ -33,7 +35,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
 
     //Check if there is an existing chatroom with duplicate members
     if (checkIfDuplicateChat(memberUids, chatroomsState.chatrooms)) {
-      console.log("chat with those members already exists"); //popup
+      setPopup("A groupchat with those members already exists.");
       return;
     }
 
@@ -106,6 +108,8 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
                 />
               </div>
             )}
+
+            {popup && <PopupError message={popup} type="error" />}
             <div className="flex">
               <button
                 onClick={handleCreateChat}

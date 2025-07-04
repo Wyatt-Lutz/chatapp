@@ -1,0 +1,118 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth !== null",
+        ".write": "auth !== null",
+        ".validate": "
+        	newData.hasChildren(['username', 'profilePictureURL', 'email', 'lastUsernameChange']) &&
+      		(
+            auth.uid !== $uid &&
+            newData.hasChild('chatsIn') &&
+            newData.child('chatsIn').hasChildren() &&
+              (
+                newData.child('username').val() === data.child('username').val() &&
+                newData.child('profilePictureURL').val() === data.child('profilePictureURL').val() &&
+                newData.child('email').val() === data.child('email').val() &&
+                newData.child('lastUsernameChange').val() === data.child('lastUsernameChange').val()
+              )
+      		) ||
+            (
+              auth.uid === $uid &&
+              newData.child('username').isString() &&
+              newData.child('profilePictureURL').isString() &&
+              newData.child('email').isString() &&
+              newData.child('lastUsernameChange').isNumber()
+            )",
+        "chatsIn": {
+          "$chatId": {
+            ".validate": "newData.isNumber()"
+          }
+        }
+      },
+      ".indexOn": ["username", "email"]
+    },
+    "members": {
+      "$chatID": {
+        ".read": "auth !== null && root.child('members/' + $chatID + '/' + auth.uid).exists()",
+        "$uid": {
+          ".write": "($uid === auth.uid || root.child('members/' + $chatID + '/' + auth.uid).exists()) && (data.exists() ? newData.exists() : true)",
+          ".validate": "
+            (
+              newData.hasChildren(['isBanned', 'isRemoved', 'username', 'isOnline', 'profilePictureURL']) &&
+              (
+                newData.child('isBanned').isBoolean() &&
+                newData.child('isRemoved').isBoolean() &&
+                newData.child('isOnline').isBoolean() &&
+                newData.child('username').isString() &&
+                newData.child('profilePictureURL').isString()
+              )
+            ) &&
+            (
+              !data.exists() ||
+							auth.uid === $uid ||
+              (
+                root.child('chats/' + $chatID + '/owner').val() === auth.uid &&
+                (
+                  newData.child('username').val() === data.child('username').val() &&
+                  newData.child('profilePictureURL').val() === data.child('profilePictureURL').val() &&
+                  newData.child('isOnline').val() === data.child('isOnline').val()
+                )
+            	)
+          	)"
+        }
+      }
+    },
+    "messages": {
+      "$chatID": {
+        ".read": "auth !== null && root.child('members/' + $chatID + '/' + auth.uid).exists()",
+        ".write": "auth !== null && root.child('members/' + $chatID + '/' + auth.uid).exists()",
+          "$messageID": {
+            ".write": "newData.child('sender').val() === auth.uid",
+            ".validate": "
+                newData.hasChildren(['sender', 'text', 'timestamp', 'showTimeAndSender', 'hasBeenEdited']) &&
+                (
+                  newData.child('sender').isString() &&
+                  newData.child('showTimeAndSender').isBoolean() &&
+                  newData.child('timestamp').isNumber() &&
+                  newData.child('text').isString() &&
+                  newData.child('hasBeenEdited').isBoolean()
+                ) &&
+                (
+                  !data.exists() ||
+                  (
+                    newData.child('sender').val() === data.child('sender').val() &&
+                    newData.child('timestamp').val() === data.child('timestamp').val() &&
+                    newData.child('showTimeAndSender').val() === data.child('showTimeAndSender').val()
+                  )
+                )"
+          }
+      },
+      ".indexOn": ["text", "timestamp", "fileName"]
+    },
+    "chats": {
+      "$chatID": {
+        ".read": "root.child('members/' + $chatID + '/' + auth.uid).exists()",
+        ".write": "root.child('members/' + $chatID + '/' + auth.uid).exists()",
+        ".validate": "
+        	newData.hasChildren(['owner', 'firstMessageID', 'tempTitle', 'title', 'lastMessageTimestamp', 'numOfMembers']) &&
+        	(
+                newData.child('owner').isString() &&
+                newData.child('firstMessageID').isString() &&
+                newData.child('tempTitle').isString() &&
+                newData.child('title').isString() &&
+                newData.child('lastMessageTimestamp').isNumber() &&
+                newData.child('numOfMembers').isNumber()
+        	) &&
+        	(
+                !data.exists() ||
+                root.child('chats/' + $chatID + '/owner').val() === auth.uid ||
+                (
+                    newData.child('owner').val() === data.child('owner').val()
+                )
+        	)
+        "
+      }
+    }
+  }
+}
