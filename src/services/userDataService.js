@@ -62,14 +62,9 @@ export const createUserData = async (
   profilePictureURL,
 ) => {
   const userRef = ref(db, `users/${uid}`);
-  const publicUsernamesRef = ref(db, `publicUsernames/${username}`);
+
   try {
-    await runTransaction(publicUsernamesRef, (username) => {
-      if (!username) {
-        return true;
-      }
-      throw new Error("username-taken");
-    });
+    await updatePublicUsername(db, username, "");
 
     await set(userRef, {
       username,
@@ -78,10 +73,37 @@ export const createUserData = async (
       profilePictureURL,
     });
   } catch (error) {
-    if (error === "username-taken") {
-      console.error("username is taken");
-    }
+    console.error(error);
+    await rollBackPublicUsernameData(db, username, "");
+  }
+};
 
-    await remove(publicUsernamesRef);
+export const updatePublicUsername = async (db, username, oldUsername = "") => {
+  if (oldUsername) {
+    const oldPublicUsernameRef = ref(db, `publicUsernames/${oldUsername}`);
+    await remove(oldPublicUsernameRef);
+  }
+
+  const newPublicUsernameRef = ref(db`publicUsernames/${username}`);
+
+  await runTransaction(newPublicUsernameRef, (username) => {
+    if (!username) {
+      return true;
+    }
+    console.error("username taken");
+  });
+};
+
+export const rollBackPublicUsernameData = async (
+  db,
+  newUsername,
+  oldUsername = "",
+) => {
+  const newPublicUsernameRef = ref(db, `publicUsernames/${newUsername}`);
+  await remove(newPublicUsernameRef);
+
+  if (oldUsername) {
+    const oldPublicUsernameRef = ref(db, `publicUsernames/${oldUsername}`);
+    await set(oldPublicUsernameRef, true);
   }
 };
