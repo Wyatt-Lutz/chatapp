@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { db } from "../../firebase";
 import { checkIfUsernameExists } from "../services/userDataService";
+import { db } from "../firebase";
 
 const UsernameAvailability = ({ username, setIsButtonDisabled }) => {
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);

@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { updateBlockedStatus } from "../../../services/memberDataService";
-import { db } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
-
 import CloseModal from "../../../components/ui/CloseModal";
 import { fetchUserData } from "../../../services/userDataService";
+import { db } from "../../../firebase";
 
 const BlockedUsersModal = ({ changeDisplayment }) => {
   const { currUser } = useAuth();

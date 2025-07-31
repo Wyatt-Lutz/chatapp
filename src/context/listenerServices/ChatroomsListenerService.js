@@ -4,7 +4,7 @@ import {
   onChildRemoved,
   ref,
 } from "firebase/database";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
 
 export const ChatroomsListenerService = {
   setUpChatroomsListeners(currUserUid, action) {

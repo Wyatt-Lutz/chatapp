@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase";
 
 export const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {

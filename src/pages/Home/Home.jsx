@@ -1,12 +1,12 @@
 import ChatScreen from "./ChatScreen/ChatScreen";
-import { auth } from "../../../firebase";
-import ChatRoomsSideBar from "./SideBar/ChatRoomsSideBar/ChatRoomsSideBar";
+import ChatRoomsSideBar from "./SideBar/ChatRoomsSideBar";
 import { useNavigate } from "react-router-dom";
 import { signUserOut } from "../../utils/userUtils";
 import { useChatContexts } from "../../hooks/useContexts";
 import { useToast } from "../../context/ToastContext";
+import { auth } from "../../firebase";
 
-const Main = () => {
+const Home = () => {
   const navigate = useNavigate();
   const { chatroomsDispatch, resetAllChatContexts } = useChatContexts();
   const { showToast } = useToast();
@@ -34,4 +34,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Home;

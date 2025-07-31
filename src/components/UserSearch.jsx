@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db } from "../../firebase";
+import { db } from "../firebase";
 import CloseModal from "./ui/CloseModal";
 import { useAuth } from "../context/providers/AuthContext";
 

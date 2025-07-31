@@ -1,5 +1,5 @@
 import { onChildChanged, ref } from "firebase/database";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
 
 export const ChatListenerService = {
   setUpChatListeners(chatID, action) {

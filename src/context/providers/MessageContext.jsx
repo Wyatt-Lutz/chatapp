@@ -9,7 +9,7 @@ import { messagesReducer } from "../reducers/messagesReducer";
 import { initialMessageState } from "../initialState";
 import { ChatContext } from "./ChatContext";
 import { MessageListenerService } from "../listenerServices/MessageListenerService";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
 import { updateFirstMessageID } from "../../services/chatBarDataService";
 
 export const MessageContext = createContext();

@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
-import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import PasswordReset from "./PasswordReset/PasswordReset";
 import { validateSignin } from "../../utils/validation/signinValidation";
 import { useToast } from "../../context/ToastContext";
+import { auth } from "../../firebase";
 
 const Signin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -18,10 +18,13 @@ const Signin = () => {
   const signUserIn = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
-    const errors = handleValidation(email, password);
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    const errors = handleValidation(trimmedEmail, trimmedPassword);
     if (errors) return;
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
 
       showToast("Success!", "success");
       navigate("/");

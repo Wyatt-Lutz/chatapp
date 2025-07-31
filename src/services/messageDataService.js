@@ -16,7 +16,7 @@ import {
   limitToLast,
 } from "firebase/database";
 import { fetchMembersByStatus } from "./memberDataService";
-import { storage } from "../../firebase";
+import { storage } from "../firebase";
 import { ref as storageRef } from "firebase/storage";
 import { uploadFile } from "./storageDataService";
 

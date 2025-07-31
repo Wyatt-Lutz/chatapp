@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { db } from "../../../../../firebase";
+import { db } from "../../../../firebase";
 import CloseModal from "../../../../components/ui/CloseModal";
 import Dropdown from "../../../../components/ui/Dropdown";
 import { useChatContexts } from "../../../../hooks/useContexts";

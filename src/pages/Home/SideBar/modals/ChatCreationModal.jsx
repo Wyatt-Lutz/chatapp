@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { useAuth } from "../../../../../context/providers/AuthContext";
-import { db } from "../../../../../../firebase";
+import { useAuth } from "../../../../context/providers/AuthContext";
+import { db } from "../../../../firebase";
 import {
   checkIfDuplicateChat,
   createChat,
-} from "../../../../../services/chatBarDataService";
-import { useChatContexts } from "../../../../../hooks/useContexts";
-import { updateTempTitle } from "../../../../../utils/chatroomUtils";
+} from "../../../../services/chatBarDataService";
+import { useChatContexts } from "../../../../hooks/useContexts";
+import { updateTempTitle } from "../../../../utils/chatroomUtils";
 
-import UserSearch from "../../../../../components/UserSearch";
-import CloseModal from "../../../../../components/ui/CloseModal";
-import PopupError from "../../../../../components/PopupError";
+import UserSearch from "../../../../components/UserSearch";
+import CloseModal from "../../../../components/ui/CloseModal";
+import PopupError from "../../../../components/PopupError";
 
 const ChatCreationModal = ({ changeChatRoomCreationState }) => {
   const { currUser } = useAuth();

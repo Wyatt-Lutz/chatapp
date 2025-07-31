@@ -1,8 +1,8 @@
 import { deleteAccount } from "../../../services/settingsDataService";
 import { useNavigate } from "react-router-dom";
 import { useChatContexts } from "../../../hooks/useContexts";
-import { db } from "../../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
+import { db } from "../../../firebase";
 
 const DeleteAccount = ({ displayPassModal }) => {
   const { chatroomsDispatch, resetAllChatContexts } = useChatContexts();

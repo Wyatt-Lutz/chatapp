@@ -5,7 +5,7 @@ import { fetchChatRoomData } from "../services/chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
 import { useAudioNotifications } from "../hooks/useAudioNotifications";
 import { useAuth } from "./providers/AuthContext";
-import { db } from "../../firebase";
+import { db } from "../firebase";
 const ChatroomsListenerWrapper = ({ children }) => {
   const { currUser } = useAuth();
   const { chatState, chatroomsDispatch, resetAllChatContexts } =

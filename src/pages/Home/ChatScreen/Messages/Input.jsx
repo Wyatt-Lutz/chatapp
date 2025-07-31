@@ -1,4 +1,3 @@
-import { db } from "../../../../../firebase";
 import { addMessage } from "../../../../services/messageDataService";
 import { calculateIfShowTimeAndSender } from "../../../../utils/messageUtils";
 import { useChatContexts } from "../../../../hooks/useContexts";
@@ -10,6 +9,7 @@ import "emoji-picker-element";
 import Smile from "../../../../components/ui/Smile";
 import Plus from "../../../../components/ui/Plus";
 import CloseFile from "../../../../components/ui/CloseFile";
+import { db } from "../../../../firebase";
 
 const Input = () => {
   const { currUser } = useAuth();

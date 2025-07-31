@@ -1,6 +1,6 @@
 import { onDisconnect, onValue, ref, remove, update } from "firebase/database";
 import { useEffect } from "react";
-import { db } from "../../firebase";
+import { db } from "../firebase";
 
 export const useChatroomPresence = (chatID, uid) => {
   useEffect(() => {

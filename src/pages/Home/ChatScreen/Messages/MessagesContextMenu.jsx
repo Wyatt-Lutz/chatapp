@@ -1,8 +1,8 @@
-import { db, storage } from "../../../../../firebase";
 import { deleteMessage } from "../../../../services/messageDataService";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { deleteObject, ref } from "firebase/storage";
+import { db, storage } from "../../../../firebase";
 const MessagesContextMenu = ({
   changeEditState,
   contextMenuData: { messageUid, messageData },

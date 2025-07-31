@@ -1,8 +1,8 @@
-import { fetchChatRoomData } from "../../../../services/chatBarDataService";
-import { db } from "../../../../../firebase";
-import { useAuth } from "../../../../context/providers/AuthContext";
-import { useChatContexts } from "../../../../hooks/useContexts";
-import { updateTempTitle } from "../../../../utils/chatroomUtils";
+import { fetchChatRoomData } from "../../../services/chatBarDataService";
+import { db } from "../../../firebase";
+import { useAuth } from "../../../context/providers/AuthContext";
+import { useChatContexts } from "../../../hooks/useContexts";
+import { updateTempTitle } from "../../../utils/chatroomUtils";
 
 const ChatRoom = ({ chatID, chatroomData }) => {
   const { chatroomsDispatch, chatState, chatDispatch, resetAllChatContexts } =

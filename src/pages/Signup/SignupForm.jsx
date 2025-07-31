@@ -1,4 +1,3 @@
-import { db, auth } from "../../../firebase";
 import {
   browserLocalPersistence,
   browserSessionPersistence,
@@ -14,6 +13,7 @@ import {
   checkIfUsernameExists,
   createUserData,
 } from "../../services/userDataService";
+import { auth, db } from "../../firebase";
 
 const SignupForm = ({ onSubmitForm }) => {
   const [formData, setFormData] = useState({
@@ -35,18 +35,21 @@ const SignupForm = ({ onSubmitForm }) => {
     if (isButtonDisabled) return;
     e.preventDefault();
     const { username, email, password } = formData;
-    const errors = handleValidation(username, email, password);
+
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim();
+    const errors = handleValidation(trimmedUsername, trimmedEmail, password);
     if (errors) return;
 
     try {
-      const usernameExists = await checkIfUsernameExists(db, username);
+      const usernameExists = await checkIfUsernameExists(db, trimmedUsername);
       if (usernameExists) {
         throw new Error("username-already-in-use");
       }
 
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        email,
+        trimmedEmail,
         password,
       );
 
@@ -61,8 +64,14 @@ const SignupForm = ({ onSubmitForm }) => {
 
       const defaultProfilePictureURL = "/default-profile.jpg";
 
-      await createUserData(db, uid, username, email, defaultProfilePictureURL);
-
+      await createUserData(
+        db,
+        uid,
+        trimmedUsername,
+        trimmedEmail,
+        defaultProfilePictureURL,
+      );
+      console.log(userCredential.user);
       await updateProfile(userCredential.user, {
         displayName: trimmedUsername,
         photoURL: defaultProfilePictureURL,
@@ -76,8 +85,8 @@ const SignupForm = ({ onSubmitForm }) => {
       const errorMap = {
         "username-already-in-use":
           "The username you entered has been taken, please choose a new one.",
-        "auth/email-already-in-use": `The email address: ${email} is already in use, either try signing in with ${email} or use a different email.`,
-        "auth/invalid-email": `Email address ${email} is invalid.`,
+        "auth/email-already-in-use": `The email address: ${trimmedEmail} is already in use, either try signing in with ${trimmedEmail} or use a different email.`,
+        "auth/invalid-email": `Email address ${trimmedEmail} is invalid.`,
         "auth/operation-not-allowed": `Error during sign up.`,
         "auth/weak-password":
           "Password is not strong enough. Add additional characters including special characters and numbers.",
@@ -86,6 +95,7 @@ const SignupForm = ({ onSubmitForm }) => {
         errorMap[error.code] ||
           "Error signing up, please reload the page and try again.",
       );
+      console.error(error);
     }
   };
 

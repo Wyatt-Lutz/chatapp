@@ -1,8 +1,8 @@
 import { sendEmailVerification, updateEmail } from "firebase/auth";
 import { changeEmail } from "../../../services/settingsDataService";
 import { useAuth } from "../../../context/providers/AuthContext";
-import { auth, db } from "../../../../firebase";
 import { useState } from "react";
+import { db, auth } from "../../../firebase";
 
 const ChangeEmail = ({
   displayPassModal,

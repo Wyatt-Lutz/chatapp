@@ -1,5 +1,9 @@
 {
   "rules": {
+    "publicUsernames": {
+      ".read": true,
+      ".write": "auth !== null",
+    },
     "users": {
       "$uid": {
         ".read": "auth !== null",
@@ -97,19 +101,19 @@
         ".validate": "
         	newData.hasChildren(['owner', 'firstMessageID', 'tempTitle', 'title', 'lastMessageTimestamp', 'numOfMembers']) &&
         	(
-                newData.child('owner').isString() &&
-                newData.child('firstMessageID').isString() &&
-                newData.child('tempTitle').isString() &&
-                newData.child('title').isString() &&
-                newData.child('lastMessageTimestamp').isNumber() &&
-                newData.child('numOfMembers').isNumber()
+          	newData.child('owner').isString() &&
+            newData.child('firstMessageID').isString() &&
+            newData.child('tempTitle').isString() &&
+            newData.child('title').isString() &&
+            newData.child('lastMessageTimestamp').isNumber() &&
+          	newData.child('numOfMembers').isNumber()
         	) &&
         	(
-                !data.exists() ||
-                root.child('chats/' + $chatID + '/owner').val() === auth.uid ||
-                (
-                    newData.child('owner').val() === data.child('owner').val()
-                )
+            !data.exists() ||
+          	root.child('chats/' + $chatID + '/owner').val() === auth.uid ||
+          	(
+              newData.child('owner').val() === data.child('owner').val()
+            )
         	)
         "
       }

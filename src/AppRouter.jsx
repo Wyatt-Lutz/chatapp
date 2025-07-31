@@ -6,10 +6,10 @@ import { useAuth } from "./context/providers/AuthContext";
 
 const EmailNotVerified = lazy(() => import("./components/EmailNotVerified"));
 const Signup = lazy(() => import("./pages/Signup/Signup"));
-const Main = lazy(() => import("./pages/Main/Main"));
+const Main = lazy(() => import("./pages/Home/Home"));
 const Settings = lazy(() => import("./pages/Settings/Settings"));
 
-function App() {
+function AppRouter() {
   const { currUser, loadingAuth } = useAuth();
   const [isVerified, setIsVerified] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -73,4 +73,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppRouter;

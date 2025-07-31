@@ -1,10 +1,10 @@
-import { db } from "../../../../../../firebase";
-import { useAuth } from "../../../../../context/providers/AuthContext";
-import { useChatContexts } from "../../../../../hooks/useContexts";
-import { removeUserFromChat } from "../../../../../services/memberDataService";
+import { db } from "../../../../firebase";
+import { useAuth } from "../../../../context/providers/AuthContext";
+import { useChatContexts } from "../../../../hooks/useContexts";
+import { removeUserFromChat } from "../../../../services/memberDataService";
 
-import CloseModal from "../../../../../components/ui/CloseModal";
-import { fetchChatRoomData } from "../../../../../services/chatBarDataService";
+import CloseModal from "../../../../components/ui/CloseModal";
+import { fetchChatRoomData } from "../../../../services/chatBarDataService";
 
 const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
   const { currUser } = useAuth();

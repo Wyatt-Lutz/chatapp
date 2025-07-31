@@ -8,7 +8,7 @@ import {
   ref,
   startAt,
 } from "firebase/database";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
 
 export const MessageListenerService = {
   setUpMessageListeners(chatID, endTimestamp, action) {

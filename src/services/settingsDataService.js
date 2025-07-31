@@ -3,7 +3,7 @@ import { deleteUser, updateProfile } from "firebase/auth";
 import { update, ref, remove } from "firebase/database";
 import { fetchMembersFromChat, removeUserFromChat } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
-import { auth, storage } from "../../firebase";
+import { auth, storage } from "../firebase";
 import { fetchChatRoomData } from "./chatBarDataService";
 import { updateTempTitle } from "../utils/chatroomUtils";
 import { deleteObject, ref as storageRef } from "firebase/storage";
@@ -52,9 +52,6 @@ export const changeUsername = async (
 
     updates[`users/${currUser.uid}/username`] = newUsername;
     updates[`users/${currUser.uid}/lastUsernameChange`] = Date.now();
-
-    updates[`publicUsernames/${newUsername}`] = true;
-    updates[`publicUsernames/${oldUsername}`] = null;
 
     chatroomUids.forEach((chatID) => {
       updates[`members/${chatID}/${currUser.uid}/username`] = newUsername;
@@ -128,6 +125,7 @@ export const deleteAccount = async (
     await deleteObject(profilePictureRef);
   }
 
+  await remove(ref(db, `publicUsernames/${currUser.displayName}`));
   await remove(userRef);
   await deleteUser(currUser);
   await signUserOut(auth, resetAllChatContexts, chatroomsDispatch);

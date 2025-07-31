@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { db } from "../../../../../firebase";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import Search from "./Search";
@@ -8,6 +7,7 @@ import AddUserModal from "../modals/AddUserModal";
 import SettingsSVG from "../../../../components/ui/SettingsSVG";
 import ChatSettings from "../modals/ChatSettings";
 import { editTitle } from "../../../../services/chatBarDataService";
+import { db } from "../../../../firebase";
 
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);

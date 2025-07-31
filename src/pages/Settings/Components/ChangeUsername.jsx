@@ -2,10 +2,10 @@ import UsernameAvailability from "../../../components/UsernameAvailability";
 import { changeUsername } from "../../../services/settingsDataService";
 import { useState } from "react";
 import { useAuth } from "../../../context/providers/AuthContext";
-import { db } from "../../../../firebase";
 import { useChatContexts } from "../../../hooks/useContexts";
 import PopupError from "../../../components/PopupError";
 import { fetchUserData } from "../../../services/userDataService";
+import { db } from "../../../firebase";
 
 const ChangeUsername = ({
   displayPassModal,

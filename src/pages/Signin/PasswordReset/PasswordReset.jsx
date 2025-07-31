@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { db, auth } from "../../../../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { fetchUserDataByEmail } from "../../../services/userDataService";
 import CheckEmail from "./CheckEmail";
 import { useToast } from "../../../context/ToastContext";
 import PopupError from "../../../components/PopupError";
+import { auth, db } from "../../../firebase";
 
 const PasswordReset = ({ passChange }) => {
   const [email, setEmail] = useState("");

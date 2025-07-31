@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { deleteObject, ref } from "firebase/storage";
-import { storage } from "../../../../firebase";
 import { uploadFile } from "../../../services/storageDataService";
 import { compressImage } from "../../../utils/mediaUtils";
 import { useAuth } from "../../../context/providers/AuthContext";
 import Camera from "../../../components/ui/Camera";
 import { useToast } from "../../../context/ToastContext";
 import PopupError from "../../../components/PopupError";
+import { storage } from "../../../firebase";
 
 const ChangeProfilePicture = () => {
   const { currUser } = useAuth();

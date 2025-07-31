@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { db } from "../../../../../firebase";
 import Message from "../Messages/Message";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { queryMessages } from "../../../../services/messageDataService";
+import { db } from "../../../../firebase";
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { db } from "../../../../../firebase";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { addUserToChat } from "../../../../services/memberDataService";
 import { addMessage } from "../../../../services/messageDataService";
@@ -7,6 +6,7 @@ import { addMessage } from "../../../../services/messageDataService";
 import UserSearch from "../../../../components/UserSearch";
 import CloseModal from "../../../../components/ui/CloseModal";
 import { useAuth } from "../../../../context/providers/AuthContext";
+import { db } from "../../../../firebase";
 
 const AddUserModal = ({ setIsDisplayAddUser }) => {
   const { chatState, memberState } = useChatContexts();

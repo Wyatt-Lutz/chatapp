@@ -37,7 +37,7 @@ export const checkIfUsernameExists = async (db, username) => {
 
 export const queryUsernames = async (db, username) => {
   const usernameQuery = query(
-    ref(db, "usernames"),
+    ref(db, "publicUsernames"),
     orderByChild("username"),
     startAt(username),
     endAt(username + "\uf8ff"),
@@ -84,7 +84,7 @@ export const updatePublicUsername = async (db, username, oldUsername = "") => {
     await remove(oldPublicUsernameRef);
   }
 
-  const newPublicUsernameRef = ref(db`publicUsernames/${username}`);
+  const newPublicUsernameRef = ref(db, `publicUsernames/${username}`);
 
   await runTransaction(newPublicUsernameRef, (username) => {
     if (!username) {

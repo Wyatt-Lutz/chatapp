@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { db } from "../../../../../firebase";
 import { debounce } from "lodash";
 import { useElementOnScreen } from "../../../../hooks/useIntersectionObserver";
 import { fetchOlderChats } from "../../../../services/messageDataService";
@@ -14,6 +13,7 @@ import MemberContextMenu from "../MembersBar/MemberContextMenu";
 import DownArrow from "../../../../components/ui/DownArrow";
 import { useScrollListener } from "../../../../hooks/useScrollListener";
 import StartOfChatBanner from "./StartOfChatBanner";
+import { db } from "../../../../firebase";
 
 const Messages = () => {
   const { chatState, memberState, messageState, messageDispatch } =

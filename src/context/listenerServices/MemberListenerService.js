@@ -1,6 +1,6 @@
 import { onChildAdded, onChildChanged, ref } from "firebase/database";
-import { db } from "../../../firebase";
 import { fetchUserData } from "../../services/userDataService";
+import { db } from "../../firebase";
 
 export const MemberListenerService = {
   setUpMemberListeners(chatID, currUserUid, action) {

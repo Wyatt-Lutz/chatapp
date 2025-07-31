@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useContextMenu } from "../../../../hooks/useContextMenu";
-import { useChatContexts } from "../../../../hooks/useContexts";
-import Plus from "../../../../components/ui/Plus";
+import { useContextMenu } from "../../../hooks/useContextMenu";
+import { useChatContexts } from "../../../hooks/useContexts";
+import Plus from "../../../components/ui/Plus";
 import ChatRoom from "./ChatRoom";
 
 import ChatRoomContextMenu from "./ChatRoomContextMenu";

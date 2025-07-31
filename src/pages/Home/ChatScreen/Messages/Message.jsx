@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
-import { db } from "../../../../../firebase";
 import { editMessage } from "../../../../services/messageDataService";
 import { calcTime } from "../../../../utils/messageUtils";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import EnlargedImage from "../modals/EnlargedImage";
 import { useState } from "react";
+import { db } from "../../../../firebase";
 
 const Message = ({
   messageUid,

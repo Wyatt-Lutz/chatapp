@@ -3,10 +3,10 @@ import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { uploadFile } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
-import { db } from "../../../firebase";
 
 import Camera from "../../components/ui/Camera";
 import { updateProfilePicture } from "../../services/userDataService";
+import { db } from "../../firebase";
 
 const ProfilePictureUpload = ({ userData }) => {
   const navigate = useNavigate();

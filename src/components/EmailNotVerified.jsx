@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/providers/AuthContext";
 import { useEffect, useState } from "react";
 import { useToast } from "../context/ToastContext";
-import { auth } from "../../firebase";
 import PopupError from "./PopupError";
+import { auth } from "../firebase";
 
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 

@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
+import AppRouter from "./AppRouter.jsx";
 import { MemberContextProvider } from "./context/providers/MemberContext.jsx";
 import { MessageContextProvider } from "./context/providers/MessageContext.jsx";
 import { AuthContextProvider } from "./context/providers/AuthContext.jsx";
@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       onReset={() => window.location.reload()}
     >
       <Providers>
-        <App />
+        <AppRouter />
       </Providers>
     </ErrorBoundary>
   </StrictMode>,

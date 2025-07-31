@@ -23,6 +23,8 @@ export const validateSignup = (username, email, password) => {
     errors.password = "Please enter a password longer than 6 characters.";
   } else if (password.length > 128) {
     errors.password = "Please enter a password shorter than 128 characters.";
+  } else if (password !== password.trim()) {
+    errors.password = "The password cannot start or end with spaces.";
   } else if (
     !/^[A-Za-z0-9$!@#%^&*()_\-+=[\]{};:'",.<>/?`~\\|]+$/.test(password)
   ) {
