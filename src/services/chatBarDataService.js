@@ -1,12 +1,12 @@
 import {
   push,
   ref,
-  set,
   update,
   get,
   serverTimestamp,
   remove,
 } from "firebase/database";
+import { fetchMembersFromChat } from "./memberDataService";
 
 export const createChat = async (
   db,
@@ -22,29 +22,26 @@ export const createChat = async (
     const chatsRef = ref(db, "chats/");
     const newChatRef = push(chatsRef);
     const chatID = newChatRef.key;
-    const membersRef = ref(db, `members/${chatID}`);
 
-    const newChatData = {
-      title: title,
-      tempTitle: tempTitle,
+    const updates = {};
+
+    updates[`chats/${chatID}`] = {
+      title,
+      tempTitle,
       owner: currUserUid,
-      memberUids: memberUids,
+      memberUids,
       firstMessageID: "",
-      numOfMembers: numOfMembers,
+      numOfMembers,
       lastMessageTimestamp: serverTimestamp(),
     };
 
-    await Promise.all([
-      set(newChatRef, newChatData),
-      set(membersRef, membersList),
+    updates[`members/${chatID}`] = membersList;
 
-      ...uids.map((uid) => {
-        const userChatDataRef = ref(db, `users/${uid}/chatsIn`);
-        const chatData = { [chatID]: 0 };
-        update(userChatDataRef, chatData);
-      }),
-    ]);
+    uids.forEach((uid) => {
+      updates[`users/${uid}/chatsIn/${chatID}`] = 0;
+    });
 
+    await update(ref(db, "/"), updates);
     return chatID;
   } catch (error) {
     console.error(error);

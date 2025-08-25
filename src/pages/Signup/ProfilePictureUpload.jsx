@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { uploadFile } from "../../services/storageDataService";
+import { changeProfilePicture } from "../../services/storageDataService";
 import { compressImage } from "../../utils/mediaUtils";
 
 import Camera from "../../components/ui/Camera";
-import { updateProfilePicture } from "../../services/userDataService";
-import { db } from "../../firebase";
+import { showToast } from "../../services/toastService";
 
 const ProfilePictureUpload = ({ userData }) => {
   const navigate = useNavigate();
@@ -20,16 +18,19 @@ const ProfilePictureUpload = ({ userData }) => {
       return;
     }
 
-    const photoStorageLocation = `users/${uid}`;
-    const photoUrl = await uploadFile(profilePicture, photoStorageLocation);
-
-    await updateProfile(userData.userCredential.user, {
-      photoURL: photoUrl,
-    });
-
-    await updateProfilePicture(db, uid, photoUrl);
-
-    navigate("/");
+    try {
+      await changeProfilePicture(
+        userData.userCredential.user,
+        profilePicture,
+        null,
+      );
+      navigate("/");
+    } catch (error) {
+      showToast(
+        "Something went wrong. Please reload the page and try to signup again.",
+      );
+      console.error(error);
+    }
   };
 
   const handlePickImage = async (e) => {

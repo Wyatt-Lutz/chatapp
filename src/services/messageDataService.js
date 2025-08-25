@@ -78,7 +78,6 @@ export const addMessage = async (
 
   const chatDataRef = ref(db, `chats/${chatID}`);
   await update(chatDataRef, { lastMessageTimestamp: timestamp });
-
   await updateUnreadCount(db, chatID, memberData);
 };
 

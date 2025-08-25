@@ -11,11 +11,11 @@ export const useChatroomPresence = (chatID, uid) => {
     const connectedRef = ref(db, ".info/connected");
     const isOnlineRef = ref(db, `members/${chatID}/${uid}/isOnline`);
 
-    const unsubscribe = onValue(connectedRef, (snap) => {
+    const unsubscribe = onValue(connectedRef, async (snap) => {
       if (snap.val() === true) {
-        onDisconnect(isOnlineRef).remove();
-        update(userMemberRef, { isOnline: true });
-        update(userDataRef, { [chatID]: 0 });
+        await onDisconnect(isOnlineRef).set(false);
+        await update(userMemberRef, { isOnline: true });
+        await update(userDataRef, { [chatID]: 0 });
       }
     });
     return () => {

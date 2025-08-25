@@ -32,12 +32,6 @@ export const changeUsername = async (
 
   try {
     let chatroomUids = [...chatroomsData.keys()];
-    if (chatroomUids.length < 1) {
-      const chatsInData = await fetchUserData(db, currUser.uid, "chatsIn");
-      if (chatsInData) {
-        chatroomUids = Object.keys(chatsInData);
-      }
-    }
 
     const updateChatroomsPromise = chatroomUids.map(async (chatID) => {
       const { tempTitle } = await fetchChatRoomData(db, chatID);

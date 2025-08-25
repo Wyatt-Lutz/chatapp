@@ -162,9 +162,11 @@ export const getUsernameFromUid = async (db, uid) => {
 export const fetchMembersByStatus = async (memberData, status) => {
   return memberData.reduce((uids, [uid, userData]) => {
     const isOnline = userData?.isOnline;
+    console.log(isOnline);
     if (
       (status === true && isOnline === true) ||
-      (status === false && (isOnline === undefined || isOnline === null))
+      (status === false &&
+        (isOnline === false || isOnline === undefined || isOnline === null))
     ) {
       uids.push(uid);
     }

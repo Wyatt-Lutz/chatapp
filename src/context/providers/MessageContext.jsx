@@ -40,6 +40,7 @@ export const MessageContextProvider = ({ children }) => {
             !messageState.isFirstMessageRendered &&
             messageID === chatState.firstMessageID
           ) {
+            console.log("haha");
             messageDispatch({
               type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
               payload: true,

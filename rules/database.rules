@@ -4,6 +4,9 @@
       ".read": true,
       ".write": "auth !== null",
     },
+
+    //Only the current user can update thier user data except for chatsIn -- Anybody that is a member for each chatroom can edit the numUnread value associated with the chatID in chatsIn, and only the owner of that chatroom or the current user can delete that chatID from chatsIn. Anybody can add a new chatID in the users chatsIn data
+    //Any authenticated user can read anyones data
     "users": {
       "$uid": {
         ".read": "auth !== null",

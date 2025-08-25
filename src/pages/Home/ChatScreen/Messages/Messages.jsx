@@ -55,16 +55,13 @@ const Messages = () => {
       debouncedFetch();
       return () => debouncedFetch.cancel();
     }
-  }, [isVisible, isFirstMessageRendered]);
-
-  useEffect(() => {
-    if (messages.size === 0) {
+    if (firstMessageID === "") {
       messageDispatch({
         type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
         payload: true,
       });
     }
-  }, []);
+  }, [isVisible, isFirstMessageRendered]);
 
   const handleFetchMore = async () => {
     const messageData = await fetchOlderChats(db, chatID, endTimestamp);

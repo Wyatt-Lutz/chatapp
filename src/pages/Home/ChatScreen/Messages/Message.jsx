@@ -135,6 +135,7 @@ const Message = ({
                 required: false,
                 maxLength: 200,
               })}
+              autoFocus
             />
           </form>
         ) : (

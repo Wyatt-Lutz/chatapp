@@ -3,6 +3,7 @@ import Signin from "./pages/Signin/Signin";
 import { Navigate } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { useAuth } from "./context/providers/AuthContext";
+import PageNotFound from "./pages/PageNotFound";
 
 const EmailNotVerified = lazy(() => import("./components/EmailNotVerified"));
 const Signup = lazy(() => import("./pages/Signup/Signup"));
@@ -67,6 +68,7 @@ function AppRouter() {
 
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

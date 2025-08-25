@@ -10,6 +10,7 @@ import {
   update,
   runTransaction,
   remove,
+  orderByKey,
 } from "firebase/database";
 
 export const fetchUserDataByEmail = async (db, email) => {
@@ -22,13 +23,6 @@ export const fetchUserDataByEmail = async (db, email) => {
   return userData;
 };
 
-export const updateProfilePicture = async (db, uid, profilePictureURL) => {
-  const userRef = ref(db, `users/${uid}`);
-  await update(userRef, {
-    profilePictureURL: profilePictureURL,
-  });
-};
-
 export const checkIfUsernameExists = async (db, username) => {
   const usernamesRef = ref(db, `publicUsernames/${username}`);
   const usernameSnap = await get(usernamesRef);
@@ -37,7 +31,7 @@ export const checkIfUsernameExists = async (db, username) => {
 
 export const queryUsernames = async (db, username) => {
   const usernameQuery = query(
-    ref(db, "publicUsernames"),
+    ref(db, "users"),
     orderByChild("username"),
     startAt(username),
     endAt(username + "\uf8ff"),
