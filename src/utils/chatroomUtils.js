@@ -8,9 +8,11 @@ export const updateTempTitle = (tempTitle, username, newUsername = "") => {
   const filteredNames = tempTitle
     .split(", ")
     .filter((name) => name !== username);
+  console.log(filteredNames);
   if (newUsername) {
     filteredNames.push(newUsername);
   }
+  console.log(filteredNames);
 
   return filteredNames.join(", ");
 };

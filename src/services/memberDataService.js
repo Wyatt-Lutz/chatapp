@@ -111,8 +111,9 @@ export const addUserToChat = async (db, user, chatroomData) => {
   const memberRef = ref(db, `members/${chatID}/${uid}`);
   const chatsInRef = ref(db, `users/${uid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
-
+  console.log(username);
   const updatedTempTitle = updateTempTitle(tempTitle, "", username);
+  console.log(updatedTempTitle);
   const newUserUidsArr = [...memberUids.match(/.{1,28}/g), uid];
   const updatedMemberUids = newUserUidsArr.sort().join("");
 

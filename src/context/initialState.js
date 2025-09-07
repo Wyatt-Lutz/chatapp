@@ -3,6 +3,7 @@ export const initialChatroomState = { chatrooms: new Map() };
 export const initialChatState = {
   chatID: null,
   title: "",
+  membersTitle: "",
   tempTitle: "",
   owner: "",
   firstMessageID: "",
