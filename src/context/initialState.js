@@ -4,7 +4,6 @@ export const initialChatState = {
   chatID: null,
   title: "",
   membersTitle: "",
-  tempTitle: "",
   owner: "",
   firstMessageID: "",
   numOfMembers: null,

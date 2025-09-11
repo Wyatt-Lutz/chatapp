@@ -12,7 +12,7 @@ import { db } from "../../../../firebase";
 const TopBar = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { chatState, memberState } = useChatContexts();
-  const { chatID, title, tempTitle } = chatState;
+  const { chatID, title, membersTitle } = chatState;
   const { currUser } = useAuth();
   const [isDisplayAddUser, setIsDisplayAddUser] = useState(false);
   const [isSearchingMessages, setIsSearchingMessages] = useState(false);
@@ -50,12 +50,12 @@ const TopBar = () => {
             <input
               value={topBarTitle}
               onChange={(e) => setTopBarTitle(e.target.value)}
-              placeholder={title || tempTitle}
+              placeholder={title || membersTitle}
               onBlur={onFinishEditTitle}
             />
           </form>
         ) : (
-          <div>{title || tempTitle}</div>
+          <div>{title || membersTitle}</div>
         )}
       </div>
       <div className="flex justify-between items-center">

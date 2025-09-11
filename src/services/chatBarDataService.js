@@ -12,7 +12,7 @@ export const createChat = async (
   db,
   memberUids,
   title,
-  tempTitle,
+  membersTitle,
   membersList,
   uids,
   numOfMembers,
@@ -27,7 +27,7 @@ export const createChat = async (
 
     updates[`chats/${chatID}`] = {
       title,
-      tempTitle,
+      membersTitle,
       owner: currUserUid,
       memberUids,
       firstMessageID: "",

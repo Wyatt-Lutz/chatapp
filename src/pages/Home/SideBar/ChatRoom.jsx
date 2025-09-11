@@ -2,7 +2,7 @@ import { fetchChatRoomData } from "../../../services/chatBarDataService";
 import { db } from "../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../hooks/useContexts";
-import { updateTempTitle } from "../../../utils/chatroomUtils";
+import { updateMembersTitle } from "../../../utils/chatroomUtils";
 
 const ChatRoom = ({ chatID, chatroomData }) => {
   const { chatroomsDispatch, chatState, chatDispatch, resetAllChatContexts } =
@@ -11,7 +11,7 @@ const ChatRoom = ({ chatID, chatroomData }) => {
   const handleChangeChat = async () => {
     resetAllChatContexts();
 
-    const { firstMessageID, owner, title, tempTitle, numOfMembers } =
+    const { firstMessageID, owner, title, membersTitle, numOfMembers } =
       await fetchChatRoomData(db, chatID);
     if (title !== chatroomData.title) {
       chatroomsDispatch({
@@ -20,11 +20,14 @@ const ChatRoom = ({ chatID, chatroomData }) => {
       });
     }
 
-    const updatedTempTitle = updateTempTitle(tempTitle, currUser.displayName);
-    if (updatedTempTitle !== chatroomData.tempTitle) {
+    const updatedMembersTitle = updateMembersTitle(
+      membersTitle,
+      currUser.displayName,
+    );
+    if (updatedMembersTitle !== chatroomData.membersTitle) {
       chatroomsDispatch({
         type: "UPDATE_TEMP_TITLE",
-        payload: { key: chatID, data: updatedTempTitle },
+        payload: { key: chatID, data: updatedMembersTitle },
       });
     }
 
@@ -34,7 +37,7 @@ const ChatRoom = ({ chatID, chatroomData }) => {
         chatID,
         firstMessageID,
         owner,
-        tempTitle: updatedTempTitle,
+        membersTitle: updatedMembersTitle,
         title: chatroomData.title,
         numOfMembers,
         memberUids: chatroomData.memberUids,
@@ -50,9 +53,9 @@ const ChatRoom = ({ chatID, chatroomData }) => {
         onClick={handleChangeChat}
       >
         {chatState.chatID === chatID ? (
-          <>{chatState.title || chatState.tempTitle}</>
+          <>{chatState.title || chatState.membersTitle}</>
         ) : (
-          <>{chatroomData.title || chatroomData.tempTitle}</>
+          <>{chatroomData.title || chatroomData.membersTitle}</>
         )}
       </button>
       <div>{chatroomData.numUnread}</div>

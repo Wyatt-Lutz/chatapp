@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 
 const StartOfChatBanner = ({
   title,
-  tempTitle,
+  membersTitle,
   numOfMembers,
   isFirstMessageRendered,
 }) => {
   const [jsxNames, setJsxNames] = useState(null);
   useEffect(() => {
-    const names = tempTitle.split(", ");
+    const names = membersTitle.split(", ");
     const newJsxNames =
       names.length === 3
         ? `${names[0]}, ${names[1]}, and ${names[2]}`
@@ -16,7 +16,7 @@ const StartOfChatBanner = ({
           ? `${names[0]} and ${names[1]}`
           : names[0];
     setJsxNames(newJsxNames);
-  }, [tempTitle]);
+  }, [membersTitle]);
 
   return (
     <div>
@@ -29,7 +29,7 @@ const StartOfChatBanner = ({
           <div className="text-center text-lg mb-2">
             This is the start of your chat with{" "}
             <span className="font-semibold">
-              {tempTitle + ", and " + numOfMembers - 3 + " other users"}
+              {membersTitle + ", and " + numOfMembers - 3 + " other users"}
             </span>{" "}
           </div>
         ) : (

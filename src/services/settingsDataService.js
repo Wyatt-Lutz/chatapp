@@ -5,7 +5,7 @@ import { fetchMembersFromChat, removeUserFromChat } from "./memberDataService";
 import { signUserOut } from "../utils/userUtils";
 import { auth, storage } from "../firebase";
 import { fetchChatRoomData } from "./chatBarDataService";
-import { updateTempTitle } from "../utils/chatroomUtils";
+import { updateMembersTitle } from "../utils/chatroomUtils";
 import { deleteObject, ref as storageRef } from "firebase/storage";
 import {
   checkIfUsernameExists,
@@ -34,10 +34,14 @@ export const changeUsername = async (
     let chatroomUids = [...chatroomsData.keys()];
 
     const updateChatroomsPromise = chatroomUids.map(async (chatID) => {
-      const { tempTitle } = await fetchChatRoomData(db, chatID);
+      const { membersTitle } = await fetchChatRoomData(db, chatID);
       return {
         chatID,
-        newTempTitle: updateTempTitle(tempTitle, oldUsername, newUsername),
+        newMembersTitle: updateMembersTitle(
+          membersTitle,
+          oldUsername,
+          newUsername,
+        ),
       };
     });
     const chatroomData = await Promise.all(updateChatroomsPromise);
@@ -51,8 +55,8 @@ export const changeUsername = async (
       updates[`members/${chatID}/${currUser.uid}/username`] = newUsername;
     });
 
-    chatroomData.forEach(({ chatID, newTempTitle }) => {
-      updates[`chats/${chatID}/tempTitle`] = newTempTitle;
+    chatroomData.forEach(({ chatID, newMembersTitle }) => {
+      updates[`chats/${chatID}/membersTitle`] = newMembersTitle;
     });
 
     await update(ref(db), updates);

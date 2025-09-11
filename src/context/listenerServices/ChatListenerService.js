@@ -7,7 +7,7 @@ export const ChatListenerService = {
 
     const propHandler = {
       title: action.onTitleChanged,
-      tempTitle: action.onTempTitleChanged,
+      membersTitle: action.onMembersTitleChanged,
       owner: action.onOwnerChanged,
       firstMessageID: action.onFirstMessageIDChanged,
       memberUids: action.onMemberUidsChanged,

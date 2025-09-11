@@ -6,7 +6,7 @@ import {
   createChat,
 } from "../../../../services/chatBarDataService";
 import { useChatContexts } from "../../../../hooks/useContexts";
-import { updateTempTitle } from "../../../../utils/chatroomUtils";
+import { updateMembersTitle } from "../../../../utils/chatroomUtils";
 
 import UserSearch from "../../../../components/UserSearch";
 import CloseModal from "../../../../components/ui/CloseModal";
@@ -51,7 +51,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
     }, {});
 
     const title = chatTitleInputText?.trim() || "";
-    const tempTitle = Object.values(membersList)
+    const membersTitle = Object.values(membersList)
       .map((member) => member.username)
       .join(", ");
 
@@ -61,14 +61,14 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
       db,
       memberUids,
       title,
-      tempTitle,
+      membersTitle,
       membersList,
       uids,
       usersToAdd.length,
       uid,
     );
     changeChatRoomCreationState(false);
-    const updatedTempTitle = updateTempTitle(tempTitle, displayName);
+    const updatedMembersTitle = updateMembersTitle(membersTitle, displayName);
 
     resetAllChatContexts();
     chatDispatch({
@@ -77,7 +77,7 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
         chatID: newChatID,
         title,
         owner: uid,
-        tempTitle: updatedTempTitle,
+        membersTitle: updatedMembersTitle,
         numOfMembers: usersToAdd.length,
         firstMessageID: "",
         memberUids: memberUids,

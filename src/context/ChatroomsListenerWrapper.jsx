@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useChatContexts } from "../hooks/useContexts";
 import { ChatroomsListenerService } from "./listenerServices/ChatroomsListenerService";
 import { fetchChatRoomData } from "../services/chatBarDataService";
-import { updateTempTitle } from "../utils/chatroomUtils";
+import { updateMembersTitle } from "../utils/chatroomUtils";
 import { useAudioNotifications } from "../hooks/useAudioNotifications";
 import { useAuth } from "./providers/AuthContext";
 import { db } from "../firebase";
@@ -20,13 +20,15 @@ const ChatroomsListenerWrapper = ({ children }) => {
         onChatroomAdded: async (chatID, numUnread) => {
           const { title, membersTitle, memberUids, lastMessageTimestamp } =
             await fetchChatRoomData(db, chatID);
-          const tempTitle = updateTempTitle(membersTitle, currUser.displayName);
+          const updatedMembersTitle = updateMembersTitle(
+            membersTitle,
+            currUser.displayName,
+          );
 
           const chatroomObj = {
             numUnread,
             title,
-            tempTitle,
-            membersTitle,
+            updatedMembersTitle,
             memberUids,
             lastMessageTimestamp,
           };

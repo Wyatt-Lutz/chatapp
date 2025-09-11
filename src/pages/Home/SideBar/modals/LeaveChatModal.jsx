@@ -19,7 +19,7 @@ const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
       updatedContextMenuData = {
         ...contextMenuData,
         numOfMembers: chatroomData.numOfMembers,
-        tempTitle: chatroomData.tempTitle,
+        membersTitle: chatroomData.membersTitle,
         ownerUid: chatroomData.owner,
         memberUids: chatroomData.memberUids,
       };

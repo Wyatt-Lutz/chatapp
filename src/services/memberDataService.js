@@ -1,6 +1,6 @@
 import { get, increment, ref, remove, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
-import { updateTempTitle } from "../utils/chatroomUtils";
+import { updateMembersTitle } from "../utils/chatroomUtils";
 import { deleteChatRoom, transferOwnership } from "./chatBarDataService";
 
 /**
@@ -37,7 +37,8 @@ export const removeUserFromChat = async (
   memberOptions = {},
   isBanned = false,
 ) => {
-  const { chatID, numOfMembers, tempTitle, ownerUid, memberUids } = chatState;
+  const { chatID, numOfMembers, membersTitle, ownerUid, memberUids } =
+    chatState;
   if (uidToRemove === currUserUid) {
     if (!isBanned) {
       resetAllChatContexts();
@@ -62,7 +63,10 @@ export const removeUserFromChat = async (
   }
 
   const newMemberUids = memberUids.replace(uidToRemove, "");
-  const newTempTitle = updateTempTitle(tempTitle, usernameOfUserRemoved);
+  const newMembersTitle = updateMembersTitle(
+    membersTitle,
+    usernameOfUserRemoved,
+  );
 
   await Promise.all([
     update(memberToRemoveRef, {
@@ -70,7 +74,10 @@ export const removeUserFromChat = async (
       ...memberOptions,
       isBanned: isBanned,
     }),
-    update(chatDataRef, { memberUids: newMemberUids, tempTitle: newTempTitle }),
+    update(chatDataRef, {
+      memberUids: newMemberUids,
+      membersTitle: newMembersTitle,
+    }),
   ]);
 
   await addMessage(
@@ -100,20 +107,17 @@ export const removeUserFromChat = async (
   }
 
   const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
-  //const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn`);
   await remove(chatsInRef);
 };
 
 export const addUserToChat = async (db, user, chatroomData) => {
   const { profilePictureURL, username, uid } = user;
-  const { chatID, memberUids, tempTitle, numOfMembers } = chatroomData;
+  const { chatID, memberUids, membersTitle, numOfMembers } = chatroomData;
 
   const memberRef = ref(db, `members/${chatID}/${uid}`);
   const chatsInRef = ref(db, `users/${uid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
-  console.log(username);
-  const updatedTempTitle = updateTempTitle(tempTitle, "", username);
-  console.log(updatedTempTitle);
+  const updatedMembersTitle = updateMembersTitle(membersTitle, "", username);
   const newUserUidsArr = [...memberUids.match(/.{1,28}/g), uid];
   const updatedMemberUids = newUserUidsArr.sort().join("");
 
@@ -131,7 +135,7 @@ export const addUserToChat = async (db, user, chatroomData) => {
     }),
 
     update(chatRef, {
-      tempTitle: updatedTempTitle,
+      membersTitle: updatedMembersTitle,
       numOfMembers: numOfMembers + 1,
       memberUids: updatedMemberUids,
     }),

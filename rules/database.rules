@@ -102,11 +102,11 @@
         ".read": "root.child('members/' + $chatID + '/' + auth.uid).exists()",
         ".write": "root.child('members/' + $chatID + '/' + auth.uid).exists()",
         ".validate": "
-        	newData.hasChildren(['owner', 'firstMessageID', 'tempTitle', 'title', 'lastMessageTimestamp', 'numOfMembers']) &&
+        	newData.hasChildren(['owner', 'firstMessageID', 'membersTitle', 'title', 'lastMessageTimestamp', 'numOfMembers']) &&
         	(
           	newData.child('owner').isString() &&
             newData.child('firstMessageID').isString() &&
-            newData.child('tempTitle').isString() &&
+            newData.child('membersTitle').isString() &&
             newData.child('title').isString() &&
             newData.child('lastMessageTimestamp').isNumber() &&
           	newData.child('numOfMembers').isNumber()

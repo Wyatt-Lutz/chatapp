@@ -20,7 +20,8 @@ const Messages = () => {
     useChatContexts();
   const { currUser } = useAuth();
 
-  const { chatID, title, tempTitle, numOfMembers, firstMessageID } = chatState;
+  const { chatID, title, membersTitle, numOfMembers, firstMessageID } =
+    chatState;
   const {
     numUnread,
     isAtBottom,
@@ -140,7 +141,7 @@ const Messages = () => {
             <>
               <StartOfChatBanner
                 title={title}
-                tempTitle={tempTitle}
+                membersTitle={membersTitle}
                 numOfMembers={numOfMembers}
                 isFirstMessageRendered={isFirstMessageRendered}
               />

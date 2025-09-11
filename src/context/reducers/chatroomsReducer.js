@@ -1,7 +1,7 @@
 import { initialChatroomState } from "../initialState";
 
 const updatePropNameMap = {
-  UPDATE_TEMP_TITLE: "tempTitle",
+  UPDATE_TEMP_TITLE: "membersTitle",
   UPDATE_TITLE: "title",
   UPDATE_MEMBER_UIDS: "memberUids",
   UPDATE_UNREAD_COUNT: "numUnread",
