@@ -14,7 +14,7 @@
     "browser-image-resizer": "^2.4.1",
     "dayjs": "^1.11.13",
     "emoji-picker-element": "^1.26.3",
-    "firebase": "^11.9.1",
+    "firebase": "^11.10.0",
     "lodash": "^4.17.21",
     "npm-check-updates": "^18.0.1",
     "react": "^19.1.0",
