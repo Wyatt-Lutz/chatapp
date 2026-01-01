@@ -15,7 +15,7 @@ const EnlargedImage = ({ imageSrc, setIsPictureEnlarged }) => {
   }, [imageRef.current, setIsPictureEnlarged]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/80">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-md z-50">
       <img className="h-200" ref={imageRef} src={imageSrc} />
     </div>
   );

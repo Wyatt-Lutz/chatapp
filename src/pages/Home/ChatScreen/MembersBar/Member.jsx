@@ -6,18 +6,27 @@ const Member = ({ memberUid, memberData }) => {
   const { chatState } = useChatContexts();
 
   return (
-    <div className="flex items-center justify-between px-3 py-2 bg-gray-500 rounded-md shadow-sm hover:bg-gray-600 transition-colors">
-      <div className="flex items-center space-x-2">
-        <div className="w-8 h-8 rounded-full overflow-hidden">
+    <div className="flex items-center justify-between px-3 py-2 bg-zinc-700/40 rounded-md hover:bg-zinc-700/30 transition">
+      <div className="flex items-center space-x-3">
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-700">
           <img
             className="h-full w-full object-cover"
             src={memberData?.profilePictureURL}
           />
         </div>
-        <div className="text-gray-800 font-medium">{memberData?.username}</div>
+        <div>
+          <div className="text-zinc-100 font-medium">
+            {memberData?.username}
+          </div>
+          <div
+            className={`text-xs ${memberData?.isOnline ? "text-violet-400 font-medium" : "text-zinc-400"}`}
+          >
+            {memberData?.isOnline ? "Online" : "Offline"}
+          </div>
+        </div>
       </div>
       {chatState.owner === memberUid && (
-        <div className="ml-2">
+        <div className="ml-2 text-yellow-400">
           <Crown />
         </div>
       )}

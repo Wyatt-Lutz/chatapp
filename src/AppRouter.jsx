@@ -29,7 +29,18 @@ function AppRouter() {
 
   const VerifiedProtected = ({ children }) => {
     if (loading || loadingAuth) {
-      return <div>Loading App...</div>;
+      return (
+        <div className="min-h-screen w-full bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
+          <div className="w-full max-w-md text-center">
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight">
+              Loading app
+            </h1>
+            <p className="mt-1 text-sm text-zinc-400">
+              Please wait while we prepare your chats.
+            </p>
+          </div>
+        </div>
+      );
     }
     if (!isVerified) {
       return (
@@ -44,7 +55,23 @@ function AppRouter() {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading App...</div>}>
+      <Suspense
+        fallback={
+          <div className="min-h-screen w-full bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
+            <div className="w-full max-w-md text-center">
+              <div className="mx-auto h-12 w-12 rounded-xl bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md animate-pulse">
+                <span className="text-xl font-bold">C</span>
+              </div>
+              <h1 className="mt-4 text-2xl font-semibold tracking-tight">
+                Loading app
+              </h1>
+              <p className="mt-1 text-sm text-zinc-400">
+                Please wait while we prepare your chats.
+              </p>
+            </div>
+          </div>
+        }
+      >
         <Routes>
           <Route
             path="/"

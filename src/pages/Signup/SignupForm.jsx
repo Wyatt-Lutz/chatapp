@@ -129,57 +129,139 @@ const SignupForm = ({ onSubmitForm }) => {
   };
 
   return (
-    <div>
-      <form noValidate onSubmit={onSignUserUp} className="flex flex-col">
-        <label>Username</label>
-        <input
-          name="username"
-          type="text"
-          placeholder="Username"
-          value={formData.username}
-          ref={usernameRef}
-          onChange={(e) => handleChange(e, "username")}
-          onKeyDown={handleKeyDown}
-        />
-        <UsernameAvailability
-          username={formData.username}
-          setIsButtonDisabled={setIsButtonDisabled}
-        />
-        <div>{formErrors.username}</div>
-        <label>Email</label>
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          ref={emailRef}
-          value={formData.email}
-          onChange={(e) => handleChange(e, "email")}
-          onKeyDown={handleKeyDown}
-        />
-        <div>{formErrors.email}</div>
-        <label>Password</label>
-        <input
-          name="password"
-          type="password"
-          placeholder="******"
-          value={formData.password}
-          ref={passwordRef}
-          onChange={(e) => handleChange(e, "password")}
-        />
-        <div>{formErrors.password || errorMessage}</div>
-        <div className="italic text-sm">*Must be at least 6 characters</div>
-        <button
-          type="submit"
-          disabled={isButtonDisabled}
-          className="border rounded-md bg-zinc-500"
-        >
-          Next
-        </button>
+    <div className="min-h-screen w-full bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-zinc-800/60 backdrop-blur rounded-xl shadow-lg border border-zinc-700 p-6 sm:p-8">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Create your account
+            </h1>
+            <p className="mt-1 text-sm text-zinc-400">
+              Choose a username, email, and password to get started.
+            </p>
+          </div>
 
-        <input type="checkbox" ref={checkboxRef} />
-        <span>Don&apos;t Remember Login</span>
-      </form>
-      <button onClick={() => navigate("/signin")}>Sign in</button>
+          <form
+            noValidate
+            onSubmit={onSignUserUp}
+            className="space-y-4"
+            aria-label="signup-form"
+          >
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-zinc-300"
+              >
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                placeholder="your username"
+                value={formData.username}
+                ref={usernameRef}
+                onChange={(e) => handleChange(e, "username")}
+                onKeyDown={handleKeyDown}
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
+              />
+              <div className="mt-2">
+                <UsernameAvailability
+                  username={formData.username}
+                  setIsButtonDisabled={setIsButtonDisabled}
+                />
+              </div>
+              {formErrors.username && (
+                <div className="mt-1 text-sm text-rose-400" role="alert">
+                  {formErrors.username}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-zinc-300"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                ref={emailRef}
+                value={formData.email}
+                onChange={(e) => handleChange(e, "email")}
+                onKeyDown={handleKeyDown}
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
+              />
+              {formErrors.email && (
+                <div className="mt-1 text-sm text-rose-400" role="alert">
+                  {formErrors.email}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-zinc-300"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                ref={passwordRef}
+                onChange={(e) => handleChange(e, "password")}
+                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
+              />
+              <div className="mt-1 text-xs text-zinc-400">
+                *Must be at least 6 characters.
+              </div>
+              {(formErrors.password || errorMessage) && (
+                <div className="mt-1 text-sm text-rose-400" role="alert">
+                  {formErrors.password || errorMessage}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <label className="flex items-center gap-2 text-sm text-zinc-300">
+                <input
+                  type="checkbox"
+                  ref={checkboxRef}
+                  className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/40"
+                />
+                <span className="text-zinc-300">Don&apos;t remember login</span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isButtonDisabled}
+              className="w-full inline-flex items-center justify-center rounded-lg bg-linear-to-tr from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white shadow hover:from-violet-500 hover:to-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 disabled:opacity-60 disabled:cursor-not-allowed transition"
+            >
+              Next
+            </button>
+          </form>
+
+          <div className="mt-6 text-sm text-center text-zinc-400">
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/signin")}
+              className="text-violet-400 hover:text-violet-300 hover:underline"
+            >
+              Sign in
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

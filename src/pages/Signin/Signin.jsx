@@ -70,40 +70,100 @@ const Signin = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen w-full bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
       {passReset ? (
         <PasswordReset passChange={setPassReset} />
       ) : (
-        <div>
-          <form noValidate onSubmit={signUserIn} className="flex flex-col">
-            <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={(e) => handleChange(e, "email")}
-              ref={emailRef}
-              onKeyDown={handleKeyDown}
-            />
-            <div>{formErrors.email}</div>
-            <input
-              name="password"
-              type="password"
-              placeholder="******"
-              value={formData.password}
-              onChange={(e) => handleChange(e, "password")}
-              ref={passwordRef}
-              onKeyDown={handleKeyDown}
-            />
-            <div>{formErrors.password || errorMessage}</div>
+        <div className="w-full max-w-md">
+          <div className="bg-zinc-800/60 backdrop-blur rounded-xl shadow-lg border border-zinc-700 p-6 sm:p-8">
+            <div className="mb-6 text-center">
+              <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+              <p className="mt-1 text-sm text-zinc-400">
+                Welcome back. Enter your credentials to continue.
+              </p>
+            </div>
 
-            <button type="submit" className="border rounded-md bg-zinc-500">
-              Signin
-            </button>
-          </form>
+            <form
+              noValidate
+              onSubmit={signUserIn}
+              className="space-y-4"
+              aria-label="signin-form"
+            >
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-zinc-300"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={(e) => handleChange(e, "email")}
+                  ref={emailRef}
+                  onKeyDown={handleKeyDown}
+                  className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
+                />
+                {formErrors.email && (
+                  <div className="mt-1 text-sm text-rose-400" role="alert">
+                    {formErrors.email}
+                  </div>
+                )}
+              </div>
 
-          <button onClick={() => setPassReset(true)}>Forgot Password?</button>
-          <button onClick={() => navigate("/signup")}> Signup </button>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-zinc-300"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => handleChange(e, "password")}
+                  ref={passwordRef}
+                  onKeyDown={handleKeyDown}
+                  className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
+                />
+                {(formErrors.password || errorMessage) && (
+                  <div className="mt-1 text-sm text-rose-400" role="alert">
+                    {formErrors.password || errorMessage}
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center rounded-lg bg-linear-to-tr from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white shadow hover:from-violet-500 hover:to-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 disabled:opacity-60 disabled:cursor-not-allowed transition"
+              >
+                Sign in
+              </button>
+
+              <div className="flex items-center justify-between text-sm">
+                <button
+                  type="button"
+                  onClick={() => setPassReset(true)}
+                  className="text-violet-400 hover:text-violet-300 hover:underline"
+                >
+                  Forgot password?
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/signup")}
+                  className="text-zinc-300 hover:text-white"
+                >
+                  Create account
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

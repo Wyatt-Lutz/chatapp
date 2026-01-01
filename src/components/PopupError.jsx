@@ -5,7 +5,7 @@ const PopupError = ({ message, onClose, type = "error" }) => {
   };
   return (
     <div
-      className={`px-4 max-w-2xl shadow-lg w-full p-6 by-2 rounded-lg mb-2 text-sm ${typeDependentCSS[type]}`}
+      className={`px-4 max-w-2xl shadow-lg w-full p-6 by-2 rounded-lg mb-2 text-lg ${typeDependentCSS[type]}`}
     >
       {message}
     </div>

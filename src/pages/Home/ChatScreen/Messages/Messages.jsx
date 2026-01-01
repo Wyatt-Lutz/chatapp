@@ -46,7 +46,31 @@ const Messages = () => {
   const messagesContainerRef = useRef(null);
   const lastMessageRef = useRef(null);
 
-  useScrollListener(containerRef, isAtBottom, messageDispatch);
+  useScrollListener(messagesContainerRef, isAtBottom, messageDispatch);
+
+  const prevChatIDRef = useRef(null);
+
+  useEffect(() => {
+    if (isAtBottom && lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isAtBottom]);
+
+  useEffect(() => {
+    if (!chatID) return;
+
+    const switchedChat = prevChatIDRef.current !== chatID;
+    const hasMessages = messages && messages.size > 0;
+
+    // If we changed chats but messages aren't loaded yet, wait for next render
+    if (switchedChat && !hasMessages) return;
+
+    if (switchedChat && lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "auto" });
+    }
+
+    prevChatIDRef.current = chatID;
+  }, [chatID, messages]);
 
   useEffect(() => {
     if (!isFirstMessageRendered && isVisible) {
@@ -108,6 +132,7 @@ const Messages = () => {
             isEditing={editState[messageUid]}
             changeEditState={changeEditState}
             index={index}
+            currentUserId={currUser.uid}
             onMemberContextMenu={(e, memberUid, memberData) => {
               e.preventDefault();
               setContextMenu({ member: true });
@@ -129,44 +154,36 @@ const Messages = () => {
   };
 
   return (
-    <div className="w-full h-full rounded-lg shadow-md">
+    <div className="flex-1 min-h-0 flex flex-col bg-zinc-900">
       <div
+        className="flex-1 overflow-auto px-4 py-4 space-y-4 no-scrollbar min-h-0"
         ref={messagesContainerRef}
-        className="max-h-[800px] w-[1000px] overflow-y-auto px-4 py-2 space-y-2 no-scrollbar flex flex-col-reverse scroll-smooth"
       >
-        <div className="flex-grow">
-          {!messages ? (
-            <div className="text-center text-red-900 py-4">Loading...</div>
-          ) : (
-            <>
-              <StartOfChatBanner
-                title={title}
-                membersTitle={membersTitle}
-                numOfMembers={numOfMembers}
-                isFirstMessageRendered={isFirstMessageRendered}
-              />
-              {renderMessages()}
-            </>
-          )}
-          {!isAtBottom && (
-            <button
-              className="absolute bottom-40 right-120 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition"
-              onClick={scrollToBottom}
-            >
-              <DownArrow />
-            </button>
-          )}
-
-          <div className="bg-gray-500 rounded-md py-1 px-2">
-            <Input />
+        {!messages ? (
+          <div className="text-center text-zinc-400 py-4">Loading...</div>
+        ) : (
+          <div className="w-full">
+            <StartOfChatBanner
+              title={title}
+              membersTitle={membersTitle}
+              numOfMembers={numOfMembers}
+              isFirstMessageRendered={isFirstMessageRendered}
+            />
+            <div className="flex flex-col space-y-3">{renderMessages()}</div>
           </div>
-        </div>
+        )}
 
-        <div ref={containerRef}></div>
+        <div ref={containerRef} />
+      </div>
+
+      <div className="shrink-0 px-4 py-3 border-t border-zinc-700 bg-zinc-800/40">
+        <div className="w-full">
+          <Input />
+        </div>
       </div>
 
       {numUnread > 0 && (
-        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full shadow">
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-4 py-1 rounded-full shadow">
           {numUnread} new messages
         </div>
       )}

@@ -34,7 +34,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       onReset={() => window.location.reload()}
     >
       <Providers>
-        <AppRouter />
+        <div className="h-screen w-screen overflow-hidden">
+          <AppRouter />
+        </div>
       </Providers>
     </ErrorBoundary>
   </StrictMode>,

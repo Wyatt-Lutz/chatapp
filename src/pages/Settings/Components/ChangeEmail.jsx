@@ -29,17 +29,34 @@ const ChangeEmail = ({
   };
 
   return (
-    <div className="flex">
-      <label>Email</label>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (email !== currUser.email) handleSaveEmail();
+      }}
+    >
+      <div>
+        <label className="block text-sm font-medium text-zinc-300">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
+        />
+      </div>
+
       {email !== currUser.email && (
-        <button onClick={handleSaveEmail}>Save Email</button>
+        <div>
+          <button
+            type="submit"
+            className="inline-flex items-center rounded-lg bg-linear-to-tr from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-medium text-white shadow hover:from-violet-500 hover:to-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 transition"
+          >
+            Save email
+          </button>
+        </div>
       )}
-    </div>
+    </form>
   );
 };
 export default ChangeEmail;

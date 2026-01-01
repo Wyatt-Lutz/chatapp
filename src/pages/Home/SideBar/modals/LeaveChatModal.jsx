@@ -43,17 +43,33 @@ const LeaveChatModal = ({ setModal, contextMenuData, setContextMenu }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
-      <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
-        <button onClick={onClose} className="absolute top-4 right-4">
+    <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/60 z-50">
+      <div className="relative w-full max-w-md p-6 bg-zinc-800/95 rounded-xl shadow-2xl border border-zinc-700">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4"
+          aria-label="Close leave chat modal"
+        >
           <CloseModal />
         </button>
 
-        <div>Are you sure you want to leave</div>
+        <h3 className="text-lg font-semibold text-zinc-100 mb-3">Leave Chat</h3>
+        <p className="text-sm text-zinc-400 mb-4">
+          Are you sure you want to leave this chat? You can be re-invited later
+          if needed.
+        </p>
 
-        <div className="flex justify-end space-x-2">
-          <button onClick={onLeaveChat}>Leave</button>
-          <button onClick={onClose} className="px-4 py-2 text-white">
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onLeaveChat}
+            className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-500"
+          >
+            Leave
+          </button>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-zinc-700 text-zinc-100 rounded-md hover:bg-zinc-700/80"
+          >
             Cancel
           </button>
         </div>

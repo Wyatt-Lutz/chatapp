@@ -13,6 +13,7 @@ const Message = ({
   isEditing,
   changeEditState,
   index,
+  currentUserId,
   onMemberContextMenu,
   onMessageContextMenu,
 }) => {
@@ -91,42 +92,53 @@ const Message = ({
           setIsPictureEnlarged={setIsPictureEnlarged}
         />
       )}
-      <div className="hover:bg-gray-600 rounded-lg pt-2 pb-2">
-        {(messageData.showTimeAndSender || index === 0) && (
-          <div className="flex items-center gap-2">
-            {messageData.sender !== "server" && (
-              <div
-                onContextMenu={(e) =>
-                  onMemberContextMenu(e, messageData.sender, memberDataOfSender)
-                }
-              >
-                {memberDataOfSender && (
-                  <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-full overflow-hidden">
-                      <img
-                        className="h-full w-full object-cover"
-                        src={memberDataOfSender.profilePictureURL}
-                        alt="profile picture"
-                      />
-                    </div>
 
+      <div className="group">
+        {(messageData.showTimeAndSender || index === 0) && (
+          <div className="flex items-center gap-3 mb-2">
+            {messageData.sender !== "server" && memberDataOfSender && (
+              <div className="flex items-center gap-3">
+                <div
+                  onContextMenu={(e) =>
+                    onMemberContextMenu(
+                      e,
+                      messageData.sender,
+                      memberDataOfSender,
+                    )
+                  }
+                  className="h-10 w-10 rounded-full overflow-hidden cursor-pointer"
+                >
+                  <img
+                    className="h-full w-full object-cover"
+                    src={memberDataOfSender.profilePictureURL}
+                    alt="profile"
+                  />
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <div>
                     {memberDataOfSender.isBlocked ? (
-                      <div>Blocked User</div>
+                      <div className="italic text-sm text-zinc-400">
+                        Blocked User
+                      </div>
                     ) : (
-                      <div className="font-semibold text-xl">
-                        {memberDataOfSender && memberDataOfSender.username}
+                      <div className="font-semibold text-zinc-100 flex items-center gap-2">
+                        <span>{memberDataOfSender.username}</span>
+                        <span className="text-xs text-zinc-400 font-normal">
+                          {calcTime(messageData.timestamp)}
+                        </span>
                       </div>
                     )}
                     {memberDataOfSender.isRemoved && (
-                      <div> (Removed user) </div>
+                      <div className="text-xs text-zinc-400">(Removed)</div>
                     )}
                   </div>
-                )}
+                </div>
               </div>
             )}
-            <div className="flex">{calcTime(messageData.timestamp)}</div>
           </div>
         )}
+
         {isEditing ? (
           <form onSubmit={handleSubmit(onSubmitEdit)}>
             <input
@@ -136,6 +148,7 @@ const Message = ({
                 maxLength: 200,
               })}
               autoFocus
+              className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-zinc-100"
             />
           </form>
         ) : (
@@ -146,20 +159,47 @@ const Message = ({
             className="mt-1"
           >
             {memberDataOfSender && memberDataOfSender.isBlocked ? (
-              <div className="italic text-xl font-bold w-max">
+              <div className="italic text-sm font-semibold text-zinc-400">
                 Blocked Message
               </div>
-            ) : (
-              <div>
-                <div className="flex w-max font-bold">
-                  <div className="text-xl whitespace-pre-wrap">
+            ) : messageData.sender === "server" ? (
+              <div className="flex justify-center w-full">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-900/20 border border-amber-700/30 text-amber-200/90 text-sm">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="whitespace-pre-wrap">
                     {messageData.text}
-                  </div>
-                  {messageData.hasBeenEdited && (
-                    <div className="text-xs italic text-gray-800">Edited</div>
-                  )}
+                  </span>
                 </div>
-                {renderMedia()}
+              </div>
+            ) : (
+              <div
+                className={`inline-block p-3 rounded-lg ${
+                  messageData.sender === currentUserId
+                    ? "bg-violet-900/40 text-zinc-100 border border-violet-800/30"
+                    : "bg-zinc-800 text-zinc-100"
+                }`}
+              >
+                <div className="whitespace-pre-wrap">{messageData.text}</div>
+                {messageData.hasBeenEdited && (
+                  <div className="text-xs italic text-zinc-400 mt-1">
+                    Edited
+                  </div>
+                )}
+                {messageData.fileRef && (
+                  <div className="mt-2">{renderMedia()}</div>
+                )}
               </div>
             )}
           </div>

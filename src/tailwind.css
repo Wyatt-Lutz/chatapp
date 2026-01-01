@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
-:root {
-  background-color: dimgray;
+@layer base {
+  body {
+    @apply bg-zinc-900;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {

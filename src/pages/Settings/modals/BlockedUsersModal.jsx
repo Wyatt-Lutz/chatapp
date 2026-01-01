@@ -38,37 +38,52 @@ const BlockedUsersModal = ({ changeDisplayment }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/50">
-      <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
+    <div className="fixed inset-0 flex items-center justify-center p-6 bg-black/60 z-50">
+      <div className="relative w-full max-w-xl p-6 bg-zinc-800/90 rounded-xl shadow-2xl border border-zinc-700">
         <button
           onClick={() => changeDisplayment(null)}
           className="absolute top-4 right-4"
+          aria-label="Close blocked users modal"
         >
           <CloseModal />
         </button>
-        <h2 className="mb-4 text-lg font-semibold">Blocked Users</h2>
+
+        <h2 className="mb-4 text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+          Blocked Users
+        </h2>
+
         {users.length === 0 ? (
-          <div>No blocked users.</div>
+          <div className="py-6 text-center text-sm text-zinc-400">
+            No blocked users.
+          </div>
         ) : (
-          <div>
+          <div className="space-y-3 max-h-72 overflow-auto pr-2">
             {users.map((user) => (
               <div
-                className="flex items-center p-2 bg-gray-400 rounded-lg hover:bg-gray-200 transition"
+                className="flex items-center gap-4 p-3 bg-zinc-700/40 rounded-md hover:bg-zinc-700/30 transition"
                 key={user.uid}
               >
-                <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
+                <div className="h-14 w-14 rounded-full overflow-hidden flex-shrink-0">
                   <img
                     className="h-full w-full object-cover"
                     src={user.profilePictureURL}
+                    alt={user.username}
                   />
                 </div>
-                <span className="flex-grow font-medium">{user.username}</span>
-                <button
-                  onClick={() => unBlockUser(user.uid)}
-                  className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-blue-600 transition"
-                >
-                  Unblock
-                </button>
+                <div className="flex-grow">
+                  <div className="font-medium text-zinc-100">
+                    {user.username}
+                  </div>
+                  <div className="text-xs text-zinc-400">{user.email}</div>
+                </div>
+                <div className="flex-shrink-0">
+                  <button
+                    onClick={() => unBlockUser(user.uid)}
+                    className="px-4 py-2 text-sm bg-rose-600 text-white rounded-md hover:bg-rose-500 transition"
+                  >
+                    Unblock
+                  </button>
+                </div>
               </div>
             ))}
           </div>

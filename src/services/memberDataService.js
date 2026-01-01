@@ -58,6 +58,7 @@ export const removeUserFromChat = async (
   const chatDataRef = ref(db, `chats/${chatID}`);
 
   if (numOfMembers && numOfMembers <= 2) {
+    console.log("Deleting chatroom since last member is leaving");
     await deleteChatRoom(db, chatID);
     return;
   }

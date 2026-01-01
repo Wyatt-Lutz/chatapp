@@ -68,35 +68,62 @@ const MemberContextMenu = ({
 
   return (
     <div
-      className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col"
+      className="fixed bg-zinc-800 border border-zinc-700 rounded-lg shadow-2xl p-1 flex flex-col min-w-max z-50"
       style={{ top: points.y, left: points.x }}
     >
-      {memberData.isBlocked ? (
-        <button onClick={() => onChangeBlockStatus(false)}>Unblock User</button>
-      ) : (
-        <button onClick={() => onChangeBlockStatus(true)}>Block User</button>
-      )}
+      {/* Block/Unblock Section */}
+      <button
+        onClick={() => onChangeBlockStatus(!memberData.isBlocked)}
+        className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-700/70 rounded transition group"
+      >
+        {memberData.isBlocked ? (
+          <span>Unblock User</span>
+        ) : (
+          <span>Block User</span>
+        )}
+      </button>
 
       {currUser.uid === chatState.owner && (
-        <div>
+        <>
+          <div className="border-t border-zinc-700 my-1" />
+
           {!memberData.isRemoved && (
-            <div className="flex flex-col">
-              {" "}
-              <button onClick={onRemoveMemberFromChat}>Remove User</button>
-              <button onClick={onTransferOwnership}>Transfer Ownership</button>
-            </div>
+            <>
+              <button
+                onClick={onRemoveMemberFromChat}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-700/70 rounded transition"
+              >
+                <span>Remove User</span>
+              </button>
+
+              <button
+                onClick={onTransferOwnership}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-700/70 rounded transition"
+              >
+                <span>Transfer Ownership</span>
+              </button>
+            </>
           )}
 
-          {memberData.isBanned ? (
-            <button className="text-red-700" onClick={onUnbanUser}>
-              Unban User
-            </button>
-          ) : (
-            <button className="text-red-700" onClick={onBanMemberFromChat}>
-              Ban User
-            </button>
-          )}
-        </div>
+          <div className="border-t border-zinc-700 my-1" />
+
+          <button
+            onClick={memberData.isBanned ? onUnbanUser : onBanMemberFromChat}
+            className="flex items-center gap-2 px-3 py-2 text-sm rounded transition"
+            style={{
+              color: memberData.isBanned ? "#10b981" : "#ef4444",
+              backgroundColor: memberData.isBanned
+                ? "rgba(16, 185, 129, 0.1)"
+                : "rgba(239, 68, 68, 0.1)",
+            }}
+          >
+            {memberData.isBanned ? (
+              <span>Unban User</span>
+            ) : (
+              <span>Ban User</span>
+            )}
+          </button>
+        </>
       )}
     </div>
   );

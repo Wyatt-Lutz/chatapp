@@ -3,12 +3,16 @@ import { db } from "../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../hooks/useContexts";
 import { updateMembersTitle } from "../../../utils/chatroomUtils";
+import ChatRoomItem from "../../../components/Sidebar/ChatRoomItem";
 
-const ChatRoom = ({ chatID, chatroomData }) => {
+const ChatRoom = ({ chatID, chatroomData, onContextMenu }) => {
   const { chatroomsDispatch, chatState, chatDispatch, resetAllChatContexts } =
     useChatContexts();
   const { currUser } = useAuth();
+
   const handleChangeChat = async () => {
+    if (chatState.chatID === chatID) return;
+
     resetAllChatContexts();
 
     const { firstMessageID, owner, title, membersTitle, numOfMembers } =
@@ -16,7 +20,7 @@ const ChatRoom = ({ chatID, chatroomData }) => {
     if (title !== chatroomData.title) {
       chatroomsDispatch({
         type: "UPDATE_TITLE",
-        payload: { key: chatID, data: { title: title } },
+        payload: { key: chatID, data: title },
       });
     }
 
@@ -24,7 +28,7 @@ const ChatRoom = ({ chatID, chatroomData }) => {
       membersTitle,
       currUser.displayName,
     );
-    if (updatedMembersTitle !== chatroomData.membersTitle) {
+    if (updatedMembersTitle !== chatroomData.updatedMembersTitle) {
       chatroomsDispatch({
         type: "UPDATE_TEMP_TITLE",
         payload: { key: chatID, data: updatedMembersTitle },
@@ -38,28 +42,27 @@ const ChatRoom = ({ chatID, chatroomData }) => {
         firstMessageID,
         owner,
         membersTitle: updatedMembersTitle,
-        title: chatroomData.title,
+        title: title,
         numOfMembers,
         memberUids: chatroomData.memberUids,
       },
     });
   };
 
+  const title = chatroomData.title || chatroomData.updatedMembersTitle;
+
   return (
-    <div className="flex">
-      <button
-        disabled={chatState.chatID === chatID}
-        className="ring m-2"
-        onClick={handleChangeChat}
-      >
-        {chatState.chatID === chatID ? (
-          <>{chatState.title || chatState.membersTitle}</>
-        ) : (
-          <>{chatroomData.title || chatroomData.membersTitle}</>
-        )}
-      </button>
-      <div>{chatroomData.numUnread}</div>
-    </div>
+    <ChatRoomItem
+      onContextMenu={(e) => onContextMenu && onContextMenu(e, chatID)}
+      title={
+        chatState.chatID === chatID
+          ? chatState.title || chatState.membersTitle
+          : title
+      }
+      unread={chatroomData.numUnread || 0}
+      active={chatState.chatID === chatID}
+      onClick={handleChangeChat}
+    />
   );
 };
 

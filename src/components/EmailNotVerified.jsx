@@ -94,23 +94,54 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
   }, [loading, setIsVerified]);
 
   return (
-    <div>
-      <div>Before you continue, please verify your email.</div>
-      <div>We have sent a email verification link to {email}.</div>
-      <button
-        onClick={() => checkIfSendEmail(currUser)}
-        className="border rounded-md bg-zinc-500 m-2 p-1"
-      >
-        Resend Email
-      </button>
-      <button
-        onClick={() => navigate("/settings")}
-        className="border rounded-md bg-zinc-500 m-2 p-1"
-      >
-        Change Email
-      </button>
+    <div className="min-h-screen w-full bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-zinc-800/60 backdrop-blur rounded-xl shadow-lg border border-zinc-700 p-6 sm:p-8">
+          <div className="mb-6 text-center">
+            <div className="mx-auto h-12 w-12 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md">
+              <span className="text-xl font-bold">@</span>
+            </div>
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight">
+              Verify your email
+            </h1>
+            <p className="mt-1 text-sm text-zinc-400">
+              Before you continue, we need to confirm it&apos;s really you.
+            </p>
+          </div>
 
-      {popup && <PopupError message={popup} type="error" />}
+          <p className="text-sm text-zinc-300 mb-4">
+            We&apos;ve sent a verification link to
+            {" "}
+            <span className="font-medium text-zinc-100">{email}</span>.
+            {" "}
+            Please check your inbox (and spam) and click the link to verify
+            your account.
+          </p>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <button
+              type="button"
+              onClick={() => handleSendEmail(currUser)}
+              className="flex-1 inline-flex items-center justify-center rounded-lg bg-linear-to-tr from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white shadow hover:from-violet-500 hover:to-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 transition"
+            >
+              Resend email
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/settings")}
+              className="flex-1 inline-flex items-center justify-center rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-200 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-violet-500/30 transition"
+            >
+              Change email
+            </button>
+          </div>
+
+          {popup && (
+            <div className="mt-2">
+              <PopupError message={popup} type="error" />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

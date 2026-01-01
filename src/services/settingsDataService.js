@@ -119,6 +119,7 @@ export const deleteAccount = async (
   }
 
   if (currUser.photoURL !== "/default-profile.jpg") {
+    console.log("deleting profile picture");
     const profilePictureRef = storageRef(storage, `users/${currUser.uid}`);
     await deleteObject(profilePictureRef);
   }

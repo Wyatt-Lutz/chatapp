@@ -6,12 +6,14 @@ export const useScrollListener = (ref, isAtBottom, messageDispatch) => {
     if (!container) return;
 
     const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      if (scrollTop !== 0 && isAtBottom) {
-        messageDispatch({ type: "UPDATE_IS_AT_BOTTOM", payload: false });
-      } else if (scrollTop === 0 && !isAtBottom) {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const nearBottom = scrollHeight - scrollTop - clientHeight <= 8;
+
+      if (nearBottom && !isAtBottom) {
         messageDispatch({ type: "UPDATE_IS_AT_BOTTOM", payload: true });
         messageDispatch({ type: "UPDATE_UNREAD", payload: 0 });
+      } else if (!nearBottom && isAtBottom) {
+        messageDispatch({ type: "UPDATE_IS_AT_BOTTOM", payload: false });
       }
     };
 

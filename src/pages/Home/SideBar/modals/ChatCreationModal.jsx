@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { db } from "../../../../firebase";
 import {
@@ -85,51 +86,119 @@ const ChatCreationModal = ({ changeChatRoomCreationState }) => {
     });
   };
 
-  return (
-    <>
-      <div className="fixed z-50 inset-0 flex items-center justify-center p-6 bg-black/50">
-        <div className="relative w-full max-w-md p-6 bg-gray-600 rounded-lg shadow-lg">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="relative w-full max-w-2xl rounded-2xl border border-zinc-700/70 bg-zinc-900/95 backdrop-blur shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700/70 bg-gradient-to-r from-zinc-800/50 to-transparent">
+          <div>
+            <h2 className="text-xl font-bold text-zinc-100">
+              Create Group Chat
+            </h2>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Add members and start a conversation
+            </p>
+          </div>
           <button
             onClick={() => changeChatRoomCreationState(false)}
-            className="absolute top-4 right-4"
+            className="p-2 rounded-lg hover:bg-zinc-800 transition"
+            aria-label="Close create chat modal"
           >
             <CloseModal />
           </button>
-          <div>
-            <UserSearch addedUsers={addedUsers} setAddedUsers={setAddedUsers} />
+        </div>
 
-            {addedUsers.length > 2 && (
-              <div>
-                <div>Create a name for your group (optional)</div>
-                <input
-                  maxLength={25}
-                  onChange={(e) => setChatTitleInputText(e.target.value)}
-                  value={chatTitleInputText}
-                />
-              </div>
-            )}
+        {/* Content */}
+        <div className="p-6 max-h-96 overflow-y-auto no-scrollbar space-y-4">
+          <UserSearch addedUsers={addedUsers} setAddedUsers={setAddedUsers} />
 
-            {popup && <PopupError message={popup} type="error" />}
-            <div className="flex">
-              <button
-                onClick={handleCreateChat}
-                type="submit"
-                disabled={addedUsers.length < 1}
-                className="ring"
-              >
-                Create Chat
-              </button>
-              <button
-                className="ring"
-                onClick={() => changeChatRoomCreationState(false)}
-              >
-                Cancel
-              </button>
+          {addedUsers.length > 2 && (
+            <div>
+              <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                Group Name (optional)
+              </label>
+              <input
+                maxLength={25}
+                onChange={(e) => setChatTitleInputText(e.target.value)}
+                value={chatTitleInputText}
+                className="w-full px-4 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/50 transition"
+                placeholder="Enter group name"
+              />
+            </div>
+          )}
+
+          {popup && <PopupError message={popup} type="error" />}
+        </div>
+
+        {/* Selected Users Preview */}
+        {addedUsers.length > 0 && (
+          <div className="px-6 py-4 border-t border-zinc-700/70 bg-zinc-800/30">
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">
+              Selected ({addedUsers.length})
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {addedUsers.map((user) => (
+                <div
+                  key={user.uid}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-br from-violet-900/60 to-violet-900/40 border border-violet-700/50 text-zinc-100 text-sm font-medium hover:border-violet-600/70 transition"
+                >
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
+                    <img
+                      src={user.profilePictureURL}
+                      alt={user.username}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span>{user.username}</span>
+                  <button
+                    onClick={() =>
+                      setAddedUsers((prev) =>
+                        prev.filter((u) => u.uid !== user.uid),
+                      )
+                    }
+                    className="ml-1 hover:text-rose-400 transition"
+                    aria-label={`Remove ${user.username}`}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
+        )}
+
+        {/* Footer */}
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-zinc-700/70 bg-zinc-900/50">
+          <button
+            onClick={() => changeChatRoomCreationState(false)}
+            className="px-4 py-2 rounded-lg bg-zinc-700/50 hover:bg-zinc-700 text-zinc-100 border border-zinc-600 transition font-medium text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleCreateChat}
+            type="submit"
+            disabled={addedUsers.length < 1}
+            className="px-4 py-2 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          >
+            Create Chat {addedUsers.length > 0 && `(${addedUsers.length})`}
+          </button>
         </div>
       </div>
-    </>
+    </div>,
+    document.body,
   );
 };
 export default ChatCreationModal;

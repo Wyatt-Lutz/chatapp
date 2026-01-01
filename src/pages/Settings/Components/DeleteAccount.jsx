@@ -20,11 +20,27 @@ const DeleteAccount = ({ displayPassModal }) => {
     navigate("/signin");
   };
   return (
-    <>
-      <button onClick={handleDeleteAccount} className="bg-red-500">
-        Delete Account
-      </button>
-    </>
+    <div className="space-y-3">
+      <div className="bg-zinc-800/40 p-4 rounded-md border border-zinc-700">
+        <div className="text-lg font-semibold text-zinc-100">
+          Delete Account
+        </div>
+        <div className="mt-2 text-sm text-rose-300">
+          Warning: This will permanently delete all your account data.
+        </div>
+        <div className="mt-3 text-sm text-zinc-300">
+          This action cannot be undone. You will be signed out and redirected.
+        </div>
+        <div className="mt-4">
+          <button
+            onClick={handleDeleteAccount}
+            className="inline-flex items-center rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/30 transition"
+          >
+            Delete account
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 export default DeleteAccount;

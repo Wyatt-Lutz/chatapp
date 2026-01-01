@@ -9,7 +9,7 @@ const UpwardArrow = () => {
       className="rotate-180"
     >
       <path
-        fill="#000"
+        fill="currentColor"
         fillRule="evenodd"
         d="M12.7 14.7a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 1.4-1.4l4.3 4.3 4.3-4.3a1 1 0 1 1 1.4 1.4l-5 5Z"
         clipRule="evenodd"

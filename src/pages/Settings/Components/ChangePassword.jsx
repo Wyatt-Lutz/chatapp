@@ -37,6 +37,8 @@ const ChangePassword = ({
         setPopup(
           "Your new password must be at least 6 characters long and strong. Please choose a stronger password.",
         );
+      } else if (error.code === "auth/requires-recent-login") {
+        return;
       } else {
         setPopup(
           "There was an error while trying to change your password : " +
@@ -47,6 +49,7 @@ const ChangePassword = ({
     });
     setPassword("");
     setConfirmPassword("");
+    setPopup("Your password has been successfully changed.");
   };
 
   const handleKeyDown = async (e) => {
@@ -63,9 +66,11 @@ const ChangePassword = ({
     }
   };
   return (
-    <>
-      <form onSubmit={changePassword} className="flex">
-        <label>Change Password</label>
+    <form onSubmit={changePassword} className="space-y-3">
+      <div>
+        <label className="block text-sm font-medium text-zinc-300">
+          Change password
+        </label>
         <input
           type="password"
           placeholder="New password"
@@ -73,21 +78,43 @@ const ChangePassword = ({
           onChange={(e) => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
           ref={passwordRef}
+          className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-zinc-300">
+          Confirm new password
+        </label>
         <input
           type="password"
-          placeholder="Confirm new password "
+          placeholder="Confirm new password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           onKeyDown={handleKeyDown}
           ref={confirmPasswordRef}
+          className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition"
         />
-        {popup && <PopupError message={popup} type="error" />}
-        {password.length > 0 && confirmPassword.length > 0 && (
-          <button disabled={password !== confirmPassword}>Save Password</button>
-        )}
-      </form>
-    </>
+      </div>
+
+      {popup && (
+        <PopupError
+          message={popup}
+          type={popup.toLowerCase().includes("success") ? "success" : "error"}
+        />
+      )}
+      {password.length > 0 && confirmPassword.length > 0 && (
+        <div>
+          <button
+            type="submit"
+            disabled={password !== confirmPassword || password.length === 0}
+            className="inline-flex items-center justify-center rounded-lg bg-linear-to-tr from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-medium text-white shadow hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-60 disabled:cursor-not-allowed transition"
+          >
+            Save password
+          </button>
+        </div>
+      )}
+    </form>
   );
 };
 export default ChangePassword;

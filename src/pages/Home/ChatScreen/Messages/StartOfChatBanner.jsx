@@ -22,20 +22,21 @@ const StartOfChatBanner = ({
     <div>
       {isFirstMessageRendered &&
         (title ? (
-          <div className="text-center text-lg mb-2">
-            This is the start of <span className="font-semibold">{title}</span>
+          <div className="text-center text-sm text-zinc-400 mb-2">
+            This is the start of{" "}
+            <span className="font-semibold text-zinc-100">{title}</span>
           </div>
         ) : numOfMembers > 3 ? (
-          <div className="text-center text-lg mb-2">
+          <div className="text-center text-sm text-zinc-400 mb-2">
             This is the start of your chat with{" "}
-            <span className="font-semibold">
-              {membersTitle + ", and " + numOfMembers - 3 + " other users"}
-            </span>{" "}
+            <span className="font-semibold text-zinc-100">
+              {membersTitle + ", and " + (numOfMembers - 3) + " other users"}
+            </span>
           </div>
         ) : (
-          <div className="text-center text-lg mb-2">
+          <div className="text-center text-sm text-zinc-400 mb-2">
             This is the start of your chat with{" "}
-            <span className="font-semibold">{jsxNames}</span>
+            <span className="font-semibold text-zinc-100">{jsxNames}</span>
           </div>
         ))}
     </div>

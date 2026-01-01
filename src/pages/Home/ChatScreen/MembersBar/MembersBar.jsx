@@ -18,13 +18,13 @@ const MembersBar = () => {
     setContextMenuData({ memberUid: memberUid, memberData: memberData });
   };
   return (
-    <div>
-      <div className="font-semibold text-gray-900 border-t text-lg text-center">
+    <aside className="w-72 bg-zinc-800/40 border-l border-zinc-700 p-3">
+      <div className="text-sm font-semibold text-zinc-100 text-center mb-3">
         Members
       </div>
-      <>
+      <div className="space-y-2">
         {!members ? (
-          <div>Loading members...</div>
+          <div className="text-sm text-zinc-400">Loading members...</div>
         ) : (
           <>
             {[...members]
@@ -35,19 +35,18 @@ const MembersBar = () => {
                   onContextMenu={(e) =>
                     handleContextMenu(e, memberUid, memberData)
                   }
-                  className="hover:bg-gray-600"
                 >
                   <Member memberUid={memberUid} memberData={memberData} />
                 </div>
               ))}
           </>
         )}
-      </>
+      </div>
 
       {contextMenu.member && contextMenuData.memberUid !== currUser.uid && (
         <MemberContextMenu contextMenuData={contextMenuData} points={points} />
       )}
-    </div>
+    </aside>
   );
 };
 export default MembersBar;

@@ -9,7 +9,7 @@ const Plus = () => {
     >
       <path
         d="m4 12h16m-8-8v16"
-        stroke="#000"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"

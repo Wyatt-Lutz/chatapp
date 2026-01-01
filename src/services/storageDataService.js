@@ -26,13 +26,14 @@ export const changeProfilePicture = async (
   }
   const photoURL = await uploadFile(profilePicture, photoStorageLocation);
 
-  const chatroomUids = [...chatroomsData.keys()];
-
   const updates = {};
-  updates[`users/${currUser.uid}/profilePictureURL`] = photoURL;
-  chatroomUids.forEach((uid) => {
-    updates[`members/${uid}/${currUser.uid}/profilePictureURL`] = photoURL;
-  });
+  if (chatroomsData) {
+    const chatroomUids = [...chatroomsData.keys()];
+    updates[`users/${currUser.uid}/profilePictureURL`] = photoURL;
+    chatroomUids.forEach((uid) => {
+      updates[`members/${uid}/${currUser.uid}/profilePictureURL`] = photoURL;
+    });
+  }
 
   await Promise.all([
     update(dbRef(db), updates),

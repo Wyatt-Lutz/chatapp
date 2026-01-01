@@ -11,10 +11,15 @@ const ChatRoomContextMenu = ({ contextMenuData, setContextMenu, points }) => {
   return (
     <div>
       <div
-        className="fixed bg-gray-500 border border-gray-600 shadow p-2 flex flex-col"
+        className="fixed bg-zinc-800/95 border border-zinc-700 shadow-lg p-2 rounded-md text-sm z-50"
         style={{ top: points.y, left: points.x }}
       >
-        <button onClick={onLeaveGroupChat}>Leave Group Chat</button>
+        <button
+          onClick={onLeaveGroupChat}
+          className="w-full text-left px-3 py-2 hover:bg-zinc-700/40 rounded-md text-sm text-zinc-100"
+        >
+          Leave Group Chat
+        </button>
       </div>
 
       {modal.type === "leaveChat" && (
