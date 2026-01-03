@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Member from "./Member";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
+import { useLongPress } from "../../../../hooks/useLongPress";
 import MemberContextMenu from "./MemberContextMenu";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
@@ -30,14 +31,12 @@ const MembersBar = () => {
             {[...members]
               .filter(([_, memberData]) => !memberData.isRemoved)
               .map(([memberUid, memberData]) => (
-                <div
+                <Member
                   key={memberUid}
-                  onContextMenu={(e) =>
-                    handleContextMenu(e, memberUid, memberData)
-                  }
-                >
-                  <Member memberUid={memberUid} memberData={memberData} />
-                </div>
+                  memberUid={memberUid}
+                  memberData={memberData}
+                  onContextMenu={handleContextMenu}
+                />
               ))}
           </>
         )}

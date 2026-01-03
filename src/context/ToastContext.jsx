@@ -21,28 +21,36 @@ export const ToastProvider = ({ children }) => {
   }, [showToast]);
 
   const typeDependentCSS = {
-    error: "bg-red-500",
-    success: "bg-green-500",
+    error: "bg-rose-500/95 border border-rose-400/70 shadow-rose-300/40",
+    success:
+      "bg-emerald-500/95 border border-emerald-400/70 shadow-emerald-300/40",
+    info: "bg-sky-500/95 border border-sky-400/70 shadow-sky-300/40",
   };
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-1/6 p-4 space-y-2 z-50">
+      <div className="fixed inset-x-2 top-4 sm:top-6 flex flex-col items-center gap-3 sm:gap-2 z-50 pointer-events-none">
         <AnimatePresence>
           {toasts.map(({ id, message, type }) => (
             <motion.div
               key={id}
-              className={`px-8 py-8 rounded shadow text-white ${typeDependentCSS[type]}`}
-              initial={{ opacity: 0, y: -100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -200 }}
-              transition={{ duration: 0.3 }}
+              className={`pointer-events-auto w-full sm:w-auto max-w-xl px-4 py-3 sm:px-5 sm:py-4 rounded-2xl text-white shadow-xl backdrop-blur-md ${
+                typeDependentCSS[type] || typeDependentCSS.error
+              }`}
+              initial={{ opacity: 0, y: -20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.98 }}
+              transition={{ duration: 0.25 }}
               onClick={() =>
                 setToasts((prev) => prev.filter((toast) => toast.id !== id))
               }
             >
-              {message}
+              <div className="flex items-start gap-3">
+                <div className="flex-1 text-sm sm:text-base leading-snug">
+                  {message}
+                </div>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>

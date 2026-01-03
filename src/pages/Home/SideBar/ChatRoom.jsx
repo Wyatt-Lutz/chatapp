@@ -2,6 +2,7 @@ import { fetchChatRoomData } from "../../../services/chatBarDataService";
 import { db } from "../../../firebase";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { useChatContexts } from "../../../hooks/useContexts";
+import { useLongPress } from "../../../hooks/useLongPress";
 import { updateMembersTitle } from "../../../utils/chatroomUtils";
 import ChatRoomItem from "../../../components/Sidebar/ChatRoomItem";
 
@@ -60,9 +61,16 @@ const ChatRoom = ({
 
   const title = chatroomData.title || chatroomData.updatedMembersTitle;
 
+  const chatroomLongPressHandlers = useLongPress((e) => {
+    if (onContextMenu) {
+      onContextMenu(e, chatID);
+    }
+  });
+
   return (
     <ChatRoomItem
       onContextMenu={(e) => onContextMenu && onContextMenu(e, chatID)}
+      {...chatroomLongPressHandlers}
       title={
         chatState.chatID === chatID
           ? chatState.title || chatState.membersTitle
