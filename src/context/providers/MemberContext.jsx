@@ -13,7 +13,7 @@ export const MemberContextProvider = ({ children }) => {
     initialMemberState,
   );
   const { currUser } = useAuth();
-  const { chatState } = useContext(ChatContext);
+  const { chatState, chatDispatch } = useContext(ChatContext);
 
   const currUserUid = currUser?.uid;
   const chatID = chatState.chatID;
@@ -33,6 +33,12 @@ export const MemberContextProvider = ({ children }) => {
         },
 
         onMemberUpdated: (uid, memberData) => {
+          if (uid == currUser.uid) {
+            if (memberData.isBanned || memberData.isRemoved) {
+              chatDispatch({ type: "RESET" });
+              memberDispatch({ type: "RESET" });
+            }
+          }
           memberDispatch({
             type: "UPDATE_MEMBER_DATA",
             payload: { uid, data: memberData },

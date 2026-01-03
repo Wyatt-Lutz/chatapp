@@ -1,4 +1,5 @@
 import { signOut } from "firebase/auth";
+import { showToast } from "../services/toastService";
 
 export const signUserOut = async (
   auth,
@@ -12,7 +13,7 @@ export const signUserOut = async (
   //Firebase sign out
   await signOut(auth)
     .then(() => {
-      console.info("Sign out successful");
+      showToast("Sign out successful", "success");
     })
     .catch((error) => {
       console.error(error);

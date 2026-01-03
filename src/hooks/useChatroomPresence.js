@@ -1,25 +1,38 @@
-import { onDisconnect, onValue, ref, remove, update } from "firebase/database";
+import {
+  get,
+  onDisconnect,
+  onValue,
+  ref,
+  remove,
+  update,
+} from "firebase/database";
 import { useEffect } from "react";
-import { db } from "../../firebase";
+import { db } from "../firebase";
 
 export const useChatroomPresence = (chatID, uid) => {
   useEffect(() => {
     if (!chatID || !uid) return;
 
-    const userMemberRef = ref(db, `members/${chatID}/${uid}`);
+    const chatRef = ref(db, `chats/${chatID}`);
     const userDataRef = ref(db, `users/${uid}/chatsIn`);
-    const connectedRef = ref(db, ".info/connected");
+    const userMemberRef = ref(db, `members/${chatID}/${uid}`);
     const isOnlineRef = ref(db, `members/${chatID}/${uid}/isOnline`);
+    const connectedRef = ref(db, ".info/connected");
 
-    const unsubscribe = onValue(connectedRef, (snap) => {
-      if (snap.val() === true) {
-        onDisconnect(isOnlineRef).remove();
-        update(userMemberRef, { isOnline: true });
-        update(userDataRef, { [chatID]: 0 });
-      }
+    const unsubscribe = onValue(connectedRef, async (snap) => {
+      if (snap.val() !== true) return;
+
+      const chatSnap = await get(chatRef);
+      if (!chatSnap.exists()) return;
+
+      await onDisconnect(isOnlineRef).set(false);
+      await update(userMemberRef, { isOnline: true });
+      await update(userDataRef, { [chatID]: 0 });
     });
+
     return () => {
       unsubscribe();
+      onDisconnect(isOnlineRef).cancel();
       remove(isOnlineRef);
     };
   }, [chatID, uid]);

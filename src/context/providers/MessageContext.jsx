@@ -9,8 +9,8 @@ import { messagesReducer } from "../reducers/messagesReducer";
 import { initialMessageState } from "../initialState";
 import { ChatContext } from "./ChatContext";
 import { MessageListenerService } from "../listenerServices/MessageListenerService";
-import { updateFirstMessageID } from "../../services/messageDataService";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
+import { updateFirstMessageID } from "../../services/chatBarDataService";
 
 export const MessageContext = createContext();
 
@@ -36,7 +36,6 @@ export const MessageContextProvider = ({ children }) => {
       {
         onMessageAdded: (messageID, messageData) => {
           if (
-            //This doesn't work when a user is sending the first message because chatState.firstMessageID isn't updated yet -- Have to manually update IsFirstMessageRendered in addMessage service function
             !messageState.isFirstMessageRendered &&
             messageID === chatState.firstMessageID
           ) {

@@ -9,11 +9,15 @@ import { useAuth } from "../../context/providers/AuthContext";
 
 import ConfirmPassModal from "./modals/ConfirmPassModal";
 import BlockedUsersModal from "./modals/BlockedUsersModal";
+import { signUserOut } from "../../utils/userUtils";
+import { useChatContexts } from "../../hooks/useContexts";
+import { auth } from "../../firebase";
 
 const Settings = () => {
   const { currUser } = useAuth();
   const navigate = useNavigate();
   const [currUsername, setCurrUsername] = useState(currUser.displayName);
+  const { chatroomsDispatch, resetAllChatContexts } = useChatContexts();
 
   const [modal, setModal] = useState({ type: null, props: {} });
 
@@ -37,57 +41,111 @@ const Settings = () => {
   };
 
   return (
-    <>
-      <h1>Settings</h1>
+    <div className="min-h-screen w-full bg-zinc-900 text-zinc-100 flex items-center justify-center p-2 md:p-4">
+      <div className="w-full max-w-2xl">
+        <div className="bg-zinc-800/60 backdrop-blur rounded-xl shadow-lg border border-zinc-700 p-4 sm:p-6 md:p-8 space-y-4 md:space-y-6">
+          <div className="mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              Settings
+            </h1>
+            <div className="mt-2 flex items-center gap-4">
+              <p className="text-xs md:text-sm text-zinc-400">
+                Manage your account and preferences.
+              </p>
+            </div>
+          </div>
 
-      <h2>My Account</h2>
+          <section className="w-full">
+            <div className="bg-zinc-800/40 border border-zinc-700 rounded-md px-4 sm:px-6 md:px-8 py-4 md:py-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 md:gap-8 max-w-3xl mx-auto">
+              <div className="shrink-0">
+                <ChangeProfilePicture />
+              </div>
+              <div className="text-center sm:text-left">
+                <div className="text-xs md:text-sm text-zinc-400">
+                  Signed in as
+                </div>
+                <div className="mt-1 text-xl sm:text-2xl md:text-3xl font-semibold text-zinc-100 break-all">
+                  {currUsername}
+                </div>
+                <div className="mt-1 text-xs md:text-sm text-zinc-400 break-all">
+                  {currUser?.email}
+                </div>
+              </div>
+            </div>
+          </section>
 
-      <div className="flex">
-        <ChangeProfilePicture />
-        <div>{currUsername}</div>
+          <div className="space-y-4">
+            <ChangeUsername
+              displayPassModal={displayPassModal}
+              passwordModalHeader={passwordModalHeader}
+              passwordModalText={passwordModalText}
+              setCurrUsername={setCurrUsername}
+            />
+
+            <ChangeEmail
+              displayPassModal={displayPassModal}
+              passwordModalHeader={passwordModalHeader}
+              passwordModalText={passwordModalText}
+            />
+
+            <ChangePassword
+              displayPassModal={displayPassModal}
+              passwordModalHeader={passwordModalHeader}
+              passwordModalText={passwordModalText}
+            />
+
+            <div className="pt-4 border-t border-zinc-700">
+              <DeleteAccount displayPassModal={displayPassModal} />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 pt-4">
+            <button
+              onClick={() =>
+                setModal({
+                  type: "BlockedUsersModal",
+                  props: {
+                    changeDisplayment: () =>
+                      setModal({ type: null, props: {} }),
+                  },
+                })
+              }
+              className="text-sm md:text-base text-violet-400 hover:underline font-medium"
+            >
+              Blocked users
+            </button>
+
+            <div className="flex gap-2 md:gap-3 w-full sm:w-auto">
+              <button
+                onClick={() => navigate("/")}
+                className="flex-1 sm:flex-none text-sm md:text-base text-zinc-300 hover:text-white font-medium px-3 py-2 rounded-lg hover:bg-zinc-700/50 transition"
+              >
+                Go Home
+              </button>
+              <button
+                onClick={async () =>
+                  await signUserOut(
+                    auth,
+                    resetAllChatContexts,
+                    chatroomsDispatch,
+                  )
+                }
+                className="flex-1 sm:flex-none inline-flex items-center justify-center rounded-lg bg-linear-to-tr from-violet-600 to-fuchsia-600 px-3 md:px-4 py-2 text-sm md:text-base font-semibold text-white shadow hover:from-violet-500 hover:to-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 transition"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+
+          {modal.type === "ConfirmPassModal" && (
+            <ConfirmPassModal {...modal.props} />
+          )}
+          {modal.type === "BlockedUsersModal" && (
+            <BlockedUsersModal {...modal.props} />
+          )}
+        </div>
       </div>
-
-      <ChangeUsername
-        displayPassModal={displayPassModal}
-        passwordModalHeader={passwordModalHeader}
-        passwordModalText={passwordModalText}
-        setCurrUsername={setCurrUsername}
-      />
-      <ChangeEmail
-        displayPassModal={displayPassModal}
-        passwordModalHeader={passwordModalHeader}
-        passwordModalText={passwordModalText}
-      />
-      <ChangePassword
-        displayPassModal={displayPassModal}
-        passwordModalHeader={passwordModalHeader}
-        passwordModalText={passwordModalText}
-      />
-      <DeleteAccount displayPassModal={displayPassModal} />
-
-      <button
-        onClick={() =>
-          setModal({
-            type: "BlockedUsersModal",
-            props: {
-              changeDisplayment: () => setModal({ type: null, props: {} }),
-            },
-          })
-        }
-        className="bg-gray-500"
-      >
-        Blocked Users
-      </button>
-
-      <button onClick={() => navigate("/")}>Go Home</button>
-
-      {modal.type === "ConfirmPassModal" && (
-        <ConfirmPassModal {...modal.props} />
-      )}
-      {modal.type === "BlockedUsersModal" && (
-        <BlockedUsersModal {...modal.props} />
-      )}
-    </>
+    </div>
   );
 };
 export default Settings;

@@ -7,7 +7,7 @@ export const chatReducer = (state, action) => {
         chatID,
         firstMessageID,
         owner,
-        tempTitle,
+        membersTitle,
         title,
         numOfMembers,
         memberUids,
@@ -17,7 +17,7 @@ export const chatReducer = (state, action) => {
         chatID,
         title,
         owner,
-        tempTitle,
+        membersTitle,
         firstMessageID,
         numOfMembers,
         memberUids,
@@ -25,7 +25,7 @@ export const chatReducer = (state, action) => {
     case "UPDATE_TITLE":
       return { ...state, title: action.payload };
     case "UPDATE_TEMP_TITLE":
-      return { ...state, tempTitle: action.payload };
+      return { ...state, membersTitle: action.payload };
     case "UPDATE_OWNER":
       return { ...state, owner: action.payload };
     case "UPDATE_MEMBER_UIDS":

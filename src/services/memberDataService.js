@@ -1,6 +1,11 @@
 import { get, increment, ref, remove, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
-import { updateTempTitle } from "../utils/chatroomUtils";
+import { updateMembersTitle } from "../utils/chatroomUtils";
+import {
+  deleteChatRoom,
+  fetchChatRoomData,
+  transferOwnership,
+} from "./chatBarDataService";
 
 /**
  * Updates the block status of a given user for the current user
@@ -25,38 +30,17 @@ export const fetchMembersFromChat = async (db, chatID) => {
   return (await get(membersRef)).val();
 };
 
-export const fetchChatsInData = async (db, uid) => {
-  const chatsInRef = ref(db, `users/${uid}/chatsIn`);
-  return (await get(chatsInRef)).val();
-};
-
-export const fetchNumOfMembers = async (db, chatID) => {
-  const chatRef = ref(db, `chats/${chatID}/numOfMembers`);
-  const numOfMembers = (await get(chatRef)).val();
-  console.log(numOfMembers);
-  return numOfMembers;
-};
-
 export const removeUserFromChat = async (
   db,
   chatState,
   uidToRemove,
   usernameOfUserRemoved,
   currUserUid,
-  resetAllChatContexts,
   memberData,
   memberOptions = {},
   isBanned = false,
 ) => {
-  const { chatID, numOfMembers, tempTitle, ownerUid, memberUids } = chatState;
-  if (uidToRemove === currUserUid) {
-    if (!isBanned) {
-      resetAllChatContexts();
-    } else {
-      console.error("Can't ban yourself");
-      return;
-    }
-  }
+  const { chatID, numOfMembers, ownerUid, memberUids } = chatState;
 
   const userRemovedServerMessage = isBanned
     ? `${usernameOfUserRemoved} has been banned.`
@@ -73,20 +57,24 @@ export const removeUserFromChat = async (
   }
 
   const newMemberUids = memberUids.replace(uidToRemove, "");
-  const newTempTitle = updateTempTitle(tempTitle, usernameOfUserRemoved);
+  const membersTitle = await fetchChatRoomData(db, chatID, "membersTitle");
+  const newMembersTitle = updateMembersTitle(
+    membersTitle,
+    usernameOfUserRemoved,
+  );
 
-  console.log("newMemberUids: " + newMemberUids);
-  console.log("newTempTitle: " + newTempTitle);
 
   await Promise.all([
     update(memberToRemoveRef, {
       isRemoved: true,
-      ...memberOptions,
       isBanned: isBanned,
+      ...memberOptions,
     }),
-    update(chatDataRef, { memberUids: newMemberUids, tempTitle: newTempTitle }),
+    update(chatDataRef, {
+      memberUids: newMemberUids,
+      membersTitle: newMembersTitle,
+    }),
   ]);
-
   await addMessage(
     userRemovedServerMessage,
     chatID,
@@ -97,7 +85,6 @@ export const removeUserFromChat = async (
   );
 
   await updateNumOfMembers(db, chatID, false);
-
   if (uidToRemove === ownerUid) {
     const arr = new Uint32Array(1);
     crypto.getRandomValues(arr);
@@ -114,20 +101,17 @@ export const removeUserFromChat = async (
   }
 
   const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn/${chatID}`);
-  //const chatsInRef = ref(db, `users/${uidToRemove}/chatsIn`);
   await remove(chatsInRef);
 };
 
 export const addUserToChat = async (db, user, chatroomData) => {
   const { profilePictureURL, username, uid } = user;
-  const { chatID, memberUids, tempTitle, numOfMembers } = chatroomData;
-
+  const { chatID, memberUids, numOfMembers } = chatroomData;
+  const membersTitle = await fetchChatRoomData(db, chatID, "membersTitle");
   const memberRef = ref(db, `members/${chatID}/${uid}`);
   const chatsInRef = ref(db, `users/${uid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
-
-  const updatedTempTitle = updateTempTitle(tempTitle, "", username);
-  console.log(updatedTempTitle);
+  const updatedMembersTitle = updateMembersTitle(membersTitle, "", username);
   const newUserUidsArr = [...memberUids.match(/.{1,28}/g), uid];
   const updatedMemberUids = newUserUidsArr.sort().join("");
 
@@ -145,7 +129,7 @@ export const addUserToChat = async (db, user, chatroomData) => {
     }),
 
     update(chatRef, {
-      tempTitle: updatedTempTitle,
+      membersTitle: updatedMembersTitle,
       numOfMembers: numOfMembers + 1,
       memberUids: updatedMemberUids,
     }),
@@ -160,46 +144,6 @@ export const updateNumOfMembers = async (db, chatID, isAdd) => {
   await update(numOfMembersRef, updates);
 };
 
-export const deleteChatRoom = async (db, chatID, memberData = null) => {
-  if (!memberData) {
-    memberData = Object.keys(await fetchMembersFromChat(db, chatID));
-  }
-
-  const deleteUserChatsInRefs = memberData.map((uid) => {
-    remove(ref(db, `users/${uid}/chatsIn/${chatID}`));
-  });
-
-  const deleteChatRefs = [
-    remove(ref(db, `members/${chatID}`)),
-    remove(ref(db, `messages/${chatID}`)),
-    remove(ref(db, `chats/${chatID}`)),
-  ];
-
-  await Promise.all([...deleteUserChatsInRefs, ...deleteChatRefs]); //Parallelization
-};
-
-export const transferOwnership = async (db, chatID, newOwnerUid) => {
-  const chatMetadataRef = ref(db, `chats/${chatID}`);
-  await update(chatMetadataRef, {
-    owner: newOwnerUid,
-  });
-};
-
-/**
- * Fetches the block status of users blocked by current user
- * @param {Database} db - Reference to Realtime Database
- * @param {string} uid - Uid of the user whose block data is fetched
- * @returns {Object} Object of blocked users by current user with true and false values for current blocked status
- */
-export const getBlockData = async (db, uid) => {
-  const userBlockListRef = ref(db, `users/${uid}/blockList`);
-
-  const userBlockDataSnap = await get(userBlockListRef);
-  const userBlockData = userBlockDataSnap.val() || {};
-
-  return userBlockData;
-};
-
 /**
  * Fetches a users username using their uid
  * @param {Database} db - Realtime Database Reference
@@ -211,16 +155,16 @@ export const getUsernameFromUid = async (db, uid) => {
 
   const usernameSnap = await get(userRef);
   const username = usernameSnap.val();
-  console.log(username);
   return username;
 };
 
-export const fetchChatUsersByStatus = async (memberData, status) => {
+export const fetchMembersByStatus = async (memberData, status) => {
   return memberData.reduce((uids, [uid, userData]) => {
     const isOnline = userData?.isOnline;
     if (
       (status === true && isOnline === true) ||
-      (status === false && (isOnline === undefined || isOnline === null))
+      (status === false &&
+        (isOnline === false || isOnline === undefined || isOnline === null))
     ) {
       uids.push(uid);
     }

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { chatReducer } from "../reducers/chatReducer";
 import { initialChatState } from "../initialState";
-import { updateTempTitle } from "../../utils/chatroomUtils";
+import { updateMembersTitle } from "../../utils/chatroomUtils";
 import { useAuth } from "./AuthContext";
 import { ChatroomsContext } from "./ChatroomsContext";
 import { ChatListenerService } from "../listenerServices/ChatListenerService";
@@ -28,12 +28,15 @@ export const ChatContextProvider = ({ children }) => {
       onOwnerChanged: (ownerUid) => {
         chatDispatch({ type: "UPDATE_OWNER", payload: ownerUid });
       },
-      onTempTitleChanged: (tempTitle) => {
-        const newTempTitle = updateTempTitle(tempTitle, currUser.displayName);
-        chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: newTempTitle });
+      onMembersTitleChanged: (membersTitle) => {
+        const newMembersTitle = updateMembersTitle(
+          membersTitle,
+          currUser.displayName,
+        );
+        chatDispatch({ type: "UPDATE_TEMP_TITLE", payload: newMembersTitle });
         chatroomsDispatch({
           type: "UPDATE_TEMP_TITLE",
-          payload: { key: chatID, data: newTempTitle },
+          payload: { key: chatID, data: newMembersTitle },
         });
       },
       onFirstMessageIDChanged: (firstMessageID) => {

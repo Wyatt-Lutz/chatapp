@@ -1,25 +1,35 @@
 import { useState } from "react";
-import { updateProfile } from "firebase/auth";
-import { deleteObject, ref } from "firebase/storage";
-import { storage } from "../../../../firebase";
-import { uploadFile } from "../../../services/storageDataService";
 import { compressImage } from "../../../utils/mediaUtils";
 import { useAuth } from "../../../context/providers/AuthContext";
 import Camera from "../../../components/ui/Camera";
+import { useToast } from "../../../context/ToastContext";
+import PopupError from "../../../components/PopupError";
+import { changeProfilePicture } from "../../../services/storageDataService";
+import { useChatContexts } from "../../../hooks/useContexts";
 
 const ChangeProfilePicture = () => {
   const { currUser } = useAuth();
   const [profilePicture, setProfilePicture] = useState(currUser.photoURL);
   const [isChangingPicture, setIsChangingPicture] = useState(false);
-
+  const { chatroomsState } = useChatContexts();
+  const { showToast } = useToast();
+  const [popup, setPopup] = useState("");
   const onFinish = async () => {
-    const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
-
-    await deleteObject(photoStorageLocation);
-    const photoURL = await uploadFile(profilePicture, photoStorageLocation);
-    await updateProfile(currUser, { photoURL: photoURL });
-    setIsChangingPicture(false);
-    // add successful toast
+    try {
+      await changeProfilePicture(
+        currUser,
+        profilePicture,
+        chatroomsState.chatrooms,
+      );
+      showToast("Successfully changed profile picture!", "success");
+    } catch (error) {
+      showToast(
+        "Something went wrong, please reload the page and upload the image again.",
+      );
+      console.error(error);
+    } finally {
+      setIsChangingPicture(false);
+    }
   };
 
   const handlePickImage = async (e) => {
@@ -43,7 +53,7 @@ const ChangeProfilePicture = () => {
   const handleClick = (e) => {
     if (!currUser.emailVerified) {
       e.preventDefault();
-      console.info("To change your profile picture, please verify your email.");
+      setPopup("To change your profile picture, please verify your email.");
     }
   };
   return (
@@ -74,6 +84,7 @@ const ChangeProfilePicture = () => {
           onChange={handlePickImage}
         />
       </div>
+      {popup && <PopupError message={popup} type="error" />}
       {isChangingPicture && (
         <div>
           <button onClick={onCancel}>Cancel</button>

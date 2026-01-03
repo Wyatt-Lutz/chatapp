@@ -1,0 +1,45 @@
+import { useState, useEffect } from "react";
+
+const StartOfChatBanner = ({
+  title,
+  membersTitle,
+  numOfMembers,
+  isFirstMessageRendered,
+}) => {
+  const [jsxNames, setJsxNames] = useState(null);
+  useEffect(() => {
+    const names = membersTitle.split(", ");
+    const newJsxNames =
+      names.length === 3
+        ? `${names[0]}, ${names[1]}, and ${names[2]}`
+        : names.length === 2
+          ? `${names[0]} and ${names[1]}`
+          : names[0];
+    setJsxNames(newJsxNames);
+  }, [membersTitle]);
+
+  return (
+    <div>
+      {isFirstMessageRendered &&
+        (title ? (
+          <div className="text-center text-sm text-zinc-400 mb-2">
+            This is the start of{" "}
+            <span className="font-semibold text-zinc-100">{title}</span>
+          </div>
+        ) : numOfMembers > 3 ? (
+          <div className="text-center text-sm text-zinc-400 mb-2">
+            This is the start of your chat with{" "}
+            <span className="font-semibold text-zinc-100">
+              {membersTitle + ", and " + (numOfMembers - 3) + " other users"}
+            </span>
+          </div>
+        ) : (
+          <div className="text-center text-sm text-zinc-400 mb-2">
+            This is the start of your chat with{" "}
+            <span className="font-semibold text-zinc-100">{jsxNames}</span>
+          </div>
+        ))}
+    </div>
+  );
+};
+export default StartOfChatBanner;

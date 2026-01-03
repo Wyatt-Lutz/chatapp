@@ -1,10 +1,44 @@
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { storage } from "../../firebase";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { db, storage } from "../firebase";
+import { updateProfile } from "firebase/auth";
+import { update, ref as dbRef } from "firebase/database";
 
 export const fetchProfilePicture = async (uid) => {
   const pictureRef = ref(storage, `users/${uid}`);
   const pictureUrl = await getDownloadURL(pictureRef);
   return pictureUrl;
+};
+
+export const changeProfilePicture = async (
+  currUser,
+  profilePicture,
+  chatroomsData,
+) => {
+  const photoStorageLocation = ref(storage, `users/${currUser.uid}`);
+
+  if (chatroomsData) {
+    await deleteObject(photoStorageLocation);
+  }
+  const photoURL = await uploadFile(profilePicture, photoStorageLocation);
+
+  const updates = {};
+  updates[`users/${currUser.uid}/profilePictureURL`] = photoURL;
+  if (chatroomsData) {
+    const chatroomUids = [...chatroomsData.keys()];
+    chatroomUids.forEach((uid) => {
+      updates[`members/${uid}/${currUser.uid}/profilePictureURL`] = photoURL;
+    });
+  }
+
+  await Promise.all([
+    update(dbRef(db), updates),
+    updateProfile(currUser, { photoURL: photoURL }),
+  ]);
 };
 
 export const uploadFile = async (file, storageLocation) => {
@@ -25,7 +59,7 @@ export const uploadFile = async (file, storageLocation) => {
             console.error("upload is paused");
             break;
           case "running":
-            console.log("uploading");
+            "uploading";
             break;
         }
       },

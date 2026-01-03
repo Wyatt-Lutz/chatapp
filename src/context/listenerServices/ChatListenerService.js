@@ -1,5 +1,5 @@
 import { onChildChanged, ref } from "firebase/database";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
 
 export const ChatListenerService = {
   setUpChatListeners(chatID, action) {
@@ -7,7 +7,7 @@ export const ChatListenerService = {
 
     const propHandler = {
       title: action.onTitleChanged,
-      tempTitle: action.onTempTitleChanged,
+      membersTitle: action.onMembersTitleChanged,
       owner: action.onOwnerChanged,
       firstMessageID: action.onFirstMessageIDChanged,
       memberUids: action.onMemberUidsChanged,

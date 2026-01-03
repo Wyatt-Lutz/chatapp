@@ -4,7 +4,7 @@ import {
   onChildRemoved,
   ref,
 } from "firebase/database";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
 
 export const ChatroomsListenerService = {
   setUpChatroomsListeners(currUserUid, action) {
@@ -15,7 +15,6 @@ export const ChatroomsListenerService = {
 
     if (action.onChatroomAdded) {
       const handleChatroomAdded = async (snap) => {
-        console.log("yoooo");
         action.onChatroomAdded(snap.key, snap.val());
       };
 
@@ -28,7 +27,6 @@ export const ChatroomsListenerService = {
 
     if (action.onChatroomRemoved) {
       const handleChatroomRemoved = (snap) => {
-        console.log(snap.key);
         action.onChatroomRemoved(snap.key);
       };
 

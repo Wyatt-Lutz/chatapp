@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useChatContexts } from "../hooks/useContexts";
 import { ChatroomsListenerService } from "./listenerServices/ChatroomsListenerService";
 import { fetchChatRoomData } from "../services/chatBarDataService";
-import { updateTempTitle } from "../utils/chatroomUtils";
+import { updateMembersTitle } from "../utils/chatroomUtils";
 import { useAudioNotifications } from "../hooks/useAudioNotifications";
 import { useAuth } from "./providers/AuthContext";
-import { db } from "../../firebase";
+import { db } from "../firebase";
 const ChatroomsListenerWrapper = ({ children }) => {
   const { currUser } = useAuth();
   const { chatState, chatroomsDispatch, resetAllChatContexts } =
@@ -18,19 +18,19 @@ const ChatroomsListenerWrapper = ({ children }) => {
       currUser.uid,
       {
         onChatroomAdded: async (chatID, numUnread) => {
-          const { title, tempTitle, memberUids, lastMessageTimestamp } =
+          const { title, membersTitle, memberUids, lastMessageTimestamp } =
             await fetchChatRoomData(db, chatID);
-          const updatedTempTitle = updateTempTitle(
-            tempTitle,
+          const updatedMembersTitle = updateMembersTitle(
+            membersTitle,
             currUser.displayName,
           );
 
           const chatroomObj = {
-            numUnread: numUnread,
+            numUnread,
             title,
-            tempTitle: updatedTempTitle,
-            memberUids: memberUids,
-            lastMessageTimestamp: lastMessageTimestamp,
+            updatedMembersTitle,
+            memberUids,
+            lastMessageTimestamp,
           };
           chatroomsDispatch({
             type: "ADD_CHATROOM",
@@ -38,12 +38,10 @@ const ChatroomsListenerWrapper = ({ children }) => {
           });
         },
         onChatroomRemoved: (chatID) => {
-          console.log("yo");
-          chatroomsDispatch({ type: "REMOVE_CHATROOM", payload: chatID });
-
           if (chatID === chatState.chatID) {
             resetAllChatContexts();
           }
+          chatroomsDispatch({ type: "REMOVE_CHATROOM", payload: chatID });
         },
         onUpdateUnread: (chatID, newUnreadCount) => {
           chatroomsDispatch({
@@ -56,7 +54,7 @@ const ChatroomsListenerWrapper = ({ children }) => {
     );
 
     return unsubscribe;
-  }, [currUser?.uid]);
+  }, [currUser?.uid, chatState.chatID]);
 
   return children;
 };
