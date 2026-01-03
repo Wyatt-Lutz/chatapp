@@ -8,10 +8,12 @@ import {
   unBanUser,
 } from "../../../../services/memberDataService";
 import UpwardArrow from "../../../../components/ui/UpwardArrow";
+import { useAuth } from "../../../../context/providers/AuthContext";
 
 const ChatSettings = ({ setIsSettingsOpen }) => {
   const { chatState, memberState } = useChatContexts();
   const [bannedUsers, setBannedUsers] = useState(null);
+  const { currUser } = useAuth();
   const [isBannedUsersDropdown, setIsBannedUsersDropdown] = useState(false);
 
   const handleLoadBannedUsers = async () => {
@@ -99,12 +101,14 @@ const ChatSettings = ({ setIsSettingsOpen }) => {
                       <span className="flex-1 font-medium text-zinc-200 truncate">
                         {user.username}
                       </span>
-                      <button
-                        onClick={() => handleUnbanUser(user)}
-                        className="px-3 py-1.5 rounded-lg bg-rose-600/20 text-rose-400 border border-rose-600/30 hover:bg-rose-600/30 transition text-sm font-medium"
-                      >
-                        Unban
-                      </button>
+                      {chatState.owner === currUser.uid && (
+                        <button
+                          onClick={() => handleUnbanUser(user)}
+                          className="px-3 py-1.5 rounded-lg bg-rose-600/20 text-rose-400 border border-rose-600/30 hover:bg-rose-600/30 transition text-sm font-medium"
+                        >
+                          Unban
+                        </button>
+                      )}
                     </div>
                   ))
                 ) : (

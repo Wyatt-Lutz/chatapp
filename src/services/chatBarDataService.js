@@ -83,20 +83,16 @@ export const deleteChatRoom = async (db, chatID, memberData = null) => {
   if (!memberData) {
     memberData = Object.keys(await fetchMembersFromChat(db, chatID));
   }
-  console.log("1");
   const deleteUserChatsInRefs = memberData.map((uid) => {
     remove(ref(db, `users/${uid}/chatsIn/${chatID}`));
   });
-  console.log("2");
   const deleteChatRefs = [
     remove(ref(db, `members/${chatID}`)),
     remove(ref(db, `messages/${chatID}`)),
     remove(ref(db, `chats/${chatID}`)),
   ];
 
-  console.log("3");
   await Promise.all([...deleteUserChatsInRefs, ...deleteChatRefs]);
-  console.log("4");
 };
 
 export const transferOwnership = async (db, chatID, newOwnerUid) => {

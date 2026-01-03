@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
-import CloseModal from "./ui/CloseModal";
 import { useAuth } from "../context/providers/AuthContext";
 
 import BlockedUserWarning from "./BlockedUserWarning";
@@ -83,21 +82,11 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
     );
   };
 
-  const removeFromAddedUsers = (user) => {
-    setAddedUsers((prev) =>
-      prev.filter((addedUser) => addedUser.uid !== user.uid),
-    );
-
-    setUsernameQueryData((prev) => [...prev, user]);
-  };
-
   return (
     <div className="w-full space-y-4">
       {modal.type === "blockedWarning" && (
         <BlockedUserWarning {...modal.props} />
       )}
-
-      {/* Search Input */}
       <div>
         <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
           Search Users
@@ -111,7 +100,6 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
         />
       </div>
 
-      {/* Search Results */}
       {usernameQueryData && usernameQueryData.length > 0 ? (
         <div className="space-y-2">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider px-1">
@@ -123,21 +111,21 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
                 className="flex items-center gap-3 p-3 bg-zinc-800/40 border border-zinc-700/50 rounded-lg hover:bg-zinc-800/70 hover:border-zinc-600/50 transition group"
                 key={user.uid}
               >
-                <div className="h-10 w-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-zinc-700">
+                <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 ring-2 ring-zinc-700">
                   <img
                     className="h-full w-full object-cover"
                     src={user.profilePictureURL}
                     alt={user.username}
                   />
                 </div>
-                <div className="flex-grow min-w-0">
+                <div className="grow min-w-0">
                   <p className="font-medium text-zinc-100 truncate">
                     {user.username}
                   </p>
                 </div>
                 <button
                   onClick={() => addUser(user)}
-                  className="px-3 py-1.5 text-sm bg-gradient-to-br from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-lg transition font-semibold flex-shrink-0"
+                  className="px-3 py-1.5 text-sm bg-linear-to-br from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-lg transition font-semibold shrink-0"
                 >
                   Add
                 </button>
@@ -154,12 +142,11 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
           <p>Start typing a username to search</p>
         </div>
       )}
-
-      {/* Current Members Section */}
       {previousUsers && previousUsers.length > 0 && (
         <div className="space-y-2 border-t border-zinc-700/50 pt-4">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider px-1">
-            Current Members ({previousUsers.filter((u) => !u.isBanned).length})
+            Current Members (
+            {previousUsers.filter((user) => !user.isBanned).length})
           </p>
           <div className="space-y-2 max-h-32 overflow-y-auto no-scrollbar">
             {previousUsers
@@ -169,14 +156,14 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
                   key={user.uid}
                   className="flex items-center gap-3 p-3 bg-zinc-800/30 border border-zinc-700/40 rounded-lg"
                 >
-                  <div className="h-9 w-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-zinc-700">
+                  <div className="h-9 w-9 rounded-full overflow-hidden shrink-0 ring-2 ring-zinc-700">
                     <img
                       className="h-full w-full object-cover"
                       src={user.profilePictureURL}
                       alt={user.username}
                     />
                   </div>
-                  <div className="flex-grow min-w-0">
+                  <div className="grow min-w-0">
                     <p className="font-medium text-zinc-300 text-sm truncate">
                       {user.username}
                     </p>

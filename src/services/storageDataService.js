@@ -27,9 +27,9 @@ export const changeProfilePicture = async (
   const photoURL = await uploadFile(profilePicture, photoStorageLocation);
 
   const updates = {};
+  updates[`users/${currUser.uid}/profilePictureURL`] = photoURL;
   if (chatroomsData) {
     const chatroomUids = [...chatroomsData.keys()];
-    updates[`users/${currUser.uid}/profilePictureURL`] = photoURL;
     chatroomUids.forEach((uid) => {
       updates[`members/${uid}/${currUser.uid}/profilePictureURL`] = photoURL;
     });
@@ -59,7 +59,7 @@ export const uploadFile = async (file, storageLocation) => {
             console.error("upload is paused");
             break;
           case "running":
-            console.log("uploading");
+            "uploading";
             break;
         }
       },

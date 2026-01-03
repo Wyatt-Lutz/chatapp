@@ -15,6 +15,5 @@ export const updateMembersTitle = (
   if (newUsername) {
     filteredNames.push(newUsername);
   }
-
   return filteredNames.join(", ");
 };

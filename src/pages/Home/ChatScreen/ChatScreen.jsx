@@ -2,7 +2,6 @@ import { useChatContexts } from "../../../hooks/useContexts";
 import { useChatroomPresence } from "../../../hooks/useChatroomPresence";
 import { useAuth } from "../../../context/providers/AuthContext";
 import { useState } from "react";
-import Plus from "../../../components/ui/Plus";
 
 import TopBar from "./Ancillary/TopBar";
 import Messages from "./Messages/Messages";
@@ -39,13 +38,16 @@ const ChatScreen = ({ isSidebarCollapsed, setIsSidebarCollapsed }) => {
       ) : (
         <>
           <TopBar
-            isSearchingMessages={isSearchingMessages}
             setIsSearchingMessages={setIsSearchingMessages}
             isSidebarCollapsed={isSidebarCollapsed}
             setIsSidebarCollapsed={setIsSidebarCollapsed}
           />
-          <div className="flex-1 flex overflow-hidden min-h-0">
-            <Messages />
+          <div
+            className={`flex-1 flex overflow-hidden min-h-0 transition-all duration-300 ${
+              !isSidebarCollapsed ? "md:ml-80" : ""
+            }`}
+          >
+            <Messages isSidebarCollapsed={isSidebarCollapsed} />
 
             {isSearchingMessages ? (
               <Search setIsSearchingMessages={setIsSearchingMessages} />

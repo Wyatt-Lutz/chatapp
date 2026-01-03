@@ -7,19 +7,48 @@ import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { transferOwnership } from "../../../../services/chatBarDataService";
 import { db } from "../../../../firebase";
+import { useRef, useEffect, useState } from "react";
 
 const MemberContextMenu = ({
   contextMenuData: { memberUid, memberData },
   points,
 }) => {
-  const { chatState, memberDispatch, memberState, resetAllChatContexts } =
-    useChatContexts();
+  const { chatState, memberDispatch, memberState } = useChatContexts();
   const { currUser } = useAuth();
+  const menuRef = useRef(null);
+  const [position, setPosition] = useState({ x: points.x, y: points.y });
+
+  useEffect(() => {
+    if (menuRef.current) {
+      const menuRect = menuRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      let x = points.x;
+      let y = points.y;
+
+      if (x + menuRect.width > viewportWidth) {
+        x = viewportWidth - menuRect.width - 10;
+      }
+
+      if (y + menuRect.height > viewportHeight) {
+        y = viewportHeight - menuRect.height - 10;
+      }
+      if (x < 10) {
+        x = 10;
+      }
+
+      if (y < 10) {
+        y = 10;
+      }
+
+      setPosition({ x, y });
+    }
+  }, [points.x, points.y]);
 
   const onChangeBlockStatus = async (newBlockStatus) => {
     await updateBlockedStatus(db, currUser.uid, memberUid, newBlockStatus);
     const newMemberObj = { ...memberData, isBlocked: newBlockStatus };
-    console.log(newMemberObj);
     memberDispatch({
       type: "UPDATE_MEMBER_DATA",
       payload: { uid: memberUid, data: newMemberObj },
@@ -33,7 +62,6 @@ const MemberContextMenu = ({
       memberUid,
       memberData.username,
       currUser.uid,
-      resetAllChatContexts,
       memberState.members,
     );
   };
@@ -49,7 +77,6 @@ const MemberContextMenu = ({
       memberUid,
       memberData.username,
       currUser.uid,
-      resetAllChatContexts,
       memberState.members,
       {}, //memberOptions
       true, //isBanned
@@ -68,10 +95,10 @@ const MemberContextMenu = ({
 
   return (
     <div
+      ref={menuRef}
       className="fixed bg-zinc-800 border border-zinc-700 rounded-lg shadow-2xl p-1 flex flex-col min-w-max z-50"
-      style={{ top: points.y, left: points.x }}
+      style={{ top: `${position.y}px`, left: `${position.x}px` }}
     >
-      {/* Block/Unblock Section */}
       <button
         onClick={() => onChangeBlockStatus(!memberData.isBlocked)}
         className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-700/70 rounded transition group"

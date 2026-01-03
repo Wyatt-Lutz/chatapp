@@ -71,7 +71,6 @@ const SignupForm = ({ onSubmitForm }) => {
         trimmedEmail,
         defaultProfilePictureURL,
       );
-      console.log(userCredential.user);
       await updateProfile(userCredential.user, {
         displayName: trimmedUsername,
         photoURL: defaultProfilePictureURL,

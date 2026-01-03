@@ -98,7 +98,7 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
       <div className="w-full max-w-md">
         <div className="bg-zinc-800/60 backdrop-blur rounded-xl shadow-lg border border-zinc-700 p-6 sm:p-8">
           <div className="mb-6 text-center">
-            <div className="mx-auto h-12 w-12 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md">
+            <div className="mx-auto h-12 w-12 rounded-xl bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md">
               <span className="text-xl font-bold">@</span>
             </div>
             <h1 className="mt-4 text-2xl font-semibold tracking-tight">
@@ -110,12 +110,10 @@ const EmailNotVerified = ({ email, setIsVerified }) => {
           </div>
 
           <p className="text-sm text-zinc-300 mb-4">
-            We&apos;ve sent a verification link to
-            {" "}
-            <span className="font-medium text-zinc-100">{email}</span>.
-            {" "}
-            Please check your inbox (and spam) and click the link to verify
-            your account.
+            We&apos;ve sent a verification link to{" "}
+            <span className="font-medium text-zinc-100">{email}</span>. Please
+            check your inbox (and spam) and click the link to verify your
+            account.
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">

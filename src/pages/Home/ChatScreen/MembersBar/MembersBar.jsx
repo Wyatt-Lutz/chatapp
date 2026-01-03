@@ -14,11 +14,11 @@ const MembersBar = () => {
   const handleContextMenu = (e, memberUid, memberData) => {
     e.preventDefault();
     setContextMenu({ member: true });
-    setPoints({ x: e.pageX, y: e.pageY });
+    setPoints({ x: e.clientX, y: e.clientY });
     setContextMenuData({ memberUid: memberUid, memberData: memberData });
   };
   return (
-    <aside className="w-72 bg-zinc-800/40 border-l border-zinc-700 p-3">
+    <aside className="hidden lg:block w-72 bg-zinc-800/40 border-l border-zinc-700 p-3">
       <div className="text-sm font-semibold text-zinc-100 text-center mb-3">
         Members
       </div>

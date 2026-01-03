@@ -128,11 +128,11 @@ const Input = () => {
       )}
 
       <div className="relative">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           <div className="shrink-0 self-stretch flex items-center">
             <label
               htmlFor="filePicker"
-              className={`cursor-pointer inline-flex items-center justify-center h-11 w-11 rounded-xl border border-violet-700/70 bg-violet-900/40 text-violet-300 shadow-sm transition hover:-translate-y-px hover:border-violet-500 hover:bg-violet-900/60 ${fileToUpload ? "opacity-50 pointer-events-none" : ""}`}
+              className={`cursor-pointer inline-flex items-center justify-center h-9 w-9 md:h-11 md:w-11 rounded-xl border border-violet-700/70 bg-violet-900/40 text-violet-300 shadow-sm transition hover:-translate-y-px hover:border-violet-500 hover:bg-violet-900/60 ${fileToUpload ? "opacity-50 pointer-events-none" : ""}`}
               aria-label="Attach file"
             >
               <Plus />
@@ -146,7 +146,7 @@ const Input = () => {
             />
           </div>
 
-          <div className="flex-1 flex items-center gap-2 rounded-2xl border border-zinc-700/70 bg-zinc-800/70 px-3 py-2 shadow-lg">
+          <div className="flex-1 flex items-center gap-1 md:gap-2 rounded-2xl border border-zinc-700/70 bg-zinc-800/70 px-2 md:px-3 py-2 shadow-lg">
             <textarea
               className="flex-1 bg-transparent border-0 text-zinc-50 placeholder-zinc-500 resize-none focus:ring-0 focus:outline-none text-sm sm:text-base leading-relaxed"
               value={text}
@@ -158,7 +158,7 @@ const Input = () => {
               onInput={(e) => {
                 const el = e.target;
                 el.style.height = "auto";
-                const maxHeight = 160; // cap growth so the input doesn't overrun the screen
+                const maxHeight = 160;
                 const nextHeight = Math.min(el.scrollHeight, maxHeight);
                 el.style.height = `${nextHeight}px`;
                 el.style.overflowY =
@@ -172,11 +172,11 @@ const Input = () => {
               }}
             />
 
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setIsEmojiPickerOpen((prev) => !prev)}
-                className="h-9 w-9 rounded-lg border border-zinc-700/70 bg-zinc-800/80 text-zinc-100 grid place-items-center transition hover:border-zinc-500"
+                className="hidden md:grid h-8 w-8 md:h-9 md:w-9 rounded-lg border border-zinc-700/70 bg-zinc-800/80 text-zinc-100 place-items-center transition hover:border-zinc-500"
                 aria-label="Toggle emoji picker"
               >
                 <Smile />
@@ -185,7 +185,7 @@ const Input = () => {
               <button
                 type="submit"
                 disabled={!text.trim() && !fileToUpload}
-                className="h-9 px-4 rounded-lg font-medium text-white transition bg-linear-to-tr from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 shadow disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
+                className="h-8 px-3 md:h-9 md:px-4 text-sm rounded-lg font-medium text-white transition bg-linear-to-tr from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 shadow disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
                 aria-label="Send message"
               >
                 Send
@@ -195,7 +195,7 @@ const Input = () => {
         </div>
 
         {isEmojiPickerOpen && (
-          <div className="absolute bottom-[calc(100%+0.5rem)] right-0 z-20 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden">
+          <div className="absolute bottom-[calc(100%+0.5rem)] right-0 left-0 md:left-auto z-20 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden">
             <emoji-picker class="dark" ref={emojiPickerRef}></emoji-picker>
           </div>
         )}

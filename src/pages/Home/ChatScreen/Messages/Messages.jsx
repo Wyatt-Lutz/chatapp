@@ -5,17 +5,16 @@ import { fetchOlderChats } from "../../../../services/messageDataService";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
-
+import DownArrow from "../../../../components/ui/DownArrow";
 import Message from "./Message";
 import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
 import MemberContextMenu from "../MembersBar/MemberContextMenu";
-import DownArrow from "../../../../components/ui/DownArrow";
 import { useScrollListener } from "../../../../hooks/useScrollListener";
 import StartOfChatBanner from "./StartOfChatBanner";
 import { db } from "../../../../firebase";
 
-const Messages = () => {
+const Messages = ({ isSidebarCollapsed }) => {
   const { chatState, memberState, messageState, messageDispatch } =
     useChatContexts();
   const { currUser } = useAuth();
@@ -62,11 +61,22 @@ const Messages = () => {
     const switchedChat = prevChatIDRef.current !== chatID;
     const hasMessages = messages && messages.size > 0;
 
-    // If we changed chats but messages aren't loaded yet, wait for next render
     if (switchedChat && !hasMessages) return;
 
     if (switchedChat && lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ behavior: "auto" });
+      const container = messagesContainerRef.current;
+      if (container) {
+        if (window.innerWidth < 768) {
+          container.scrollTop = container.scrollHeight;
+          setTimeout(() => {
+            if (container) {
+              container.scrollTop = container.scrollHeight + 1000;
+            }
+          }, 75);
+        } else {
+          lastMessageRef.current.scrollIntoView({ behavior: "auto" });
+        }
+      }
     }
 
     prevChatIDRef.current = chatID;
@@ -142,7 +152,7 @@ const Messages = () => {
             onMessageContextMenu={(e, messageUid, messageData) => {
               e.preventDefault();
               setContextMenu({ messages: true });
-              setPoints({ messages: { x: e.pageX, y: e.pageY } });
+              setPoints({ messages: { x: e.clientX, y: e.clientY } });
               setMessageContextMenuData({ messageUid, messageData });
             }}
           />
@@ -156,7 +166,7 @@ const Messages = () => {
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-zinc-900">
       <div
-        className="flex-1 overflow-auto px-4 py-4 space-y-4 no-scrollbar min-h-0"
+        className="flex-1 overflow-auto px-2 md:px-4 py-4 space-y-4 no-scrollbar min-h-0"
         ref={messagesContainerRef}
       >
         {!messages ? (
@@ -176,14 +186,18 @@ const Messages = () => {
         <div ref={containerRef} />
       </div>
 
-      <div className="shrink-0 px-4 py-3 border-t border-zinc-700 bg-zinc-800/40">
+      <div
+        className={`shrink-0 px-2 md:px-4 py-2 md:py-3 border-t border-zinc-700 bg-zinc-800/40 ${
+          !isSidebarCollapsed ? "md:-ml-80 md:w-[calc(100%+20rem)]" : ""
+        }`}
+      >
         <div className="w-full">
           <Input />
         </div>
       </div>
 
       {numUnread > 0 && (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-4 py-1 rounded-full shadow">
+        <div className="fixed bottom-20 md:bottom-8 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-3 md:px-4 py-1 text-sm rounded-full shadow z-10">
           {numUnread} new messages
         </div>
       )}

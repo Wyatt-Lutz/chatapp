@@ -1,4 +1,4 @@
-const PopupError = ({ message, onClose, type = "error" }) => {
+const PopupError = ({ message, type = "error" }) => {
   const typeDependentCSS = {
     error: "bg-red-100 text-red-800 border-red-400",
     success: "bg-green-100 text-green-800 border-green-400",

@@ -14,6 +14,7 @@ export const useChatroomPresence = (chatID, uid) => {
     if (!chatID || !uid) return;
 
     const chatRef = ref(db, `chats/${chatID}`);
+    const userDataRef = ref(db, `users/${uid}/chatsIn`);
     const userMemberRef = ref(db, `members/${chatID}/${uid}`);
     const isOnlineRef = ref(db, `members/${chatID}/${uid}/isOnline`);
     const connectedRef = ref(db, ".info/connected");
@@ -26,6 +27,7 @@ export const useChatroomPresence = (chatID, uid) => {
 
       await onDisconnect(isOnlineRef).set(false);
       await update(userMemberRef, { isOnline: true });
+      await update(userDataRef, { [chatID]: 0 });
     });
 
     return () => {

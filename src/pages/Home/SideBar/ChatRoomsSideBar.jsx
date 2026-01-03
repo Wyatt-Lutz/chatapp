@@ -3,16 +3,25 @@ import { useContextMenu } from "../../../hooks/useContextMenu";
 import { useChatContexts } from "../../../hooks/useContexts";
 import ChatRoom from "./ChatRoom";
 import Sidebar from "../../../components/Sidebar/Sidebar";
+import { useNavigate } from "react-router-dom";
+import { signUserOut } from "../../../utils/userUtils";
+import { auth } from "../../../firebase";
 
 import ChatRoomContextMenu from "./ChatRoomContextMenu";
 import ChatCreationModal from "./modals/ChatCreationModal";
 
-const ChatRoomsSideBar = ({ onCollapse, isCollapsed }) => {
-  const { chatroomsState } = useChatContexts();
+const ChatRoomsSideBar = ({
+  onCollapse,
+  isCollapsed,
+  setIsSidebarCollapsed,
+}) => {
+  const { chatroomsState, chatroomsDispatch, resetAllChatContexts } =
+    useChatContexts();
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const { contextMenu, setContextMenu, points, setPoints } = useContextMenu();
   const [contextMenuData, setContextMenuData] = useState({});
   const chatrooms = chatroomsState.chatrooms;
+  const navigate = useNavigate();
 
   const changeChatRoomCreationState = (state) => {
     setIsCreatingChat(state);
@@ -21,15 +30,19 @@ const ChatRoomsSideBar = ({ onCollapse, isCollapsed }) => {
   const handleContextMenu = (e, chatID) => {
     e.preventDefault();
     setContextMenu({ chatroom: true });
-    setPoints({ x: e.pageX, y: e.pageY });
+    setPoints({ x: e.clientX, y: e.clientY });
     setContextMenuData({ chatID: chatID });
+  };
+
+  const signCurrUserOut = async () => {
+    await signUserOut(auth, resetAllChatContexts, chatroomsDispatch);
   };
 
   return (
     <>
       <Sidebar
         title="Chatrooms"
-        className="w-80"
+        className="w-full md:w-80"
         onCollapse={onCollapse}
         isCollapsed={isCollapsed}
       >
@@ -76,24 +89,41 @@ const ChatRoomsSideBar = ({ onCollapse, isCollapsed }) => {
                   chatID={chatroom[0]}
                   chatroomData={chatroom[1]}
                   onContextMenu={handleContextMenu}
+                  setIsSidebarCollapsed={setIsSidebarCollapsed}
                 />
               ))}
             </div>
           )}
         </div>
 
-        {contextMenu.chatroom && (
-          <ChatRoomContextMenu
-            contextMenuData={contextMenuData}
-            points={points}
-            setContextMenu={setContextMenu}
-          />
-        )}
+        <div className="md:hidden mt-6 pt-4 border-t border-zinc-700/70 space-y-2">
+          <button
+            onClick={() => navigate("/settings")}
+            className="w-full px-4 py-2.5 text-sm rounded-lg bg-zinc-800/90 hover:bg-zinc-700 border border-zinc-700 shadow-lg transition text-zinc-100"
+          >
+            Settings
+          </button>
+          <button
+            onClick={signCurrUserOut}
+            className="w-full px-4 py-2.5 text-sm rounded-lg bg-zinc-800/90 hover:bg-zinc-700 border border-zinc-700 shadow-lg transition text-zinc-100"
+          >
+            Log Out
+          </button>
+        </div>
       </Sidebar>
+
+      {contextMenu.chatroom && (
+        <ChatRoomContextMenu
+          contextMenuData={contextMenuData}
+          points={points}
+          setContextMenu={setContextMenu}
+        />
+      )}
 
       {isCreatingChat && (
         <ChatCreationModal
           changeChatRoomCreationState={changeChatRoomCreationState}
+          setIsSidebarCollapsed={setIsSidebarCollapsed}
         />
       )}
     </>

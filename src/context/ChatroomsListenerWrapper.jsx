@@ -38,8 +38,6 @@ const ChatroomsListenerWrapper = ({ children }) => {
           });
         },
         onChatroomRemoved: (chatID) => {
-          console.log("Removing chatroom listener for chatID:", chatID);
-          console.log(chatState.chatID);
           if (chatID === chatState.chatID) {
             resetAllChatContexts();
           }

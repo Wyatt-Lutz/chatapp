@@ -9,7 +9,6 @@ export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   const showToast = (message, type = "error", duration = 3000) => {
     const id = Date.now();
-    console.log(id);
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));

@@ -107,7 +107,7 @@ const ProfilePictureUpload = ({ userData }) => {
           <button
             type="button"
             onClick={onFinish}
-            className="mt-8 w-full inline-flex items-center justify-center rounded-lg bg-gradient-to-tr from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white shadow hover:from-violet-500 hover:to-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 transition"
+            className="mt-8 w-full inline-flex items-center justify-center rounded-lg bg-linear-to-tr from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white shadow hover:from-violet-500 hover:to-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 transition"
           >
             Finish
           </button>

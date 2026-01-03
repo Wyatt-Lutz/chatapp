@@ -37,7 +37,7 @@ const Search = ({ setIsSearchingMessages }) => {
   }, [searchQuery, chatID]);
 
   return (
-    <aside className="w-72 flex flex-col bg-zinc-800/40 border-l border-zinc-700">
+    <aside className="fixed inset-0 lg:relative lg:w-72 flex flex-col bg-zinc-900 lg:bg-zinc-800/40 border-l border-zinc-700 z-30 lg:z-0">
       <div className="p-4 border-b border-zinc-700/70 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-zinc-100">Search Messages</h3>
         <button

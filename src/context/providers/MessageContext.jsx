@@ -36,11 +36,9 @@ export const MessageContextProvider = ({ children }) => {
       {
         onMessageAdded: (messageID, messageData) => {
           if (
-            //This doesn't work when a user is sending the first message because chatState.firstMessageID isn't updated yet -- Have to manually update IsFirstMessageRendered in addMessage service function
             !messageState.isFirstMessageRendered &&
             messageID === chatState.firstMessageID
           ) {
-            console.log("haha");
             messageDispatch({
               type: "UPDATE_IS_FIRST_MESSAGE_RENDERED",
               payload: true,

@@ -5,7 +5,12 @@ import { useChatContexts } from "../../../hooks/useContexts";
 import { updateMembersTitle } from "../../../utils/chatroomUtils";
 import ChatRoomItem from "../../../components/Sidebar/ChatRoomItem";
 
-const ChatRoom = ({ chatID, chatroomData, onContextMenu }) => {
+const ChatRoom = ({
+  chatID,
+  chatroomData,
+  onContextMenu,
+  setIsSidebarCollapsed,
+}) => {
   const { chatroomsDispatch, chatState, chatDispatch, resetAllChatContexts } =
     useChatContexts();
   const { currUser } = useAuth();
@@ -47,6 +52,10 @@ const ChatRoom = ({ chatID, chatroomData, onContextMenu }) => {
         memberUids: chatroomData.memberUids,
       },
     });
+
+    if (setIsSidebarCollapsed) {
+      setIsSidebarCollapsed(true);
+    }
   };
 
   const title = chatroomData.title || chatroomData.updatedMembersTitle;

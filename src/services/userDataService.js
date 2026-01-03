@@ -60,7 +60,7 @@ export const createUserData = async (
   try {
     await updatePublicUsername(db, username, "");
 
-    await set(userRef, {
+    await update(userRef, {
       username,
       email,
       lastUsernameChange: 0,

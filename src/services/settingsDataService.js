@@ -22,7 +22,6 @@ export const changeUsername = async (
 ) => {
   const usernameExists = await checkIfUsernameExists(db, newUsername);
   if (usernameExists) {
-    console.log("username already exists");
     return;
   }
 
@@ -65,7 +64,6 @@ export const changeUsername = async (
       displayName: newUsername,
     });
   } catch (error) {
-    console.log(error);
     await rollBackPublicUsernameData(db, newUsername, oldUsername);
   }
 };
@@ -90,7 +88,7 @@ export const deleteAccount = async (
   if (chatsInData) {
     const memberOptions = {
       profilePictureURL: "",
-      username: "Removed User",
+      username: "Deleted User",
       isOnline: false,
     };
 
@@ -109,7 +107,6 @@ export const deleteAccount = async (
           currUser.uid,
           currUser.displayName,
           currUser.uid,
-          resetAllChatContexts,
           transformedMemberData,
           memberOptions,
         );
@@ -117,13 +114,11 @@ export const deleteAccount = async (
     );
     await Promise.all(removeUserFromEachChat);
   }
-
-  if (currUser.photoURL !== "/default-profile.jpg") {
-    console.log("deleting profile picture");
+  const photoURL = await fetchUserData(db, currUser.uid, "profilePictureURL");
+  if (photoURL !== "/default-profile.jpg") {
     const profilePictureRef = storageRef(storage, `users/${currUser.uid}`);
     await deleteObject(profilePictureRef);
   }
-
   await remove(ref(db, `publicUsernames/${currUser.displayName}`));
   await remove(userRef);
   await deleteUser(currUser);

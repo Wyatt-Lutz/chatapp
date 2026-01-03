@@ -1,5 +1,3 @@
-import React from "react";
-
 const ChatRoomItem = ({
   title,
   unread = 0,

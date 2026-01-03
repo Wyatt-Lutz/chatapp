@@ -27,7 +27,7 @@ export const MemberListenerService = {
       //This also runs if a user who has been previously removed is re-added because their data isn't ever deleted
       const handleUpdateMember = async (snap) => {
         const userBlockData = await fetchUserData(db, currUserUid, "blockList");
-        console.log(userBlockData);
+        userBlockData;
         const memberObj = { ...snap.val(), isBlocked: userBlockData[snap.key] };
         action.onMemberUpdated(snap.key, memberObj);
       };

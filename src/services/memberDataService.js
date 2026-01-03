@@ -1,7 +1,11 @@
 import { get, increment, ref, remove, set, update } from "firebase/database";
 import { addMessage } from "./messageDataService";
 import { updateMembersTitle } from "../utils/chatroomUtils";
-import { deleteChatRoom, transferOwnership } from "./chatBarDataService";
+import {
+  deleteChatRoom,
+  fetchChatRoomData,
+  transferOwnership,
+} from "./chatBarDataService";
 
 /**
  * Updates the block status of a given user for the current user
@@ -32,21 +36,11 @@ export const removeUserFromChat = async (
   uidToRemove,
   usernameOfUserRemoved,
   currUserUid,
-  resetAllChatContexts,
   memberData,
   memberOptions = {},
   isBanned = false,
 ) => {
-  const { chatID, numOfMembers, membersTitle, ownerUid, memberUids } =
-    chatState;
-  if (uidToRemove === currUserUid) {
-    if (!isBanned) {
-      resetAllChatContexts();
-    } else {
-      console.error("Can't ban yourself");
-      return;
-    }
-  }
+  const { chatID, numOfMembers, ownerUid, memberUids } = chatState;
 
   const userRemovedServerMessage = isBanned
     ? `${usernameOfUserRemoved} has been banned.`
@@ -58,29 +52,29 @@ export const removeUserFromChat = async (
   const chatDataRef = ref(db, `chats/${chatID}`);
 
   if (numOfMembers && numOfMembers <= 2) {
-    console.log("Deleting chatroom since last member is leaving");
     await deleteChatRoom(db, chatID);
     return;
   }
 
   const newMemberUids = memberUids.replace(uidToRemove, "");
+  const membersTitle = await fetchChatRoomData(db, chatID, "membersTitle");
   const newMembersTitle = updateMembersTitle(
     membersTitle,
     usernameOfUserRemoved,
   );
 
+
   await Promise.all([
     update(memberToRemoveRef, {
       isRemoved: true,
-      ...memberOptions,
       isBanned: isBanned,
+      ...memberOptions,
     }),
     update(chatDataRef, {
       memberUids: newMemberUids,
       membersTitle: newMembersTitle,
     }),
   ]);
-
   await addMessage(
     userRemovedServerMessage,
     chatID,
@@ -91,7 +85,6 @@ export const removeUserFromChat = async (
   );
 
   await updateNumOfMembers(db, chatID, false);
-
   if (uidToRemove === ownerUid) {
     const arr = new Uint32Array(1);
     crypto.getRandomValues(arr);
@@ -113,8 +106,8 @@ export const removeUserFromChat = async (
 
 export const addUserToChat = async (db, user, chatroomData) => {
   const { profilePictureURL, username, uid } = user;
-  const { chatID, memberUids, membersTitle, numOfMembers } = chatroomData;
-
+  const { chatID, memberUids, numOfMembers } = chatroomData;
+  const membersTitle = await fetchChatRoomData(db, chatID, "membersTitle");
   const memberRef = ref(db, `members/${chatID}/${uid}`);
   const chatsInRef = ref(db, `users/${uid}/chatsIn`);
   const chatRef = ref(db, `chats/${chatID}`);
@@ -168,7 +161,6 @@ export const getUsernameFromUid = async (db, uid) => {
 export const fetchMembersByStatus = async (memberData, status) => {
   return memberData.reduce((uids, [uid, userData]) => {
     const isOnline = userData?.isOnline;
-    console.log(isOnline);
     if (
       (status === true && isOnline === true) ||
       (status === false &&

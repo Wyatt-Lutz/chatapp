@@ -47,7 +47,7 @@ const ConfirmPassModal = ({
           <CloseModal />
         </button>
 
-        <h2 className="mb-2 text-xl font-semibold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+        <h2 className="mb-2 text-xl font-semibold bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
           {modalHeader}
         </h2>
         <p className="text-sm text-zinc-400 mb-4">{modalText}</p>

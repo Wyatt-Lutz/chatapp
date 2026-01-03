@@ -48,7 +48,7 @@ const BlockedUsersModal = ({ changeDisplayment }) => {
           <CloseModal />
         </button>
 
-        <h2 className="mb-4 text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+        <h2 className="mb-4 text-2xl font-bold bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
           Blocked Users
         </h2>
 
@@ -63,20 +63,20 @@ const BlockedUsersModal = ({ changeDisplayment }) => {
                 className="flex items-center gap-4 p-3 bg-zinc-700/40 rounded-md hover:bg-zinc-700/30 transition"
                 key={user.uid}
               >
-                <div className="h-14 w-14 rounded-full overflow-hidden flex-shrink-0">
+                <div className="h-14 w-14 rounded-full overflow-hidden shrink-0">
                   <img
                     className="h-full w-full object-cover"
                     src={user.profilePictureURL}
                     alt={user.username}
                   />
                 </div>
-                <div className="flex-grow">
+                <div className="grow">
                   <div className="font-medium text-zinc-100">
                     {user.username}
                   </div>
                   <div className="text-xs text-zinc-400">{user.email}</div>
                 </div>
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <button
                     onClick={() => unBlockUser(user.uid)}
                     className="px-4 py-2 text-sm bg-rose-600 text-white rounded-md hover:bg-rose-500 transition"

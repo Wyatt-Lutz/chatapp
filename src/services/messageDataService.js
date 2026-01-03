@@ -88,14 +88,23 @@ export const addMessage = async (
  * @param {String} chatID - ID of the chatroom
  */
 const updateUnreadCount = async (db, chatID, memberData) => {
-  const transformedMemberData = [...memberData.entries()];
+  const memberDataArray =
+    memberData instanceof Map
+      ? [...memberData.entries()]
+      : Array.isArray(memberData)
+        ? memberData
+        : Object.entries(memberData);
+
+  const transformedMemberData = memberDataArray.filter(
+    ([_, memberData]) => !memberData.isRemoved,
+  );
   const offlineMembers = await fetchMembersByStatus(
     transformedMemberData,
     false,
   );
-
   await Promise.all(
     offlineMembers.map((uid) => {
+      ("uid: ", uid);
       update(ref(db, `users/${uid}/chatsIn`), { [`${chatID}`]: increment(1) });
     }),
   );

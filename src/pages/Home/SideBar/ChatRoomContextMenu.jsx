@@ -11,8 +11,8 @@ const ChatRoomContextMenu = ({ contextMenuData, setContextMenu, points }) => {
   return (
     <div>
       <div
-        className="fixed bg-zinc-800/95 border border-zinc-700 shadow-lg p-2 rounded-md text-sm z-50"
-        style={{ top: points.y, left: points.x }}
+        className="fixed bg-zinc-800/95 border border-zinc-700 shadow-lg p-2 rounded-md text-sm"
+        style={{ top: `${points.y}px`, left: `${points.x}px`, zIndex: 9999 }}
       >
         <button
           onClick={onLeaveGroupChat}
