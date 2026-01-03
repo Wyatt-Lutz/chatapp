@@ -135,7 +135,7 @@ const UserSearch = ({ addedUsers, setAddedUsers, previousUsers = null }) => {
         </div>
       ) : searchedUsername.trim() ? (
         <div className="text-center py-8 text-zinc-400 text-sm">
-          <p>No users found matching "{searchedUsername}"</p>
+          <p>No users found matching &quot;{searchedUsername}&quot;</p>
         </div>
       ) : (
         <div className="text-center py-8 text-zinc-500 text-sm">

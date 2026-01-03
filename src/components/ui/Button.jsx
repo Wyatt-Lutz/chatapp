@@ -1,5 +1,3 @@
-import React from "react";
-
 const VARIANT_CLASSES = {
   primary: "bg-accent text-white hover:opacity-90",
   secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",

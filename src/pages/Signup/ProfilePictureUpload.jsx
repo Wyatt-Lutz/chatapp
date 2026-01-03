@@ -8,7 +8,7 @@ import { showToast } from "../../services/toastService";
 
 const ProfilePictureUpload = ({ userData }) => {
   const navigate = useNavigate();
-  const { uid, photoURL } = userData.userCredential.user;
+  const { photoURL } = userData.userCredential.user;
   const [profilePicture, setProfilePicture] = useState(photoURL);
   const [isChangingPicture, setIsChangingPicture] = useState(false);
 

@@ -64,6 +64,7 @@ export const changeUsername = async (
       displayName: newUsername,
     });
   } catch (error) {
+    console.error(error);
     await rollBackPublicUsernameData(db, newUsername, oldUsername);
   }
 };

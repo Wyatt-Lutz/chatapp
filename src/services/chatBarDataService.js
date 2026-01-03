@@ -7,6 +7,7 @@ import {
   remove,
 } from "firebase/database";
 import { fetchMembersFromChat } from "./memberDataService";
+import { addMessage } from "./messageDataService";
 
 export const createChat = async (
   db,

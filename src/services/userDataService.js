@@ -10,7 +10,6 @@ import {
   update,
   runTransaction,
   remove,
-  orderByKey,
 } from "firebase/database";
 
 export const fetchUserDataByEmail = async (db, email) => {

@@ -1,5 +1,3 @@
-import React from "react";
-
 const Card = ({ title, description, children, className = "", actions }) => {
   return (
     <div

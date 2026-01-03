@@ -5,7 +5,6 @@ import { fetchOlderChats } from "../../../../services/messageDataService";
 import { useChatContexts } from "../../../../hooks/useContexts";
 import { useAuth } from "../../../../context/providers/AuthContext";
 import { useContextMenu } from "../../../../hooks/useContextMenu";
-import DownArrow from "../../../../components/ui/DownArrow";
 import Message from "./Message";
 import Input from "./Input";
 import MessagesContextMenu from "./MessagesContextMenu";
@@ -122,12 +121,6 @@ const Messages = ({ isSidebarCollapsed }) => {
 
   const changeEditState = (id, state) => {
     setEditState((prev) => ({ ...prev, [id]: state }));
-  };
-
-  const scrollToBottom = () => {
-    if (lastMessageRef.current && !isAtBottom) {
-      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
-    }
   };
 
   const renderMessages = () => {

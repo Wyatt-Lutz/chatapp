@@ -1,4 +1,4 @@
-const Sidebar = ({ title, children, className, onCollapse, isCollapsed }) => {
+const Sidebar = ({ title, children, className, onCollapse }) => {
   return (
     <div
       className={`flex flex-col max-h-[86vh] md:max-h-[80vh] rounded-2xl border border-zinc-700/70 bg-zinc-900/60 backdrop-blur-sm shadow-lg ${className || ""}`}

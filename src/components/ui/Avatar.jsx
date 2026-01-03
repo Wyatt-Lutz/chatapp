@@ -1,5 +1,3 @@
-import React from "react";
-
 const Avatar = ({ size = 10, photoURL, name, className = "" }) => {
   const initials = (n = "") =>
     n
@@ -8,8 +6,6 @@ const Avatar = ({ size = 10, photoURL, name, className = "" }) => {
       .slice(0, 2)
       .join("")
       .toUpperCase();
-
-  const sizeClass = `w-${size} h-${size}`; // small helper; callers can pass sizes matching tailwind scale
 
   return (
     <div

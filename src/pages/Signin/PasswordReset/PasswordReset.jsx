@@ -44,7 +44,7 @@ const PasswordReset = ({ passChange }) => {
 
     localStorage.setItem(passwordCookieId, Date.now());
     setIsDisplayCheckEmail(true);
-    await sendPasswordResetEmail(auth, email).catch(() => {
+    await sendPasswordResetEmail(auth, email).catch((error) => {
       if (error.code === "auth/too-many-requests") {
         setPopup(
           "You are trying to send too many emails. Please check you email for the latest password reset email or wait a few minutes and reload the page before trying again.",
