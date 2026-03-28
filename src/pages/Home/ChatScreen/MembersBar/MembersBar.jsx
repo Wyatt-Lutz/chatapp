@@ -30,14 +30,12 @@ const MembersBar = () => {
             {[...members]
               .filter(([_, memberData]) => !memberData.isRemoved)
               .map(([memberUid, memberData]) => (
-                <div
+                <Member
                   key={memberUid}
-                  onContextMenu={(e) =>
-                    handleContextMenu(e, memberUid, memberData)
-                  }
-                >
-                  <Member memberUid={memberUid} memberData={memberData} />
-                </div>
+                  memberUid={memberUid}
+                  memberData={memberData}
+                  onContextMenu={handleContextMenu}
+                />
               ))}
           </>
         )}

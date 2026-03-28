@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { editMessage } from "../../../../services/messageDataService";
 import { calcTime } from "../../../../utils/messageUtils";
 import { useChatContexts } from "../../../../hooks/useContexts";
+import { useLongPress } from "../../../../hooks/useLongPress";
 import EnlargedImage from "../modals/EnlargedImage";
 import { useState } from "react";
 import { db } from "../../../../firebase";
@@ -20,6 +21,12 @@ const Message = ({
   const { register, handleSubmit, resetField } = useForm();
   const { chatState } = useChatContexts();
   const [isPictureEnlarged, setIsPictureEnlarged] = useState(false);
+
+  const messageLongPressHandlers = useLongPress((e) => {
+    if (onMessageContextMenu) {
+      onMessageContextMenu(e, messageUid, messageData);
+    }
+  });
 
   const onSubmitEdit = async ({ editMessageText }) => {
     resetField("editMessage");
@@ -156,6 +163,7 @@ const Message = ({
             onContextMenu={(e) =>
               onMessageContextMenu(e, messageUid, messageData)
             }
+            {...messageLongPressHandlers}
             className="mt-1"
           >
             {memberDataOfSender && memberDataOfSender.isBlocked ? (
