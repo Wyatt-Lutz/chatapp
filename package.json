@@ -16,7 +16,7 @@
     "emoji-picker-element": "^1.28.1",
     "firebase": "^12.7.0",
     "framer-motion": "^12.23.26",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "npm-check-updates": "^19.2.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
